@@ -1,0 +1,24 @@
+name: echo2-p1-tests
+services:
+  database:
+    image: pgvector/pgvector:0.8.2-pg17@sha256:feb68f4f15446397d8cac7f4fe48fe4586de83160d1fc48b46283312d1a33966
+    environment:
+      POSTGRES_USER: echo2
+      POSTGRES_PASSWORD: synthetic-test-password
+      POSTGRES_DB: echo2_test
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U echo2 -d echo2_test']
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    tmpfs: /var/lib/postgresql/data
+  tests:
+    build:
+      context: ..
+      target: development
+    environment:
+      TEST_DATABASE_URL: postgresql://echo2:synthetic-test-password@database:5432/echo2_test
+    depends_on:
+      database:
+        condition: service_healthy
+    command: ['npm', 'run', 'test:integration']

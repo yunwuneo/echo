@@ -1,0 +1,69 @@
+name: echo-push-relay
+services:
+  database:
+    image: pgvector/pgvector:0.8.2-pg17@sha256:feb68f4f15446397d8cac7f4fe48fe4586de83160d1fc48b46283312d1a33966
+    environment:
+      POSTGRES_USER: relay
+      POSTGRES_PASSWORD: ${RELAY_DATABASE_PASSWORD:?set RELAY_DATABASE_PASSWORD}
+      POSTGRES_DB: relay
+    volumes: ['relay_database:/var/lib/postgresql/data']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U relay -d relay']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  relay:
+    build:
+      context: ..
+    image: ${ECHO_IMAGE:-echo2-server:0.5.0}
+    command: ['node', 'dist/packages/push-relay/src/main.js']
+    environment:
+      DATABASE_URL: postgresql://relay:${RELAY_DATABASE_PASSWORD:?set RELAY_DATABASE_PASSWORD}@database:5432/relay
+      PUBLIC_URL: ${PUBLIC_URL:?set relay HTTPS origin}
+      RELAY_MASTER_KEY: ${RELAY_MASTER_KEY:?set separate 64-hex relay key}
+      APNS_TEAM_ID: ${APNS_TEAM_ID:?set team}
+      APNS_KEY_ID: ${APNS_KEY_ID:?set key ID}
+      APNS_TOPICS: ${APNS_TOPICS:?comma-separated app bundle IDs}
+      APNS_ENVIRONMENT: ${APNS_ENVIRONMENT:?sandbox or production}
+      APNS_KEY_FILE: /run/secrets/apns_key
+    secrets: [apns_key]
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+  proxy:
+    image: caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d
+    command:
+      [
+        'caddy',
+        'reverse-proxy',
+        '--from',
+        '${PUBLIC_URL:?set relay HTTPS origin}',
+        '--to',
+        'relay:3000',
+      ]
+    ports: ['80:80', '443:443', '443:443/udp']
+    volumes: ['relay_tls:/data', 'relay_config:/config']
+    depends_on:
+      relay:
+        condition: service_healthy
+    restart: unless-stopped
+secrets:
+  apns_key:
+    file: ${APNS_KEY_FILE:?path to private p8 file}
+volumes:
+  relay_database:
+  relay_tls:
+  relay_config:

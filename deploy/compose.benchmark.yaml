@@ -1,0 +1,36 @@
+name: echo2-p6-benchmark
+services:
+  database:
+    image: pgvector/pgvector:0.8.2-pg17@sha256:feb68f4f15446397d8cac7f4fe48fe4586de83160d1fc48b46283312d1a33966
+    cpus: 1
+    mem_limit: 2g
+    environment:
+      POSTGRES_USER: echo2
+      POSTGRES_PASSWORD: synthetic-benchmark-only
+      POSTGRES_DB: echo2_benchmark
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U echo2 -d echo2_benchmark']
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - benchmark-data:/var/lib/postgresql/data
+  benchmark:
+    build:
+      context: ..
+      target: development
+    image: echo2-server:p6-check
+    cpus: 1
+    mem_limit: 2g
+    environment:
+      BENCH_DATABASE_URL: postgresql://echo2:synthetic-benchmark-only@database:5432/echo2_benchmark
+      BENCH_MODE: ${BENCH_MODE:-capacity}
+      BENCH_SECONDS: ${BENCH_SECONDS:-600}
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ../.local/p6-benchmark:/app/.local/p6-benchmark
+    command: ['node', '--import', 'tsx', 'tests/performance/capacity.ts']
+volumes:
+  benchmark-data:

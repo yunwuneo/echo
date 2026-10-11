@@ -1,0 +1,11 @@
+.git
+node_modules
+dist
+.env
+.env.*
+.local
+DerivedData
+coverage
+**/.build
+**/.swiftpm
+**/xcuserdata

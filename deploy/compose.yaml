@@ -1,0 +1,87 @@
+name: echo2
+x-app: &app
+  build:
+    context: ..
+  image: ${ECHO_IMAGE:-echo2-server:0.5.0}
+  environment: &environment
+    DATABASE_URL: postgresql://echo2:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@database:5432/echo2
+    PUBLIC_URL: ${PUBLIC_URL:?set HTTPS PUBLIC_URL}
+    MASTER_KEY: ${MASTER_KEY:?set MASTER_KEY}
+    PUSH_RELAY_URL: ${PUSH_RELAY_URL:-}
+    MASTER_KEY_VERSION: ${MASTER_KEY_VERSION:-1}
+    FOREGROUND_DAILY_REQUEST_LIMIT: ${FOREGROUND_DAILY_REQUEST_LIMIT:-100}
+    BACKGROUND_DAILY_REQUEST_LIMIT: ${BACKGROUND_DAILY_REQUEST_LIMIT:-20}
+    BACKGROUND_DAILY_INPUT_LIMIT: ${BACKGROUND_DAILY_INPUT_LIMIT:-100000}
+    BACKGROUND_DAILY_OUTPUT_LIMIT: ${BACKGROUND_DAILY_OUTPUT_LIMIT:-10000}
+  depends_on:
+    database:
+      condition: service_healthy
+services:
+  database:
+    image: pgvector/pgvector:0.8.2-pg17@sha256:feb68f4f15446397d8cac7f4fe48fe4586de83160d1fc48b46283312d1a33966
+    environment:
+      POSTGRES_USER: echo2
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: echo2
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U echo2 -d echo2']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  migrate:
+    <<: *app
+    command: ['node', 'dist/packages/server/src/cli.js', 'migrate']
+    restart: 'no'
+  api:
+    <<: *app
+    depends_on:
+      database:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+  worker:
+    <<: *app
+    command: ['node', 'dist/packages/server/src/worker.js']
+    depends_on:
+      database:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ['CMD', 'node', 'dist/packages/server/src/healthcheck.js']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+  proxy:
+    image: caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:?set HTTPS PUBLIC_URL}
+    ports: ['80:80', '443:443', '443:443/udp']
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  database:
+  caddy_data:
+  caddy_config:
