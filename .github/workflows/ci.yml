@@ -1,0 +1,62 @@
+name: P6 checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.2-pg17
+        env:
+          POSTGRES_USER: echo2
+          POSTGRES_PASSWORD: synthetic-test-password
+          POSTGRES_DB: echo2_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U echo2 -d echo2_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql://echo2:synthetic-test-password@127.0.0.1:5432/echo2_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm install -g npm@11.9.0
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm run test:evals
+      - run: npm run contracts:check
+      - run: npm run build
+      - run: npm run release:prepare
+      - uses: actions/upload-artifact@v4
+        with:
+          name: echo-local-candidate
+          path: .local/releases/*.tar.gz*
+      - run: docker build -t echo2-server:ci .
+  apple:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test --package-path apps/apple/Packages/CompanionCore
+      - run: xcodebuild -project apps/apple/Companion.xcodeproj -scheme Companion-iOS -destination 'generic/platform=iOS Simulator' -derivedDataPath .local/ios CODE_SIGNING_ALLOWED=NO -skipPackagePluginValidation build
+      - run: xcodebuild -project apps/apple/Companion.xcodeproj -scheme Companion-macOS -destination 'platform=macOS' -derivedDataPath .local/macos CODE_SIGNING_ALLOWED=NO -skipPackagePluginValidation build
+
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
