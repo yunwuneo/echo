@@ -1,0 +1,88 @@
+name: Companion
+options:
+  minimumXcodeGenVersion: 2.46.0
+  deploymentTarget:
+    iOS: '18.0'
+    macOS: '15.0'
+settings:
+  base:
+    MARKETING_VERSION: 0.6.0
+    CURRENT_PROJECT_VERSION: 6
+    SWIFT_VERSION: '6.0'
+    SWIFT_STRICT_CONCURRENCY: complete
+    GENERATE_INFOPLIST_FILE: YES
+    ECHO_UI_BASE_URL: http://127.0.0.1:3012
+    APNS_ENVIRONMENT: sandbox
+    INFOPLIST_KEY_EchoPushEnvironment: $(APNS_ENVIRONMENT)
+    CODE_SIGNING_ALLOWED: NO
+packages:
+  CompanionCore:
+    path: Packages/CompanionCore
+targets:
+  Companion-iOS:
+    type: application
+    platform: iOS
+    sources: [Shared, iOS]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.echo2.companion.ios
+        CODE_SIGN_ENTITLEMENTS: iOS/Echo.entitlements
+        CODE_SIGNING_ALLOWED[sdk=iphonesimulator*]: YES
+        CODE_SIGN_IDENTITY[sdk=iphonesimulator*]: '-'
+        PRODUCT_NAME: Echo
+        INFOPLIST_KEY_CFBundleDisplayName: Echo
+        INFOPLIST_KEY_CFBundleName: Echo
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        TARGETED_DEVICE_FAMILY: '1,2'
+    dependencies:
+      - package: CompanionCore
+  Companion-macOS:
+    type: application
+    platform: macOS
+    sources: [Shared, macOS]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.echo2.companion.macos
+        CODE_SIGN_ENTITLEMENTS: macOS/Echo.entitlements
+        PRODUCT_NAME: Echo
+        INFOPLIST_KEY_CFBundleDisplayName: Echo
+        INFOPLIST_KEY_CFBundleName: Echo
+    dependencies:
+      - package: CompanionCore
+  Companion-iOS-UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: Companion-iOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.echo2.companion.ios.uitests
+        TEST_TARGET_NAME: Companion-iOS
+  Companion-macOS-UITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources: [UITests]
+    dependencies:
+      - target: Companion-macOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.echo2.companion.macos.uitests
+        TEST_TARGET_NAME: Companion-macOS
+schemes:
+  Companion-iOS:
+    build:
+      targets:
+        Companion-iOS: all
+    test:
+      environmentVariables:
+        ECHO2_UI_TEST_BASE_URL: $(ECHO_UI_BASE_URL)
+      targets: [Companion-iOS-UITests]
+  Companion-macOS:
+    build:
+      targets:
+        Companion-macOS: all
+    test:
+      environmentVariables:
+        ECHO2_UI_TEST_BASE_URL: $(ECHO_UI_BASE_URL)
+      targets: [Companion-macOS-UITests]
