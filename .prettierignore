@@ -1,0 +1,9 @@
+package-lock.json
+packages/contracts/openapi.json
+apps/apple/Companion.xcodeproj/
+docs/research.md
+dist/
+node_modules/
+.local/
+DerivedData/
+apps/apple/Packages/CompanionCore/Sources/CompanionCore/openapi.json

@@ -1,0 +1,16 @@
+{
+  "name": "@echo2/server",
+  "version": "0.6.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@echo2/contracts": "0.6.0",
+    "@fastify/swagger": "9.9.2",
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "fastify": "5.12.5",
+    "pg": "8.23.1",
+    "pg-boss": "12.37.1",
+    "re2-wasm": "1.0.2",
+    "undici": "8.11.2"
+  }
+}

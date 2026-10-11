@@ -1,0 +1,43 @@
+{
+  "name": "echo",
+  "version": "0.6.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "npm@11.9.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:evals": "node scripts/evals.mjs",
+    "contracts:generate": "node --import tsx scripts/contracts.ts",
+    "contracts:check": "node --import tsx scripts/contracts.ts --check",
+    "build": "tsc",
+    "dev:api": "node --import tsx packages/server/src/api.ts",
+    "dev:worker": "node --import tsx packages/server/src/worker.ts",
+    "db:migrate": "node --import tsx packages/server/src/cli.ts migrate",
+    "owner:init": "node --import tsx packages/server/src/cli.ts init",
+    "pairing:create": "node --import tsx packages/server/src/cli.ts pair",
+    "p1:seed": "node --import tsx packages/server/src/cli.ts seed",
+    "eval:models": "node --import tsx scripts/story-eval.ts",
+    "release:prepare": "node scripts/release.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@types/pg": "8.15.6",
+    "prettier": "3.9.9",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  },
+  "overrides": {
+    "esbuild": "0.28.1"
+  }
+}

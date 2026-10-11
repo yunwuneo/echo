@@ -1,0 +1,15 @@
+{
+  "entries": {
+    "0": {
+      "key": ["北塔"],
+      "content": "北塔亮蓝灯",
+      "comment": "灯塔",
+      "order": 50,
+      "position": 4,
+      "depth": 2,
+      "sticky": 2,
+      "cooldown": 1,
+      "delay": 0
+    }
+  }
+}
