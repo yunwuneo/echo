@@ -27,11 +27,18 @@ struct MemoryView: View {
           Button("记忆与嵌入设置") { settings = true }.disabled(status["settings"]["revision"].int == 0)
           Button("刷新整理状态") { Task { await refresh() } }
           if !status["index_error"].string.isEmpty {
-            Text("索引暂停：\(status["index_error"].string)").foregroundStyle(.orange)
+            Label(
+              userFacingFailure(code: status["index_error"].string),
+              systemImage: "exclamationmark.circle"
+            )
+            .foregroundStyle(Color.echo.warning).fixedSize(horizontal: false, vertical: true)
           }
           ForEach(Array(status["jobs"].array.enumerated()), id: \.offset) { _, job in
             if !job["error_code"].string.isEmpty {
-              Text("整理待处理：\(job["error_code"].string) · 尝试 \(job["attempts"].int) 次").font(.caption)
+              Text(
+                "\(userFacingFailure(code: job["error_code"].string)) 已尝试 \(job["attempts"].int) 次。"
+              )
+              .font(.caption).fixedSize(horizontal: false, vertical: true)
             }
           }
           Button("重试失败任务") {
@@ -39,7 +46,7 @@ struct MemoryView: View {
               do {
                 _ = try await model.continuity(action: "retry", id: world)
                 await refresh()
-              } catch { failure = error.localizedDescription }
+              } catch { failure = userFacingError(error) }
             }
           }
         }
@@ -58,8 +65,12 @@ struct MemoryView: View {
             }.accessibilityIdentifier("memory-item")
           }
         }
-        if let failure { Text(failure).foregroundStyle(.red) }
-      }.navigationTitle("记忆与来源")
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.scrollContentBackground(.hidden).background(Color.echo.surfaceSunken)
+        .navigationTitle("记忆与来源")
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("完成") { dismiss() } } }
         .task { await refresh() }
         .sheet(item: $editing, onDismiss: { Task { await refresh() } }) {
@@ -74,7 +85,7 @@ struct MemoryView: View {
     do {
       status = try await model.continuity(action: "status", id: world)
       failure = nil
-    } catch { failure = error.localizedDescription }
+    } catch { failure = userFacingError(error) }
   }
 }
 private func memoryLabel(_ memory: Record) -> String {
@@ -102,9 +113,14 @@ struct MemoryEditor: View {
     NavigationStack {
       Form {
         Section(memoryLabel(memory)) {
-          TextField("记忆内容", text: $content, axis: .vertical).lineLimit(3...10)
-            .accessibilityIdentifier("memory-content")
-          TextField("主题", text: $topic)
+          VStack(alignment: .leading, spacing: EchoSpacing.xs) {
+            Text("记忆内容").font(EchoFont.footnote).foregroundStyle(Color.echo.textSecondary)
+            TextField("写下希望记住的内容", text: $content, axis: .vertical).lineLimit(3...10)
+              .accessibilityLabel("记忆内容").accessibilityIdentifier("memory-content")
+          }
+          LabeledContent("主题") {
+            TextField("用一句话概括", text: $topic).multilineTextAlignment(.trailing)
+          }
           Toggle("固定为核心记忆", isOn: $pinned)
           Picker("替代另一条记忆", selection: $supersedes) {
             Text("不替代").tag("")
@@ -152,8 +168,12 @@ struct MemoryEditor: View {
             "forget-memory")
           Text("忘记后，来源及其派生内容不再参与召回或自动提取。删除原文还会清除相关聊天内容。").font(.caption).foregroundStyle(.secondary)
         }
-        if let failure { Text(failure).foregroundStyle(.red) }
-      }.formStyle(.grouped).navigationTitle("记忆详情")
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.formStyle(.grouped).toggleStyle(.switch).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("记忆详情")
         .toolbar {
           ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }
           ToolbarItem(placement: .confirmationAction) {
@@ -167,7 +187,7 @@ struct MemoryEditor: View {
           pinned = memory["pinned"].bool
           audience = Set(memory["audience_actor_ids"].array.map(\.string))
           do { revisions = try await model.continuity(action: "revisions", id: memory.id) } catch {
-            failure = error.localizedDescription
+            failure = userFacingError(error)
           }
         }
         .confirmationDialog(
@@ -200,7 +220,7 @@ struct MemoryEditor: View {
         _ = try await model.continuity(
           action: action, id: id, revision: memory["revision"].int, body: body)
         dismiss()
-      } catch { failure = error.localizedDescription }
+      } catch { failure = userFacingError(error) }
     }
   }
 }
@@ -217,17 +237,35 @@ struct MemorySettingsView: View {
   var body: some View {
     NavigationStack {
       Form {
-        Toggle("自动整理长期记忆", isOn: $enabled)
-        Text("使用房间的聊天模型，受全实例后台预算限制。失败不影响聊天。默认每日 20 次请求、10 万输入与 1 万输出额度，由服务器配置。").font(.caption)
-        Picker("嵌入模型连接", selection: $provider) {
-          Text("不启用，使用词项召回").tag("")
-          ForEach(model.providers) { Text($0.name).tag($0.id) }
+        Section("自动整理") {
+          Toggle("自动整理长期记忆", isOn: $enabled)
+          Text("使用房间的聊天模型，受全实例后台预算限制。失败不影响聊天。默认每日 20 次请求、10 万输入与 1 万输出额度，由服务器配置。").font(.caption)
         }
-        if !provider.isEmpty { TextField("模型向量维度", value: $dimensions, format: .number) }
-        Text("嵌入连接必须支持 embeddings 接口。修改连接或维度会重建索引；重建期间保留词项召回。").font(.caption).foregroundStyle(
-          .secondary)
-        if let failure { Text(failure).foregroundStyle(.red) }
-      }.formStyle(.grouped).navigationTitle("记忆设置")
+        Section("回忆检索") {
+          Picker("嵌入模型连接", selection: $provider) {
+            Text("不启用，使用词项召回").tag("")
+            ForEach(model.providers) { Text($0.name).tag($0.id) }
+          }
+          if !provider.isEmpty {
+            LabeledContent("模型向量维度") {
+              TextField("1–4,096", value: $dimensions, format: .number)
+                .monospacedDigit().multilineTextAlignment(.trailing)
+              Text("维").foregroundStyle(Color.echo.textSecondary)
+            }
+            if !(1...4096).contains(dimensions) {
+              Label("请填写 1–4,096 之间的向量维度。", systemImage: "exclamationmark.circle")
+                .font(EchoFont.caption).foregroundStyle(Color.echo.error)
+            }
+          }
+          Text("嵌入连接必须支持 embeddings 接口。修改连接或维度会重建索引；重建期间保留词项召回。").font(.caption).foregroundStyle(
+            .secondary)
+        }
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.formStyle(.grouped).toggleStyle(.switch).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("记忆设置")
         .toolbar {
           ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }
           ToolbarItem(placement: .confirmationAction) {
@@ -244,7 +282,7 @@ struct MemorySettingsView: View {
                       "embedding_dimensions": .number(Double(provider.isEmpty ? 0 : dimensions)),
                     ]))
                   dismiss()
-                } catch { failure = error.localizedDescription }
+                } catch { failure = userFacingError(error) }
               }
             }.disabled(busy || (!provider.isEmpty && !(1...4096).contains(dimensions)))
           }
@@ -253,7 +291,7 @@ struct MemorySettingsView: View {
           enabled = initial["enabled"].bool
           provider = initial["embedding_provider_id"].string
           dimensions = initial["embedding_dimensions"].int
-          do { try await model.refreshSettings() } catch { failure = error.localizedDescription }
+          do { try await model.refreshSettings() } catch { failure = userFacingError(error) }
         }
     }.frame(minWidth: 320, idealWidth: 560, minHeight: 420)
   }

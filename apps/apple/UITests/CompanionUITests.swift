@@ -11,6 +11,198 @@ import XCTest
     XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
     return try JSONSerialization.jsonObject(with: data) as! [String: Any]
   }
+  // Completion is server state; ordinary messages intentionally have no visible completion label.
+  private func completedConversation(marker: String, replies: Int) async throws -> (
+    user: String, reply: String
+  ) {
+    let deadline = Date().addingTimeInterval(40)
+    while Date() < deadline {
+      let messages = try await control("state")["messages"] as? [[String: Any]] ?? []
+      if let index = messages.firstIndex(where: { ($0["content"] as? String) == marker }),
+        messages[index]["status"] as? String == "completed"
+      {
+        let response = messages.dropFirst(index + 1).prefix { ($0["role"] as? String) != "user" }
+          .filter {
+            ($0["role"] as? String) == "assistant" && ($0["status"] as? String) == "completed"
+          }
+        if response.count >= replies, let reply = response.last?["id"] as? String {
+          return (messages[index]["id"] as! String, reply)
+        }
+      }
+      try await Task.sleep(for: .seconds(1))
+    }
+    XCTFail("Expected a persisted message and \(replies) completed replies for \(marker)")
+    throw NSError(domain: "EchoUITest", code: 1)
+  }
+
+  private func attach(_ app: XCUIApplication, name: String) {
+    let shot = XCTAttachment(screenshot: app.screenshot())
+    shot.name = name
+    shot.lifetime = .keepAlways
+    add(shot)
+  }
+
+  private func designApp(dark: Bool = false, large: Bool = false) async throws -> XCUIApplication {
+    _ = try await control("online", method: "POST")
+    let code = try await control("code")["code"] as! String
+    let app = XCUIApplication()
+    app.launchEnvironment["ECHO2_UI_TEST_URL"] = base.absoluteString
+    app.launchEnvironment["ECHO2_UI_TEST_CODE"] = code
+    app.launchEnvironment["ECHO2_UI_TEST_RESET"] = "1"
+    app.launchEnvironment["ECHO2_UI_TEST_DRAFT"] = ""
+    if dark { app.launchEnvironment["ECHO2_UI_TEST_DARK"] = "1" }
+    app.launchArguments = [
+      "-AppleLanguages", "(zh-Hans)", "-AppleLocale", "zh_CN",
+      "-AppleInterfaceStyle", dark ? "Dark" : "Light",
+    ]
+    if large {
+      app.launchArguments += [
+        "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL",
+      ]
+    }
+    app.launch()
+    let pair = app.buttons["配对"]
+    // A grouped Form can keep rows outside the accessibility tree until scrolled into view.
+    _ = pair.waitForExistence(timeout: 3)
+    for _ in 0..<8 {
+      if pair.exists && pair.isHittable { break }
+      let form = app.scrollViews.firstMatch
+      if form.exists { form.swipeUp() } else { app.swipeUp() }
+    }
+    if !pair.exists || !pair.isHittable { attach(app, name: "UI 优化 · 配对定位失败现场") }
+    XCTAssertTrue(pair.exists && pair.isHittable)
+    pair.tap()
+    XCTAssertTrue(app.buttons["设置"].firstMatch.waitForExistence(timeout: 20))
+    app.launchEnvironment.removeValue(forKey: "ECHO2_UI_TEST_RESET")
+    return app
+  }
+
+  private func openDesignRoom(_ app: XCUIApplication, name: String) {
+    let room = app.buttons[name].firstMatch
+    let title = app.staticTexts[name].firstMatch
+    XCTAssertTrue(title.waitForExistence(timeout: 20) || room.exists)
+    if room.exists { room.tap() } else { title.tap() }
+    XCTAssertTrue(app.descendants(matching: .any)["chat-input"].waitForExistence(timeout: 10))
+  }
+
+  private func sendDesignMessage(_ app: XCUIApplication, marker: String, replies: Int) async throws
+    -> String
+  {
+    let input = app.descendants(matching: .any)["chat-input"].firstMatch
+    input.tap()
+    input.typeText(marker)
+    app.buttons["send-message"].tap()
+    let state = try await completedConversation(marker: marker, replies: replies)
+    let reply = app.descendants(matching: .any)["message-" + state.reply]
+    XCTAssertTrue(reply.waitForExistence(timeout: 20))
+    // Existence alone also succeeds for messages laid out behind the navigation bar.
+    // Do not scroll here: sending should reveal the latest reply without manual intervention.
+    let visibilityDeadline = Date().addingTimeInterval(5)
+    while Date() < visibilityDeadline && !reply.isHittable {
+      try await Task.sleep(for: .milliseconds(250))
+    }
+    if !reply.isHittable { attach(app, name: "UI 优化 · 最新回复未显示") }
+    XCTAssertTrue(reply.isHittable, "Latest reply must be visible after sending")
+    return state.reply
+  }
+
+  func testUIRefreshLightChatAndForms() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      let app = try await designApp()
+      attach(app, name: "UI 优化 · 浅色会话列表")
+      openDesignRoom(app, name: "阿岚私聊")
+      let reply = try await sendDesignMessage(
+        app, marker: "今天也想分享一个小故事-" + UUID().uuidString.prefix(6), replies: 1)
+      XCTAssertFalse(app.buttons["谁来回应 · 自动"].exists)
+      XCTAssertFalse(app.staticTexts["已完成"].exists)
+      XCTAssertFalse(app.buttons["换一种回答"].exists)
+      attach(app, name: "UI 优化 · 浅色一对一聊天")
+      app.descendants(matching: .any)["message-" + reply].press(forDuration: 1)
+      XCTAssertTrue(app.buttons["换一种回答"].waitForExistence(timeout: 5))
+      XCTAssertTrue(app.buttons["复制"].exists)
+      attach(app, name: "UI 优化 · 回复长按菜单")
+      app.terminate()
+      app.launch()
+      openDesignRoom(app, name: "舰桥群聊")
+      _ = try await sendDesignMessage(
+        app, marker: "大家今天过得怎么样-" + UUID().uuidString.prefix(6), replies: 3)
+      XCTAssertTrue(app.buttons["谁来回应 · 自动"].exists)
+      attach(app, name: "UI 优化 · 浅色三角色群聊")
+      app.buttons["聊天选项"].tap()
+      app.buttons["主动消息设置"].tap()
+      XCTAssertTrue(app.switches["autonomy-enabled"].waitForExistence(timeout: 10))
+      attach(app, name: "UI 优化 · 主动消息设置")
+      let daily = app.staticTexts["每日请求次数"].firstMatch
+      for _ in 0..<6 where !daily.isHittable { app.swipeUp() }
+      XCTAssertTrue(daily.isHittable)
+      let inputBudget = app.staticTexts["每日输入上限"].firstMatch
+      for _ in 0..<6 where !inputBudget.isHittable { app.swipeUp() }
+      XCTAssertTrue(inputBudget.isHittable)
+      XCTAssertTrue(app.buttons["save-autonomy"].isHittable)
+      attach(app, name: "UI 优化 · 带标签的每日预算")
+    #endif
+  }
+
+  func testUIRefreshDarkChat() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      let app = try await designApp(dark: true)
+      openDesignRoom(app, name: "阿岚私聊")
+      _ = try await sendDesignMessage(
+        app, marker: "夜深了，晚安-" + UUID().uuidString.prefix(6), replies: 1)
+      XCTAssertFalse(app.staticTexts["已完成"].exists)
+      attach(app, name: "UI 优化 · 深色一对一聊天")
+    #endif
+  }
+
+  func testUIRefreshLargeText() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      let app = try await designApp(dark: true, large: true)
+      attach(app, name: "UI 优化 · 深色最大动态字体列表")
+      openDesignRoom(app, name: "阿岚私聊")
+      let replyID = try await sendDesignMessage(
+        app, marker: "大字阅读-" + UUID().uuidString.prefix(6), replies: 1)
+      XCTAssertTrue(app.buttons["send-message"].isHittable)
+      XCTAssertTrue(app.buttons["聊天选项"].isHittable)
+      attach(app, name: "UI 优化 · 深色最大动态字体聊天")
+      let history = app.scrollViews["chat-history"]
+      let returnToLatest = app.buttons["return-to-latest"]
+      for _ in 0..<3 where !returnToLatest.isHittable { history.swipeDown() }
+      XCTAssertTrue(
+        returnToLatest.isHittable, "Reading history must expose a way back to the latest message")
+      returnToLatest.tap()
+      let latest = app.descendants(matching: .any)["message-" + replyID]
+      let deadline = Date().addingTimeInterval(5)
+      while Date() < deadline && !latest.isHittable {
+        try await Task.sleep(for: .milliseconds(250))
+      }
+      XCTAssertTrue(latest.isHittable, "Return to latest must reveal the last reply")
+    #endif
+  }
+
+  func testUIRefreshLongDraftExplainsLimit() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      let app = try await designApp()
+      app.terminate()
+      app.launchEnvironment["ECHO2_UI_TEST_DRAFT"] = String(repeating: "字", count: 16_001)
+      app.launch()
+      openDesignRoom(app, name: "阿岚私聊")
+      let limit = app.staticTexts["message-length"]
+      XCTAssertTrue(limit.waitForExistence(timeout: 10))
+      XCTAssertEqual(limit.label, "超出 1 字，删减后可发送")
+      XCTAssertFalse(app.buttons["send-message"].isEnabled)
+      attach(app, name: "UI 优化 · 超长消息说明")
+      // Replace only this synthetic draft through the same DEBUG fixture hook.
+      app.terminate()
+      app.launchEnvironment["ECHO2_UI_TEST_DRAFT"] = ""
+      app.launch()
+      openDesignRoom(app, name: "阿岚私聊")
+      XCTAssertFalse(app.staticTexts["message-length"].exists)
+    #endif
+  }
   func testP6LargeTextDarkModeAccessibility() async throws {
     #if os(iOS)
       continueAfterFailure = false
@@ -21,7 +213,10 @@ import XCTest
       app.launchEnvironment["ECHO2_UI_TEST_CODE"] = code
       app.launchEnvironment["ECHO2_UI_TEST_RESET"] = "1"
       app.launchEnvironment["ECHO2_UI_TEST_DARK"] = "1"
-      app.launchArguments = ["-AppleLanguages", "(zh-Hans)", "-AppleLocale", "zh_CN", "-AppleInterfaceStyle", "Dark", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+      app.launchArguments = [
+        "-AppleLanguages", "(zh-Hans)", "-AppleLocale", "zh_CN", "-AppleInterfaceStyle", "Dark",
+        "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL",
+      ]
       app.launch()
       XCTAssertTrue(app.buttons["配对"].waitForExistence(timeout: 15))
       for _ in 0..<4 where !app.buttons["配对"].isHittable { app.swipeUp() }
@@ -116,7 +311,7 @@ import XCTest
     let link = app.staticTexts["舰桥群聊"].firstMatch
     XCTAssertTrue(link.waitForExistence(timeout: 20))
     if room.exists { room.tap() } else { link.tap() }
-    let composer = app.textFields["写下你的故事…"].firstMatch
+    let composer = app.textFields["chat-input"].firstMatch
     let textView = app.textViews.firstMatch
     #if os(macOS)
       let marker = "Mac联调-" + UUID().uuidString.prefix(6)
@@ -127,11 +322,14 @@ import XCTest
     XCTAssertTrue(input.waitForExistence(timeout: 10))
     input.tap()
     input.typeText(marker)
-    app.buttons["发送"].tap()
+    app.buttons["send-message"].tap()
+    let sent = try await completedConversation(marker: marker, replies: 3)
     XCTAssertTrue(
-      app.descendants(matching: .any).matching(
-        NSPredicate(format: "label CONTAINS %@ AND value == %@", marker, "已完成")
-      ).firstMatch.waitForExistence(timeout: 25))
+      app.descendants(matching: .any)["message-" + sent.user]
+        .descendants(matching: .staticText).matching(
+          NSPredicate(format: "label CONTAINS %@", marker)
+        )
+        .firstMatch.waitForExistence(timeout: 25))
     let chat = XCTAttachment(screenshot: app.screenshot())
     chat.name = "群聊回复与发言者"
     chat.lifetime = .keepAlways
@@ -139,10 +337,10 @@ import XCTest
     _ = try await control("offline", method: "POST")
     input.tap()
     input.typeText("离线-" + marker)
-    app.buttons["发送"].tap()
+    app.buttons["send-message"].tap()
     XCTAssertTrue(
       app.descendants(matching: .any).matching(
-        NSPredicate(format: "label CONTAINS %@", "待发送 · 尚未被服务器接收")
+        NSPredicate(format: "label CONTAINS %@", "已存到本机 · 联网后发送")
       )
       .firstMatch.waitForExistence(timeout: 10))
     app.terminate()
@@ -152,7 +350,7 @@ import XCTest
     if room.exists { room.tap() } else { link.tap() }
     XCTAssertTrue(
       app.descendants(matching: .any).matching(
-        NSPredicate(format: "label CONTAINS %@", "待发送 · 尚未被服务器接收")
+        NSPredicate(format: "label CONTAINS %@", "已存到本机 · 联网后发送")
       )
       .firstMatch.waitForExistence(timeout: 10))
     _ = try await control("online", method: "POST")
@@ -166,10 +364,13 @@ import XCTest
       try await Task.sleep(for: .seconds(1))
     }
     XCTAssertEqual(count, 1)
+    let received = try await completedConversation(marker: "离线-" + marker, replies: 3)
     XCTAssertTrue(
-      app.descendants(matching: .any).matching(
-        NSPredicate(format: "label CONTAINS %@ AND value == %@", "离线-" + marker, "已完成")
-      ).firstMatch.waitForExistence(timeout: 25))
+      app.descendants(matching: .any)["message-" + received.user]
+        .descendants(matching: .staticText).matching(
+          NSPredicate(format: "label CONTAINS %@", "离线-" + marker)
+        )
+        .firstMatch.waitForExistence(timeout: 25))
     let restored = XCTAttachment(screenshot: app.screenshot())
     restored.name = "重启恢复后的群聊"
     restored.lifetime = .keepAlways

@@ -81,21 +81,7 @@ public struct APIError: Error, LocalizedError, Sendable {
   public let status: Int
   public let code: String
   public var errorDescription: String? {
-    switch code {
-    case "maintenance": return "服务器正在维护，稍后可自动重连。"
-    case "push_disabled": return "服务器尚未配置通知中继。"
-    case "push_binding_mismatch": return "通知票据与此设备不匹配或已过期，请使用新邀请重新绑定。"
-    case "relay_rejected": return "通知中继拒绝了请求，请检查邀请、应用环境和票据有效期。"
-    case "notification_unavailable": return "这条通知的原文已删除或无法访问，请同步后查看最新动态。"
-    case "export_too_large": return "数据超过在线导出上限，请使用服务器备份工具。"
-    default: break
-    }
-    return switch status {
-    case 401: "设备会话失效，请重新配对。"
-    case 409: "服务器内容已更改；你的编辑已保留，请比较新版本后再保存。"
-    case 410: "正在重建本地缓存。"
-    default: "请求失败（\(code)）。"
-    }
+    userFacingFailure(code: code, status: status)
   }
 }
 public struct SSEFrame: Sendable {

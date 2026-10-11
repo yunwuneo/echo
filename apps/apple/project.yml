@@ -15,17 +15,20 @@ settings:
     APNS_ENVIRONMENT: sandbox
     INFOPLIST_KEY_EchoPushEnvironment: $(APNS_ENVIRONMENT)
     CODE_SIGNING_ALLOWED: NO
+    ASSETCATALOG_COMPILER_APPICON_NAME: ''
 packages:
   CompanionCore:
     path: Packages/CompanionCore
 targets:
   Companion-iOS:
     type: application
+    productName: Echo
     platform: iOS
     sources: [Shared, iOS]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.echo2.companion.ios
+        ASSETCATALOG_COMPILER_APPICON_NAME: ''
         CODE_SIGN_ENTITLEMENTS: iOS/Echo.entitlements
         CODE_SIGNING_ALLOWED[sdk=iphonesimulator*]: YES
         CODE_SIGN_IDENTITY[sdk=iphonesimulator*]: '-'
@@ -38,11 +41,13 @@ targets:
       - package: CompanionCore
   Companion-macOS:
     type: application
+    productName: Echo
     platform: macOS
     sources: [Shared, macOS]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.echo2.companion.macos
+        ASSETCATALOG_COMPILER_APPICON_NAME: ''
         CODE_SIGN_ENTITLEMENTS: macOS/Echo.entitlements
         PRODUCT_NAME: Echo
         INFOPLIST_KEY_CFBundleDisplayName: Echo

@@ -101,6 +101,15 @@ const room = await editEntity(db, owner, 'rooms', 'POST', {
   actor_ids: actors.map((a) => a.id),
   max_replies: 3,
 });
+// A private conversation exercises the same UI without group speaker controls.
+const directRoom = await editEntity(db, owner, 'rooms', 'POST', {
+  world_id: world.id,
+  name: '阿岚私聊',
+  kind: 'direct',
+  provider_id: provider.id,
+  actor_ids: [actors[0].id],
+  max_replies: 1,
+});
 const app = await buildApp(db, config);
 let offline = false;
 app.addHook('onRequest', async (req, reply) => {
@@ -109,6 +118,7 @@ app.addHook('onRequest', async (req, reply) => {
       error: { code: 'fixture_offline', message: 'Synthetic network outage' },
     });
 });
+app.get('/__test/design-room', async () => ({ room_id: directRoom.id }));
 app.get('/__test/code', async () => createPairingCode(db, owner));
 app.post('/__test/offline', async () => {
   offline = true;
@@ -302,7 +312,10 @@ app.get('/__test/state', async () => ({
   model_calls: mock.calls,
 }));
 const worker = await startWorker(db, config);
-await app.listen({ port: 3000, host: '0.0.0.0' });
+await app.listen({
+  port: Number(process.env.ECHO_UI_PORT ?? '3000'),
+  host: process.env.ECHO_UI_HOST ?? '0.0.0.0',
+});
 await writeFile(
   '/tmp/p2-ui-ready.json',
   JSON.stringify({ room_id: room.id, world_id: world.id }),

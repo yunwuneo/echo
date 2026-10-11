@@ -5,6 +5,8 @@ import SwiftUI
   import UIKit
   struct JSONSourceEditor: UIViewRepresentable {
     @Binding var text: String
+    var accessibilityTitle = "角色卡或世界书 JSON"
+    var identifier = "import-json"
     func makeCoordinator() -> Coordinator { Coordinator(self) }
     func makeUIView(context: Context) -> UITextView {
       let view = UITextView()
@@ -16,8 +18,8 @@ import SwiftUI
       view.smartDashesType = .no
       view.autocorrectionType = .no
       view.autocapitalizationType = .none
-      view.accessibilityLabel = "角色卡或世界书 JSON"
-      view.accessibilityIdentifier = "import-json"
+      view.accessibilityLabel = accessibilityTitle
+      view.accessibilityIdentifier = identifier
       return view
     }
     func updateUIView(_ view: UITextView, context: Context) {
@@ -34,10 +36,15 @@ import SwiftUI
   import AppKit
   struct JSONSourceEditor: NSViewRepresentable {
     @Binding var text: String
+    var accessibilityTitle = "角色卡或世界书 JSON"
+    var identifier = "import-json"
     func makeCoordinator() -> Coordinator { Coordinator(self) }
     func makeNSView(context: Context) -> NSScrollView {
       let scroll = NSTextView.scrollableTextView()
       let view = scroll.documentView as! NSTextView
+      scroll.drawsBackground = false
+      view.drawsBackground = false
+      view.textColor = .labelColor
       view.delegate = context.coordinator
       view.font = .systemFont(ofSize: NSFont.systemFontSize)
       view.isRichText = false
@@ -45,8 +52,8 @@ import SwiftUI
       view.isAutomaticDashSubstitutionEnabled = false
       view.isAutomaticTextReplacementEnabled = false
       view.isAutomaticSpellingCorrectionEnabled = false
-      view.setAccessibilityLabel("角色卡或世界书 JSON")
-      view.setAccessibilityIdentifier("import-json")
+      view.setAccessibilityLabel(accessibilityTitle)
+      view.setAccessibilityIdentifier(identifier)
       return scroll
     }
     func updateNSView(_ scroll: NSScrollView, context: Context) {

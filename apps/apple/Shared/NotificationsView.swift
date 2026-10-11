@@ -105,50 +105,63 @@ struct NotificationsView: View {
   @State private var status: JSONValue = .null
   @State private var invitation = ""
   @State private var busy = false
+  @State private var failure: String?
   private var push: PushCoordinator { .shared }
   var body: some View {
     NavigationStack {
       Form {
         Section("系统通知") {
-          Text(status["enabled"].bool ? "此设备已开启通知" : "此设备未开启通知")
-          Text("通知只显示通用文案。聊天与剧情始终保存在你的服务器，打开 App 后同步。").font(.caption)
-          if status["available"].bool {
-            Text(status["relay_url"].string).font(.caption).textSelection(.enabled)
-            Button("允许系统通知") {
-              Task { do { try await push.authorize() } catch { model.report(error) } }
-            }
-            if !push.token.isEmpty { Text("已取得设备推送地址").foregroundStyle(.secondary) }
-            if let error = push.registrationError { Text(error).foregroundStyle(.orange) }
-            SecureField("中继一次性邀请", text: $invitation)
-            Button("绑定或续期此设备") {
-              busy = true
-              Task {
-                defer { busy = false }
-                do {
-                  try await model.bindPush(
-                    invitation: invitation.trimmingCharacters(in: .whitespacesAndNewlines),
-                    apnsToken: push.token, topic: Bundle.main.bundleIdentifier ?? "",
-                    environment: Bundle.main.object(forInfoDictionaryKey: "EchoPushEnvironment")
-                      as? String ?? "sandbox")
-                  invitation = ""
-                  status = try await model.operations(action: "notifications")
-                } catch { model.report(error) }
-              }
-            }.disabled(busy || invitation.isEmpty || push.token.isEmpty)
-            if status["enabled"].bool {
-              Text("到期时间：\(status["expires_at"].string)").font(.caption)
-              Button("关闭此设备通知", role: .destructive) {
+          if status == .null {
+            if failure == nil { ProgressView("正在读取通知设置…") }
+          } else {
+            Text(status["enabled"].bool ? "此设备已开启通知" : "此设备未开启通知")
+            Text("通知只显示通用文案。聊天与剧情始终保存在你的服务器，打开 App 后同步。").font(.caption)
+            if status["available"].bool {
+              Text(status["relay_url"].string).font(.caption).textSelection(.enabled)
+              Button("允许系统通知") {
                 Task {
-                  do {
-                    try await model.disablePush()
-                    status = try await model.operations(action: "notifications")
-                  } catch { model.report(error) }
+                  do { try await push.authorize() } catch { failure = userFacingError(error) }
                 }
               }
+              if !push.token.isEmpty { Text("已取得设备推送地址").foregroundStyle(.secondary) }
+              if let error = push.registrationError {
+                Label(error, systemImage: "exclamationmark.circle").foregroundStyle(
+                  Color.echo.warning
+                )
+                .fixedSize(horizontal: false, vertical: true)
+              }
+              LabeledContent("中继一次性邀请") { SecureField("填写邀请", text: $invitation) }
+              Button("绑定或续期此设备") {
+                busy = true
+                Task {
+                  defer { busy = false }
+                  do {
+                    try await model.bindPush(
+                      invitation: invitation.trimmingCharacters(in: .whitespacesAndNewlines),
+                      apnsToken: push.token, topic: Bundle.main.bundleIdentifier ?? "",
+                      environment: Bundle.main.object(forInfoDictionaryKey: "EchoPushEnvironment")
+                        as? String ?? "sandbox")
+                    invitation = ""
+                    status = try await model.operations(action: "notifications")
+                  } catch { failure = userFacingError(error) }
+                }
+              }.disabled(busy || invitation.isEmpty || push.token.isEmpty)
+              if status["enabled"].bool {
+                Text("到期时间：\(status["expires_at"].string)").font(.caption)
+                Button("关闭此设备通知", role: .destructive) {
+                  Task {
+                    do {
+                      try await model.disablePush()
+                      status = try await model.operations(action: "notifications")
+                    } catch { failure = userFacingError(error) }
+                  }
+                }
+              }
+            } else {
+              Text("服务器尚未配置通知中继，仍可正常聊天与同步。").foregroundStyle(.secondary)
             }
-          } else {
-            Text("服务器尚未配置通知中继，仍可正常聊天与同步。").foregroundStyle(.secondary)
           }
+          Button("刷新通知设置") { Task { await refresh() } }
         }
         Section("最近投递") {
           Text("“已受理”表示中继取得 APNs 接受响应，不代表设备已显示。系统可能延迟或抑制通知。").font(.caption)
@@ -157,18 +170,25 @@ struct NotificationsView: View {
               .caption)
           }
         }
-      }.formStyle(.grouped).navigationTitle("通知")
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.formStyle(.grouped).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("通知")
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
             Button("完成") { dismiss() }.accessibilityIdentifier("close-notifications")
           }
         }
-        .task {
-          do { status = try await model.operations(action: "notifications") } catch {
-            model.report(error)
-          }
-        }
+        .task { await refresh() }
     }.frame(minWidth: 320, idealWidth: 560, minHeight: 460)
+  }
+  private func refresh() async {
+    do {
+      status = try await model.operations(action: "notifications")
+      failure = nil
+    } catch { failure = userFacingError(error) }
   }
   private func stateName(_ state: String) -> String {
     [

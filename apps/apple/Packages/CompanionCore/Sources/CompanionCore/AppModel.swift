@@ -374,6 +374,6 @@ import Observation
     try await refreshSettings()
   }
   public func report(_ failure: any Error) {
-    error = APIConnection.apiError(failure)?.localizedDescription ?? failure.localizedDescription
+    error = userFacingError(failure)
   }
 }

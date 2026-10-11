@@ -21,13 +21,19 @@ struct MCPView: View {
             .font(.caption).foregroundStyle(.secondary)
           ForEach(model.items("mcp_connection")) { connection in
             VStack(alignment: .leading, spacing: 8) {
-              Button(connection.name) { editing = connection }
+              Button {
+                editing = connection
+              } label: {
+                EchoSettingsRow(
+                  title: connection.name, subtitle: "编辑连接与认证", symbol: "puzzlepiece.extension",
+                  color: Color.echo.slate)
+              }
               Text(connection["url"].string).font(.caption)
               Text(connection["enabled"].bool ? "已启用" : "已停用").font(.caption)
               Button("发现工具") {
                 Task {
                   do { _ = try await model.autonomy(action: "discover", id: connection.id) } catch {
-                    failure = error.localizedDescription
+                    failure = userFacingError(error)
                   }
                 }
               }
@@ -57,7 +63,7 @@ struct MCPView: View {
                 Button("撤销授权", role: .destructive) {
                   Task {
                     do { _ = try await model.autonomy(action: "revokeGrant", id: grant.id) } catch {
-                      failure = error.localizedDescription
+                      failure = userFacingError(error)
                     }
                   }
                 }
@@ -67,8 +73,12 @@ struct MCPView: View {
             }
           }
         }
-        if let failure { Text(failure).foregroundStyle(.red) }
-      }.buttonStyle(.borderless).navigationTitle("MCP 连接与授权")
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.buttonStyle(.borderless).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("MCP 连接与授权")
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("完成") { dismiss() } } }
         .sheet(isPresented: $adding) { MCPConnectionEditor(model: model, existing: nil) }
         .sheet(item: $editing) { MCPConnectionEditor(model: model, existing: $0) }
@@ -93,27 +103,55 @@ struct MCPConnectionEditor: View {
   var body: some View {
     NavigationStack {
       Form {
-        TextField("名称", text: $name)
-        TextField("服务地址", text: $url).autocorrectionDisabled()
-        Picker("协议", selection: $transport) {
-          Text("Streamable HTTP").tag("streamable_http")
-          Text("旧 SSE").tag("sse")
+        Section("连接信息") {
+          LabeledContent("名称") {
+            TextField("给连接起个名字", text: $name).multilineTextAlignment(.trailing)
+          }
+          LabeledContent("服务地址") {
+            TextField("https://example.com/mcp", text: $url).autocorrectionDisabled()
+              .multilineTextAlignment(.trailing)
+          }
+          Picker("协议", selection: $transport) {
+            Text("Streamable HTTP").tag("streamable_http")
+            Text("旧 SSE").tag("sse")
+          }
+          Toggle("启用连接", isOn: $enabled)
         }
-        Toggle("启用连接", isOn: $enabled)
-        Picker("认证", selection: $auth) {
-          Text("无需认证").tag("none")
-          Text("Bearer").tag("bearer")
-          Text("API Key").tag("api_key")
+        Section("认证方式") {
+          Picker("认证", selection: $auth) {
+            Text("无需认证").tag("none")
+            Text("Bearer").tag("bearer")
+            Text("API Key").tag("api_key")
+          }
+          if auth == "api_key" {
+            LabeledContent("密钥请求头") {
+              TextField("X-API-Key", text: $header).autocorrectionDisabled()
+                .multilineTextAlignment(.trailing)
+            }
+          }
+          if auth != "none" {
+            LabeledContent("凭据") {
+              SecureField(existing == nil ? "填写连接凭据" : "地址未变时可留空", text: $credential)
+            }
+          }
         }
-        if auth == "api_key" { TextField("密钥请求头", text: $header).autocorrectionDisabled() }
-        if auth != "none" {
-          SecureField(existing == nil ? "凭据" : "新凭据（地址未变时可留空）", text: $credential)
+        Section {
+          LabeledContent("允许的内网 IP") {
+            TextField("用逗号分隔", text: $addresses).autocorrectionDisabled()
+              .multilineTextAlignment(.trailing)
+          }
+        } header: {
+          Text("网络权限")
+        } footer: {
+          Text("默认只允许公共 HTTPS。需要内网服务时，在此列出该连接允许的精确 IP；云元数据和 link-local 地址始终禁止。")
+            .fixedSize(horizontal: false, vertical: true)
         }
-        TextField("允许的内网 IP（逗号分隔）", text: $addresses).autocorrectionDisabled()
-        Text("默认只允许公共 HTTPS。需要内网服务时，在此列出该连接允许的精确 IP；云元数据和 link-local 地址始终禁止。")
-          .font(.caption).foregroundStyle(.secondary)
-        if let failure { Text(failure).foregroundStyle(.red) }
-      }.navigationTitle("MCP 连接")
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.formStyle(.grouped).toggleStyle(.switch).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("MCP 连接")
         .toolbar {
           ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }
           ToolbarItem(placement: .confirmationAction) {
@@ -147,7 +185,7 @@ struct MCPConnectionEditor: View {
         action: existing == nil ? "createConnection" : "updateConnection", id: existing?.id ?? "",
         revision: existing?["revision"].int ?? 1, body: body)
       dismiss()
-    } catch { failure = error.localizedDescription }
+    } catch { failure = userFacingError(error) }
   }
 }
 struct ToolGrantEditor: View {
@@ -200,13 +238,20 @@ struct ToolGrantEditor: View {
         Section("固定资源参数") {
           Text("用 JSON 指定必须完全相等的参数，例如 {\"calendar\":\"我的日历\"}。长期写授权必须至少固定一个资源参数。")
             .font(.caption).foregroundStyle(.secondary)
-          JSONSourceEditor(text: $scope).frame(minHeight: 100)
+          JSONSourceEditor(
+            text: $scope, accessibilityTitle: "固定资源参数 JSON", identifier: "tool-scope-json"
+          )
+          .frame(minHeight: 100)
           DisclosureGroup("查看工具参数定义") {
             Text(jsonText(tool["inputSchema"])).font(.caption.monospaced()).textSelection(.enabled)
           }
         }
-        if let failure { Text(failure).foregroundStyle(.red) }
-      }.navigationTitle("授权具体工具")
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.formStyle(.grouped).toggleStyle(.switch).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("授权具体工具")
         .toolbar {
           ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }
           ToolbarItem(placement: .confirmationAction) {
@@ -232,7 +277,7 @@ struct ToolGrantEditor: View {
       ])
       _ = try await model.autonomy(action: "createGrant", body: body)
       dismiss()
-    } catch { failure = error.localizedDescription }
+    } catch { failure = userFacingError(error) }
   }
 }
 struct ToolActivityView: View {
@@ -262,14 +307,19 @@ struct ToolActivityView: View {
                 Button("拒绝", role: .destructive) { act(call, "deny") }
               }.disabled(busy)
             } else if call["state"].string == "outcome_unknown" {
-              Text("请求可能已在目标系统执行。请先核对目标系统，再记录核对结果；不会自动重发。").foregroundStyle(.orange)
+              Text("请求可能已在目标系统执行。请先核对目标系统，再记录核对结果；不会自动重发。").foregroundStyle(Color.echo.warning)
               HStack {
                 Button("已核实成功") { act(call, "confirmed_success") }
                 Button("已核实未执行") { act(call, "confirmed_failure") }
               }.disabled(busy)
             }
             if !call["error_code"].string.isEmpty {
-              Text(call["error_code"].string).font(.caption).foregroundStyle(.orange)
+              Label(
+                userFacingFailure(code: call["error_code"].string),
+                systemImage: "exclamationmark.circle"
+              )
+              .font(.caption).foregroundStyle(Color.echo.warning)
+              .fixedSize(horizontal: false, vertical: true)
             }
             if !call["result"].string.isEmpty {
               DisclosureGroup("工具返回\(call["truncated"].bool ? "（已截断）" : "")") {
@@ -282,15 +332,19 @@ struct ToolActivityView: View {
               Button("取消后续运行") {
                 Task {
                   do { try await model.cancel(id: run.id) } catch {
-                    failure = error.localizedDescription
+                    failure = userFacingError(error)
                   }
                 }
               }
             }
           }
         }
-        if let failure { Text(failure).foregroundStyle(.red) }
-      }.buttonStyle(.borderless).navigationTitle("工具审批与运行记录")
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.buttonStyle(.borderless).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("工具审批与运行记录")
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("完成") { dismiss() } } }
     }.frame(minWidth: 320, idealWidth: 640, minHeight: 480)
   }
@@ -301,7 +355,7 @@ struct ToolActivityView: View {
       do {
         _ = try await model.autonomy(
           action: "decide", id: call.id, body: .object(["decision": .string(decision)]))
-      } catch { failure = error.localizedDescription }
+      } catch { failure = userFacingError(error) }
     }
   }
 }

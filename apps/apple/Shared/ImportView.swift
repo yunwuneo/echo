@@ -37,7 +37,8 @@ struct ImportView: View {
         Section("选择来源") {
           Button("选择 JSON 或 PNG 文件") { picking = true }.disabled(busy)
           Text("或粘贴角色卡／世界书 JSON").font(.caption)
-          JSONSourceEditor(text: $json).frame(height: 160)
+          JSONSourceEditor(text: $json).frame(minHeight: 160)
+            .accessibilityLabel("角色卡或世界书 JSON 内容")
           Button("预览粘贴内容") { prepare(Data(json.utf8), format: "json", name: "粘贴的 JSON") }.disabled(
             busy || json.isEmpty
           ).accessibilityIdentifier("preview-import")
@@ -69,10 +70,10 @@ struct ImportView: View {
           }
           Section("兼容性报告") {
             ForEach(Array(preview["warnings"].array.enumerated()), id: \.offset) { _, row in
-              Text(row.string).font(.caption).foregroundStyle(.orange)
+              Text(row.string).font(.caption).foregroundStyle(Color.echo.warning)
             }
             ForEach(Array(preview["errors"].array.enumerated()), id: \.offset) { _, row in
-              Text(row.string).foregroundStyle(.red)
+              Text(row.string).foregroundStyle(Color.echo.error)
             }
           }
           if !preview["character"]["prompt_suggestions"]["system_prompt"].string.isEmpty
@@ -117,7 +118,7 @@ struct ImportView: View {
                     ]))
                   imported = true
                   failure = nil
-                } catch { failure = error.localizedDescription }
+                } catch { failure = userFacingError(error) }
               }
             }.disabled(busy || !preview["errors"].array.isEmpty || result != .null)
               .accessibilityIdentifier("commit-import")
@@ -138,15 +139,19 @@ struct ImportView: View {
                       data: Data(base64Encoded: value["data_base64"].string) ?? Data())
                     originalType = value["format"].string == "png" ? .png : .json
                     exporting = true
-                  } catch { failure = error.localizedDescription }
+                  } catch { failure = userFacingError(error) }
                 }
               }
             }
           }
         }
-        if busy { ProgressView() }
-        if let failure { Text(failure).foregroundStyle(.red) }
-      }.formStyle(.grouped).navigationTitle("导入角色与世界书")
+        if busy { ProgressView("正在处理导入内容…") }
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.formStyle(.grouped).toggleStyle(.switch).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("导入角色与世界书")
         .alert("导入已完成", isPresented: $imported) {
           Button("好") {}
         } message: {
@@ -166,19 +171,19 @@ struct ImportView: View {
               try Data(contentsOf: url),
               format: url.pathExtension.lowercased() == "png" ? "png" : "json",
               name: url.lastPathComponent)
-          } catch { failure = error.localizedDescription }
+          } catch { failure = userFacingError(error) }
         }
         .fileExporter(
           isPresented: $exporting, document: original, contentType: originalType,
           defaultFilename: "Echo-original"
         ) { selection in
-          if case .failure(let error) = selection { failure = error.localizedDescription }
+          if case .failure(let error) = selection { failure = userFacingError(error) }
         }
     }.frame(minWidth: 320, idealWidth: 640, minHeight: 520)
   }
   private func prepare(_ data: Data, format: String, name: String) {
     guard data.count <= (format == "png" ? 10 : 5) * 1024 * 1024 else {
-      failure = "文件超过大小限制"
+      failure = userFacingFailure(code: "import_too_large")
       return
     }
     busy = true
@@ -201,7 +206,7 @@ struct ImportView: View {
           strategy = result["strategy"].string
         }
         failure = nil
-      } catch { failure = error.localizedDescription }
+      } catch { failure = userFacingError(error) }
     }
   }
 }

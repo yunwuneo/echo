@@ -21,6 +21,7 @@ struct OperationsView: View {
   @State private var filename = "echo-export.json"
   @State private var exporting = false
   @State private var busy = false
+  @State private var failure: String?
   var body: some View {
     NavigationStack {
       Form {
@@ -35,39 +36,52 @@ struct OperationsView: View {
                 archive = OwnerArchive(data: try JSONEncoder().encode(value))
                 filename = "echo-data-\(UUID().uuidString.prefix(8)).json"
                 exporting = true
-              } catch { model.report(error) }
+              } catch { failure = userFacingError(error) }
             }
           }.disabled(busy)
           Text("整实例备份与恢复由服务器管理员在维护模式下执行。").font(.caption).foregroundStyle(.secondary)
         }
         Section("服务器状态") {
-          LabeledContent("版本", value: diagnostics["version"].string)
-          LabeledContent("后台进程", value: diagnostics["worker"]["healthy"].bool ? "运行中" : "未检测到近期心跳")
-          LabeledContent("实例", value: diagnostics["server_instance_id"].string).font(.caption)
-          LabeledContent("恢复版本", value: diagnostics["data_epoch"].string).font(.caption)
-          Button("导出诊断信息") {
-            do {
-              archive = OwnerArchive(data: try JSONEncoder().encode(diagnostics))
-              filename = "echo-diagnostics-\(UUID().uuidString.prefix(8)).json"
-              exporting = true
-            } catch { model.report(error) }
+          if diagnostics == .null {
+            if failure == nil { ProgressView("正在读取服务器状态…") }
+          } else {
+            LabeledContent("版本", value: diagnostics["version"].string)
+            LabeledContent(
+              "后台进程", value: diagnostics["worker"]["healthy"].bool ? "运行中" : "未检测到近期心跳")
+            LabeledContent("实例", value: diagnostics["server_instance_id"].string).font(.caption)
+            LabeledContent("恢复版本", value: diagnostics["data_epoch"].string).font(.caption)
+            Button("导出诊断信息") {
+              do {
+                archive = OwnerArchive(data: try JSONEncoder().encode(diagnostics))
+                filename = "echo-diagnostics-\(UUID().uuidString.prefix(8)).json"
+                exporting = true
+              } catch { failure = userFacingError(error) }
+            }
           }
+          Button("刷新服务器状态") { Task { await refresh() } }
           Text("诊断仅包含版本、迁移校验和、任务状态数量与后台心跳，不包含正文、密钥或工具返回。").font(.caption)
         }
-      }.formStyle(.grouped).navigationTitle("数据与诊断")
+        if let failure {
+          Label(failure, systemImage: "exclamationmark.circle")
+            .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
+        }
+      }.formStyle(.grouped).scrollContentBackground(.hidden)
+        .background(Color.echo.surfaceSunken).navigationTitle("数据与诊断")
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
             Button("完成") { dismiss() }.accessibilityIdentifier("close-operations")
           }
         }
-        .task {
-          do { diagnostics = try await model.operations(action: "diagnostics") } catch {
-            model.report(error)
-          }
-        }
+        .task { await refresh() }
         .fileExporter(
           isPresented: $exporting, document: archive, contentType: .json, defaultFilename: filename
-        ) { result in if case .failure(let error) = result { model.report(error) } }
+        ) { result in if case .failure(let error) = result { failure = userFacingError(error) } }
     }.frame(minWidth: 320, idealWidth: 560, minHeight: 460)
+  }
+  private func refresh() async {
+    do {
+      diagnostics = try await model.operations(action: "diagnostics")
+      failure = nil
+    } catch { failure = userFacingError(error) }
   }
 }
