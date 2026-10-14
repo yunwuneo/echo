@@ -373,3 +373,44 @@ P3 物理表与行为：`memory_sources/memory_jobs` 保存每房间处理水位
 ### P6 同步容量补充
 
 分页快照保留同一 repeatable-read 水位与十分钟有效期。006 迁移增加 `record_count` 与带主键 `(snapshot_id,page_number)` 的 `sync_snapshot_pages`，每块 500 条，单页最多读两个块；父快照删除级联移除分块。原 `records` 保留作为 P5 回退/旧会话兼容路径，避免改动 v1 协议。创建仍全量物化，临时存储增加，不宣称无限容量。世界书按房间、角色、条目及修订一次关联 activation；权限过滤和提交计数不变。
+
+## 17. 自有 App 规格第一批增量（ADR-022）
+
+此节先记录 2026-10-14 首次增量，再补充本轮 T01–T06；当前状态和测试以 [规格实施进度](app-spec-progress.md) 为准。
+
+- `operation_receipts` 在 owner/命令类型/operation ID 下保存内容摘要与无正文结果。owner 的 `FOR NO KEY UPDATE` 将去重检查与业务提交串行化，失败不留下成功回执。该封装只允许同库操作；外部工具继续使用原有持久意图/审批/unknown 状态机。
+- `assets/asset_references` 分离原件和消息引用，owner/world/可选 actor 为资源作用域。当前小原件以最多 1 MiB 的 bytea 入库，hash/MIME 在相同作用域内去重，私有资产不能扩展消息受众。加引用、隐私删除、分支共享引用使用世界锁；删原件带 revision/预览 token，外键和运行时检查共同保护仍在引用的资源。
+- `model_routes` 表示 inherit/override/disabled；subject 为 owner 或世界内 actor。每条线路有单独同步 ID 和 revision，当前只执行 chat。旧 room provider 为兼容回退。`run_route_snapshots` 在领取轮次时冻结所有成员非敏感连接参数，连接 revision 变化禁止沿用旧地址发送新凭据；工具权限仍在执行前动态复查。
+- `message_versions` 由消息触发器保存稳定正文，`selected_version_id` 受延迟外键约束只能指向自己的版本。版本切换不重放工具。消息 edit 带 revision 和世界/房间水位摘要，保留后文标 context_stale，截断隐藏后文但不宣称永久擦除；erase 清除所有版本和派生原文、消费队列正文、旧同步事件/快照。
+- `conversation_inputs` 保存手动聚合队列、创建时受众及版本，启动轮次将选定集合与新 run/outbox 在同事务绑定。32 条/16,000 字限额在服务端强制，运行期间不消费新输入；原生暂存草稿按现有设备连接 namespace 持久化。
+- `conversation_branches` 保存分支来源，新房间复制完整所选回合之前的已完成可见消息，拥有独立消息/版本 ID。`runs.history_source_run_id` 区分复制历史与真实执行，不产生 outbox/用量或复制工具回执；任务领取和重生成拒绝重放这些历史记录。分支资产只增加引用。来源依赖继续用于隐私删除，不把独立编辑解释成隐私擦除豁免。
+- `prompt_manifests` 增加被实际采用的消息 revision/选中版本、冻结线路及实际模型请求 payload 的 canonical 哈希；tool_execution 与 model_request 分开。正文构造/发送复用同一函数，普通诊断仍不落完整提示词、凭据或隐藏推理。后续 T04 在下节补充完整请求快照、变量与预设。
+- 删除原文时，已执行但结果未知的工具保留独立核对凭据，不重放；人工核对明确标记未获工具验证，完成核对后清除参数。这是数据擦除与不可重复副作用间的显式例外，界面删除说明同步告知。
+
+新增 schema 为 007–012 的加法迁移，只在隔离合成库执行过。本轮没有迁移正式数据。owner-export 增加上述业务表与小资产原件，但依然是可读归档；它没有对象级恢复事务，也不是 T06 的加密可恢复备份格式。
+
+### T01–T06 本地里程碑补充（013–020）
+
+- `conversation_defaults` / room behavior / run behavior 保存四类完整回合窗口及图片策略；新房间复制默认值但不复制具体消息起点。中间回复再生成沿原始输入建立内部 run，工具不可重放，成功才切选中版本。图片引用检查受众、哈希和视觉线路后进入实际载荷。
+- `prompt_presets/profiles/run_prompt_profiles` 冻结全局、角色、预设、自定义 body 和外部变量。变量网络在事务外，POST 不明结果持久化，失败不自动重发。`request_snapshots` 保存加密实际 payload，manifest 记录来源版本、裁剪、参数、工具 Schema 与哈希；Header/Key/隐藏推理排除。`time_recaps/run_recap_refs` 保存可选回顾状态、独立用量、两轮消费记录。
+- `provider_probes` 对显式确认后的付费探测记录意图及结果；不能将文本探测推导成视觉模型验收。`vision_enabled` 是明确能力配置。恢复后空凭据在执行前拒绝。
+- `projects/documents/document_versions/document_assets/document_version_assets` 提供世界/可选角色范围、正文乐观并发、历史及原件引用。internal MCP runtime 复用现有网关与授权，文档写入和回执在同事务提交；020 对 run/model_call_id 唯一，参数变化冲突。
+- `restore_sessions/backup_origins` 支持加密暂存、逐记录预览、来源映射、冲突保护与有界 owner 图原子恢复。manifest 固定迁移名称/校验和，不兼容 schema 在写入前拒绝。恢复事务锁 owner 与业务表，延迟外键仅限本 schema 的显式业务表；专用事务标记避免历史版本触发器额外制造版本。活动执行阻止恢复；导入运行暂停且没有出站队列。
+- 网络断开的事务连接会销毁，不把损坏连接返回池；保留原始失败，回滚失败不会掩盖业务错误。同步旧事件/快照失效后，客户端处理 410 并重取快照与配置。隐私擦除同时清除含旧数据的恢复会话、请求快照和派生回顾。
+
+业务包与维护 pg_dump 是不同格式，限额、排除范围、恢复边界和理由见 ADR-023 / [恢复指南](recovery.md)。没有在现有用户库自动执行迁移。
+
+## 自有规格 T07–T13 增量（021–030）
+
+- `memory_materials/policies/organizations/corrections` 分离正文、参与来源、模式、整理游标和人工反馈；保存前重查 source snapshot。事实与消息原话向量使用新命名空间、完成后切换；原话检索先物化 actor/来源参与权限再算距离。消息隐私擦除同步删除相关向量、资料正文/纠正和语音文本，旧备份按删除标记拒绝复活。
+- `worldbooks/worldbook_bindings` 复用 lore entries，`extensions/skill_bindings/run_skill_snapshots` 复用统一工具目录。`read_material/read_skill` 与文档工具使用同一执行前权限检查；Skill 文本不会提升权限。安装连接所有权、晚到回执独立于 MCP 凭据。
+- `media_jobs/media_job_assets` 在网络前持久化命令，提交 CAS 与查询不同状态；unknown 不重放。`voice_sessions/turns/invites` 保存 turn ID、转写版本、对话 run、TTS 及已播位置；录音/播放留在平台，模型/STT/TTS 各自验收。
+- `miniapps/runtime_sessions/runtime_conflicts` 分离源码、状态、权限和临时网络会话。GET 网关不借用服务端凭据；HTML 在 WKWebView 的 CSP 内，通过窄桥接请求；Python 运行在配置的 OS 隔离适配器内。macOS RSS 采样和 WebKit 销毁未被视为已验证硬容器资源配额。
+- `group_policies/group_member_policies/runs.group_snapshot` 将群策略、私密支线和成员权限与私聊配置分离；私密 lane 固定单成员、受原群成员关系控制。冻结配置与实时撤销做交集，不能通过群或支线扩大工具权限。
+- 新读写动作汇入现有 `milestone` 的严格 `feature` 联合契约，保持 OpenAPI/Swift 生成链；原生入口在数据与诊断 → 知识、创作与群协作，复用项目自身导航/设计 token。
+
+## T14–T20 平台与 Host 增量
+
+031–038 新增设备能力/动作、分享草稿、计划/事件、Host 身份/作业/租约、外部文件基线和远端恢复点。仍由原有运行引擎和 PostgreSQL 权威协调；Host 只在自己的独立 Echo 身份中执行对话。`remote_pending` 是活动状态，版本编辑、删除、分支、恢复和清理均须保护它。跨端动作先持久化 intent，开始响应不明即对账，不通过新 ID 重发。计划暂停使旧 epoch 无效，外部回执允许晚到但不能重新授权旧动作。
+
+适配器在 `llm/protocol.ts` 构造实际协议 body，同一对象进入请求账本；权限判断不依赖模型或客户端按钮。外部目录写入受显式根目录、基线及协作锁约束。详见 ADR-025、`host-runtime.md` 和 `app-spec-progress.md` 的逐项证据/限制。
