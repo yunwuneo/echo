@@ -1,0 +1,1 @@
+CREATE TABLE credential_import_sessions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),owner_id uuid NOT NULL REFERENCES owners(id),package jsonb NOT NULL,preview jsonb NOT NULL,token text NOT NULL,created_at timestamptz NOT NULL DEFAULT now());

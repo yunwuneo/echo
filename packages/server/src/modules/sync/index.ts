@@ -14,6 +14,7 @@ import {
   roomView,
 } from '../worlds/index.js';
 import { AppError } from '../../security.js';
+import { queuedView } from '../conversations/queue.js';
 export const messageView = (r: Record<string, any>) => ({
   id: r.id,
   room_id: r.room_id,
@@ -24,6 +25,10 @@ export const messageView = (r: Record<string, any>) => ({
   actor_name: r.actor_name ?? null,
   step_index: r.step_index ?? 0,
   content: r.content,
+  revision: r.revision ?? 1,
+  selected_version_id: r.selected_version_id ?? null,
+  context_stale: r.context_stale ?? false,
+  external_origin: r.external_origin ?? null,
   status: r.status,
   created_at: new Date(r.created_at).toISOString(),
 });
@@ -33,6 +38,7 @@ export const runView = (r: Record<string, any>) => ({
   room_id: r.room_id,
   state: r.state,
   attempts: r.attempts,
+  history_source_run_id: r.history_source_run_id ?? null,
   error_code: r.error_code,
   created_at: new Date(r.created_at).toISOString(),
 });
@@ -136,6 +142,24 @@ export async function snapshot(db: pg.Pool, ownerId: string) {
         owner_id: ownerId,
         high_water_cursor: String(head.cursor),
         worlds: worlds.map(worldView),
+        queued_inputs: (
+          await tx.query(
+            "SELECT q.* FROM conversation_inputs q JOIN rooms r ON r.id=q.room_id JOIN worlds w ON w.id=r.world_id WHERE q.owner_id=$1 AND q.state='pending' AND NOT r.deleted AND NOT w.deleted ORDER BY q.created_at,q.id",
+            [ownerId],
+          )
+        ).rows.map(queuedView),
+        assets: (
+          await tx.query(
+            'SELECT id,world_id,actor_id,content_hash,mime,size,revision FROM assets WHERE owner_id=$1 ORDER BY id',
+            [ownerId],
+          )
+        ).rows,
+        model_routes: (
+          await tx.query(
+            'SELECT id,subject_id,subject_kind,capability,state,provider_id,revision FROM model_routes WHERE owner_id=$1 ORDER BY id',
+            [ownerId],
+          )
+        ).rows,
         autonomy_settings: (
           await tx.query('SELECT * FROM autonomy_settings WHERE owner_id=$1', [
             ownerId,
@@ -216,6 +240,9 @@ export async function beginSnapshot(db: pg.Pool, owner: string) {
   const records: { kind: string; entity_id: string; data: unknown }[] = [];
   for (const [key, kind] of Object.entries({
     worlds: 'world',
+    assets: 'asset',
+    model_routes: 'model_route',
+    queued_inputs: 'queued_input',
     memories: 'memory',
     memory_settings: 'memory_settings',
     autonomy_settings: 'autonomy_settings',

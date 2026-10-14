@@ -42,6 +42,7 @@ export const AutonomyPolicyInput = Type.Object(
 );
 export const McpConnectionInput = Type.Object(
   {
+    operation_id: Type.Optional(Type.String({ format: 'uuid' })),
     name,
     url: Type.String({ minLength: 8, maxLength: 2048 }),
     transport: Type.Union([
@@ -63,6 +64,7 @@ export const McpConnectionInput = Type.Object(
 );
 export const ToolGrantInput = Type.Object(
   {
+    operation_id: Type.Optional(Type.String({ format: 'uuid' })),
     world_id: id,
     actor_id: id,
     connection_id: id,

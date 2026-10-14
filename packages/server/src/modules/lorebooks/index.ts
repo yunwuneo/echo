@@ -15,7 +15,11 @@ export const emptyActivation = (): Activation => ({
 });
 export function validateLore(data: any) {
   if (data.match_mode === 'regex')
-    for (const key of data.keys) {
+    for (const key of [
+      ...data.keys,
+      ...(data.exclude_keys ?? []),
+      ...(data.required_groups ?? []).flat(),
+    ]) {
       try {
         new RE2(key, data.case_sensitive ? 'u' : 'iu');
       } catch {
@@ -33,23 +37,41 @@ export function evaluateLore(
   data: any,
   scan: string,
   previous = emptyActivation(),
+  clock?: number,
+  conditions = scan,
 ) {
   validateLore(data);
-  const next = { ...previous, turn: previous.turn + 1 };
+  const next = { ...previous, turn: clock ?? previous.turn + 1 };
+  const contains = (key: string, source: string) =>
+    data.match_mode === 'regex'
+      ? new RE2(key, data.case_sensitive ? 'u' : 'iu').test(source)
+      : data.whole_word
+        ? source
+            .split(/[^\p{L}\p{N}_]+/u)
+            .some(
+              (word) =>
+                (data.case_sensitive ? word : word.toLowerCase()) ===
+                (data.case_sensitive ? key : key.toLowerCase()),
+            )
+        : (data.case_sensitive ? source : source.toLowerCase()).includes(
+            data.case_sensitive ? key : key.toLowerCase(),
+          );
+  const excluded = (data.exclude_keys ?? []).some((key: string) =>
+    contains(key, conditions),
+  );
+  const required = (data.required_groups ?? []).every((group: string[]) =>
+    group.some((key) => contains(key, conditions)),
+  );
   const matched =
-    data.constant ||
-    data.keys.some((key: string) =>
-      data.match_mode === 'regex'
-        ? new RE2(key, data.case_sensitive ? 'u' : 'iu').test(scan)
-        : (data.case_sensitive ? scan : scan.toLocaleLowerCase('und')).includes(
-            data.case_sensitive ? key : key.toLocaleLowerCase('und'),
-          ),
-    );
+    data.constant || data.keys.some((key: string) => contains(key, scan));
   let active = false,
     reason = 'not_triggered';
   if (!data.enabled) {
     next.pending_since = null;
     reason = 'disabled';
+  } else if (excluded || !required) {
+    next.pending_since = null;
+    reason = excluded ? 'excluded' : 'required_missing';
   } else if (next.turn <= previous.sticky_until) {
     active = true;
     reason = 'sticky';

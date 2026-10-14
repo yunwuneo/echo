@@ -455,7 +455,24 @@ describe('P2 world and role boundaries', () => {
     await drain(
       (await send('秘密口令：合成红月', undefined, direct.id)).run_id,
     );
-    await create('lore', lore('A 独占的隐秘航道', [actors[0].id]));
+    const privateEntry = await create(
+      'lore',
+      lore('A 独占的隐秘航道', [actors[0].id]),
+    );
+    const book = (
+      await db.query(
+        'INSERT INTO worldbooks(owner_id,world_id,name) VALUES($1,$2,$3) RETURNING id',
+        [owner, world.id, '群明确绑定的书'],
+      )
+    ).rows[0];
+    await db.query('UPDATE lore_entries SET book_id=$2 WHERE id=$1', [
+      privateEntry.id,
+      book.id,
+    ]);
+    await db.query(
+      "INSERT INTO worldbook_bindings(owner_id,book_id,scope,target_id,actor_id) VALUES($1,$2,'group_member',$3,$4)",
+      [owner, book.id, room.id, actors[0].id],
+    );
     await request(
       'PUT',
       `worlds/${world.id}/state`,

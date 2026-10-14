@@ -1,0 +1,4 @@
+CREATE TABLE memory_source_indexes(actor_id uuid PRIMARY KEY REFERENCES world_characters(id),active_version integer,active_scope text);
+CREATE TABLE memory_source_vectors(actor_id uuid NOT NULL REFERENCES world_characters(id),message_id uuid NOT NULL REFERENCES messages(id),index_version integer NOT NULL,scope text NOT NULL,revision integer NOT NULL,content_hash text NOT NULL,embedding vector NOT NULL,PRIMARY KEY(actor_id,message_id,index_version,scope));
+CREATE TABLE memory_source_shards(actor_id uuid NOT NULL REFERENCES world_characters(id),message_id uuid NOT NULL REFERENCES messages(id),index_version integer NOT NULL,scope text NOT NULL,state text NOT NULL CHECK(state IN ('failed','skipped')),error_code text,PRIMARY KEY(actor_id,message_id,index_version,scope));
+CREATE TABLE run_skill_snapshots(run_id uuid NOT NULL REFERENCES runs(id),actor_id uuid NOT NULL REFERENCES world_characters(id),entries jsonb NOT NULL,PRIMARY KEY(run_id,actor_id));

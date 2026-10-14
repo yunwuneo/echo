@@ -18,11 +18,13 @@ import { proposeTool } from '../../packages/server/src/modules/mcp/gateway.js';
 import { mockMcp } from './mock-mcp.js';
 import { randomUUID } from 'node:crypto';
 import {
+  cancel,
   enqueue,
   getRun,
 } from '../../packages/server/src/modules/runs/repository.js';
 import { execute } from '../../packages/server/src/modules/runs/engine.js';
 import {
+  editMemory,
   listMemories,
   saveSettings,
 } from '../../packages/server/src/modules/memory/repository.js';
@@ -126,6 +128,60 @@ app.post('/__test/offline', async () => {
 });
 app.post('/__test/online', async () => {
   offline = false;
+  return { ok: true };
+});
+// Drive Dock tests through persisted runs + ordinary sync events. No client-side
+// fake typing flag is involved, and cleanup uses the production cancellation path.
+app.post('/__test/design-live-clear', async () => {
+  mock.setMode('success');
+  const { g, p } = await policies(db, owner, world.id);
+  await savePolicy(db, owner, null, g.revision, { ...g, enabled: false });
+  await savePolicy(db, owner, world.id, p.revision, { ...p, enabled: false });
+  const active = await db.query(
+    "SELECT id FROM runs WHERE owner_id=$1 AND state NOT IN ('completed','failed','interrupted','cancelled')",
+    [owner],
+  );
+  for (const run of active.rows) await cancel(db, owner, run.id);
+  return { ok: true };
+});
+app.post('/__test/design-live-start', async () => {
+  mock.setMode('hold');
+  const ack = await enqueue(db, owner, directRoom.id, {
+    client_command_id: randomUUID(),
+    content: '请慢慢分享一个合成故事',
+    addressed_actor_ids: [actors[0].id],
+  });
+  for (let attempt = 0; attempt < 80; attempt++) {
+    if ((await getRun(db, owner, ack.run_id)).state === 'running')
+      return { ...ack, room_id: directRoom.id, actor_id: actors[0].id };
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error('Synthetic live run did not start');
+});
+app.post('/__test/design-forget-memories', async () => {
+  for (const memory of await listMemories(db, owner, world.id)) {
+    const current = (await listMemories(db, owner, world.id)).find(
+      (item) => item.id === memory.id,
+    );
+    if (current && !['deleted', 'invalidated'].includes(current.status))
+      await editMemory(db, owner, current.id, current.revision, null);
+  }
+  return { ok: true };
+});
+let scrollRoomsSeeded = false;
+app.post('/__test/design-scroll-rooms', async () => {
+  if (!scrollRoomsSeeded) {
+    for (let index = 1; index <= 14; index++)
+      await editEntity(db, owner, 'rooms', 'POST', {
+        world_id: world.id,
+        name: `合成会话 ${index}`,
+        kind: 'direct',
+        provider_id: provider.id,
+        actor_ids: [actors[0].id],
+        max_replies: 1,
+      });
+    scrollRoomsSeeded = true;
+  }
   return { ok: true };
 });
 app.post('/__test/p3-seed', async () => {

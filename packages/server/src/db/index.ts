@@ -15,15 +15,27 @@ export async function transaction<T>(
   isolation = '',
 ): Promise<T> {
   const tx = await db.connect();
+  let broken: Error | undefined;
+  const onError = (error: Error) => {
+    broken = error;
+  };
+  tx.on('error', onError);
   try {
     await tx.query(`BEGIN ${isolation}`);
     const result = await fn(tx);
+    if (broken) throw broken;
     await tx.query('COMMIT');
     return result;
   } catch (e) {
-    await tx.query('ROLLBACK');
+    try {
+      await tx.query('ROLLBACK');
+    } catch (rollbackError) {
+      broken = rollbackError as Error;
+    }
     throw e;
   } finally {
-    tx.release();
+    // A lost session must not be returned to the pool as a healthy connection.
+    tx.release(broken);
+    tx.off('error', onError);
   }
 }

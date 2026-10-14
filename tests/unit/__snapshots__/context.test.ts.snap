@@ -14,12 +14,15 @@ exports[`P2 prompt compiler > rebuilds a deterministic Chinese prompt and conten
     "current_message_id": "current",
     "decisions": [
       {
+        "effective_role": "system",
         "estimated_tokens": 52,
         "id": "lore-a",
         "included": true,
         "kind": "lore",
         "reason": "triggered",
+        "requested_role": "system",
         "revision": 2,
+        "role_downgrade": null,
       },
       {
         "estimated_tokens": 25,

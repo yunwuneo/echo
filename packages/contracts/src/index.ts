@@ -1,4 +1,17 @@
+import { HostPairBody, HostRPCBody, EventBody } from './continuation.js';
+import { MilestoneInput, Behavior } from './milestone.js';
 import { PushTicket } from './p5.js';
+import {
+  AssetInput,
+  AssetReferenceInput,
+  AssetDeleteInput,
+  RouteInput,
+  MessageEditInput,
+  QueueInput,
+  BranchInput,
+  QueueEditInput,
+  StartTurnInput,
+} from './spec.js';
 import {
   AutonomySettingsInput,
   AutonomyPolicyInput,
@@ -52,9 +65,16 @@ export const RefreshRequest = Type.Object(
 );
 export const ProviderRequest = Type.Object(
   {
+    protocol: Type.Optional(
+      Type.Union(
+        ['openai', 'claude', 'gemini', 'vertex'].map((x) => Type.Literal(x)),
+      ),
+    ),
+    operation_id: Type.Optional(ID),
     name: Type.String({ minLength: 1, maxLength: 80 }),
     base_url: Type.String({ minLength: 8, maxLength: 2048 }),
     tools_enabled: Type.Optional(Type.Boolean()),
+    vision_enabled: Type.Optional(Type.Boolean()),
     api_key: Type.String({ minLength: 1, maxLength: 4096 }),
     model: Type.String({ minLength: 1, maxLength: 200 }),
     context_window: Type.Integer({
@@ -72,6 +92,7 @@ export const ProviderRequest = Type.Object(
 );
 export const Provider = Type.Object(
   {
+    protocol: Type.Optional(Type.String()),
     id: ID,
     name: Type.String(),
     base_url: Type.String(),
@@ -79,11 +100,13 @@ export const Provider = Type.Object(
     context_window: Type.Integer(),
     max_output_tokens: Type.Integer(),
     credential_present: Type.Boolean(),
+    revision: Type.Integer(),
     capabilities: Type.Object(
       {
         text: Type.Literal(true),
         streaming: Type.Literal(true),
         tools: Type.Boolean(),
+        vision: Type.Optional(Type.Boolean()),
         verification: Type.Literal('declared'),
       },
       strict,
@@ -93,6 +116,9 @@ export const Provider = Type.Object(
 );
 export const MessageRequest = Type.Object(
   {
+    asset_ids: Type.Optional(
+      Type.Array(ID, { maxItems: 8, uniqueItems: true }),
+    ),
     client_command_id: ID,
     content: Type.String({ minLength: 1, maxLength: 16000 }),
     addressed_actor_ids: Type.Optional(
@@ -108,6 +134,7 @@ export const RunState = Type.Union(
     'queued',
     'running',
     'awaiting_approval',
+    'remote_pending',
     'completed',
     'failed',
     'cancelled',
@@ -126,6 +153,10 @@ export const Message = Type.Object(
     step_index: Type.Integer(),
     role: Type.Union([Type.Literal('user'), Type.Literal('assistant')]),
     content: Type.String(),
+    revision: Type.Integer(),
+    selected_version_id: Type.Union([ID, Type.Null()]),
+    context_stale: Type.Boolean(),
+    external_origin: Type.Optional(Type.Unknown()),
     status: Type.String(),
     created_at: Type.String(),
   },
@@ -138,6 +169,7 @@ export const Run = Type.Object(
     room_id: ID,
     state: RunState,
     attempts: Type.Integer(),
+    history_source_run_id: Type.Union([ID, Type.Null()]),
     error_code: Type.Union([Type.String(), Type.Null()]),
     created_at: Type.String(),
   },
@@ -200,6 +232,7 @@ export const Actor = Type.Composite(
 );
 export const RoomInput = Type.Object(
   {
+    behavior: Type.Optional(Behavior),
     name,
     provider_id: ID,
     kind: Type.Union([Type.Literal('direct'), Type.Literal('group')]),
@@ -210,6 +243,7 @@ export const RoomInput = Type.Object(
 );
 export const Room = Type.Object(
   {
+    behavior: Type.Optional(Type.Unknown()),
     id: ID,
     world_id: ID,
     name,
@@ -223,6 +257,37 @@ export const Room = Type.Object(
 );
 export const LoreInput = Type.Object(
   {
+    injection_role: Type.Optional(
+      Type.Union(['system', 'user', 'assistant'].map((v) => Type.Literal(v))),
+    ),
+    whole_word: Type.Optional(Type.Boolean()),
+    keyword_scoring: Type.Optional(Type.Boolean()),
+    exclude_keys: Type.Optional(
+      Type.Array(Type.String({ minLength: 1, maxLength: 120 }), {
+        maxItems: 32,
+      }),
+    ),
+    required_groups: Type.Optional(
+      Type.Array(
+        Type.Array(Type.String({ minLength: 1, maxLength: 120 }), {
+          minItems: 1,
+          maxItems: 32,
+        }),
+        { maxItems: 8 },
+      ),
+    ),
+    probability: Type.Optional(Type.Integer({ minimum: 0, maximum: 100 })),
+    exclusion_group: Type.Optional(Type.String({ maxLength: 100 })),
+    weight: Type.Optional(Type.Number({ minimum: 0.01, maximum: 1000 })),
+    recursion: Type.Optional(
+      Type.Union(
+        ['direct', 'only', 'allow', 'stop'].map((v) => Type.Literal(v)),
+      ),
+    ),
+    max_recursion: Type.Optional(Type.Integer({ minimum: 0, maximum: 128 })),
+    timing_unit: Type.Optional(Type.Literal('messages')),
+
+    budget_exempt: Type.Optional(Type.Boolean()),
     match_mode: Type.Optional(
       Type.Union([Type.Literal('keywords'), Type.Literal('regex')]),
     ),
@@ -237,11 +302,13 @@ export const LoreInput = Type.Object(
       maxItems: 32,
     }),
     case_sensitive: Type.Boolean(),
-    scan_depth: Type.Integer({ minimum: 1, maximum: 50 }),
+    scan_depth: Type.Integer({ minimum: 0, maximum: 50 }),
     priority: Type.Integer({ minimum: -1000, maximum: 1000 }),
     insertion_slot: Type.Union(
       [
         'before_character',
+        'environment',
+        'after_history',
         'after_character',
         'before_history',
         'history_depth',
@@ -369,14 +436,26 @@ const entityRoutes = <N extends string>(
     `/v1/${resource}`,
     `create${resource}`,
     { 201: schema },
-    { body },
+    {
+      body: Type.Composite(
+        [body as any, Type.Object({ operation_id: Type.Optional(ID) })],
+        strict,
+      ),
+    },
   ),
   [`update${resource}`]: route(
     'PUT',
     `/v1/${resource}/:id`,
     `update${resource}`,
     { 200: schema },
-    { params: idParams, headers: revisionHeader, body },
+    {
+      params: idParams,
+      headers: revisionHeader,
+      body: Type.Composite(
+        [body as any, Type.Object({ operation_id: Type.Optional(ID) })],
+        strict,
+      ),
+    },
   ),
   [`delete${resource}`]: route(
     'DELETE',
@@ -445,6 +524,114 @@ const ImportInput = Type.Object(
   strict,
 );
 export const routes = {
+  milestone: route(
+    'POST',
+    '/v1/milestone',
+    'milestone',
+    { 200: Type.Unknown() },
+    { body: MilestoneInput },
+  ),
+  branchConversation: route(
+    'POST',
+    '/v1/messages/:id/branch',
+    'branchConversation',
+    { 200: Type.Unknown() },
+    { params: idParams, body: BranchInput },
+  ),
+  queuedInputs: route(
+    'GET',
+    '/v1/rooms/:id/queued-inputs',
+    'queuedInputs',
+    { 200: Type.Unknown() },
+    { params: idParams },
+  ),
+  queueInput: route(
+    'POST',
+    '/v1/rooms/:id/queued-inputs',
+    'queueInput',
+    { 200: Type.Unknown() },
+    { params: idParams, body: QueueInput },
+  ),
+  updateQueuedInput: route(
+    'PUT',
+    '/v1/queued-inputs/:id',
+    'updateQueuedInput',
+    { 200: Type.Unknown() },
+    { params: idParams, body: QueueEditInput },
+  ),
+  startQueuedTurn: route(
+    'POST',
+    '/v1/rooms/:id/start-turn',
+    'startQueuedTurn',
+    { 200: Type.Unknown() },
+    { params: idParams, body: StartTurnInput },
+  ),
+  messageVersions: route(
+    'GET',
+    '/v1/messages/:id/versions',
+    'messageVersions',
+    { 200: Type.Unknown() },
+    { params: idParams },
+  ),
+  editMessage: route(
+    'PUT',
+    '/v1/messages/:id',
+    'editMessage',
+    { 200: Type.Unknown() },
+    { params: idParams, body: MessageEditInput },
+  ),
+  exportConversation: route(
+    'GET',
+    '/v1/rooms/:id/export',
+    'exportConversation',
+    { 200: Type.Unknown() },
+    { params: idParams },
+  ),
+  createAsset: route(
+    'POST',
+    '/v1/assets',
+    'createAsset',
+    { 201: Type.Unknown() },
+    { body: AssetInput },
+  ),
+  readAsset: route(
+    'GET',
+    '/v1/assets/:id',
+    'readAsset',
+    { 200: Type.Unknown() },
+    { params: idParams },
+  ),
+  referenceAsset: route(
+    'PUT',
+    '/v1/assets/:id/references',
+    'referenceAsset',
+    { 200: Type.Unknown() },
+    { params: idParams, body: AssetReferenceInput },
+  ),
+  previewAssetDeletion: route(
+    'GET',
+    '/v1/assets/:id/deletion-preview',
+    'previewAssetDeletion',
+    { 200: Type.Unknown() },
+    { params: idParams },
+  ),
+  deleteAsset: route(
+    'POST',
+    '/v1/assets/:id/delete',
+    'deleteAsset',
+    { 200: Type.Unknown() },
+    { params: idParams, body: AssetDeleteInput },
+  ),
+  modelRoutes: route('GET', '/v1/model-routes', 'listModelRoutes', {
+    200: Type.Unknown(),
+  }),
+  saveModelRoute: route(
+    'PUT',
+    '/v1/model-routes',
+    'saveModelRoute',
+    { 200: Type.Unknown() },
+    { body: RouteInput },
+  ),
   notificationStatus: route('GET', '/v1/notifications', 'notificationStatus', {
     200: Type.Unknown(),
   }),
@@ -729,6 +916,30 @@ export const routes = {
     { 202: Ack },
     { params: idParams, body: Type.Object({ client_command_id: ID }, strict) },
   ),
+  hostPair: route(
+    'POST',
+    '/v1/hosts/pair',
+    'hostPair',
+    { 200: Type.Unknown() },
+    { body: HostPairBody },
+    false,
+  ),
+  hostRPC: route(
+    'POST',
+    '/v1/hosts/rpc',
+    'hostRPC',
+    { 200: Type.Unknown() },
+    { body: HostRPCBody },
+    false,
+  ),
+  receiveEvent: route(
+    'POST',
+    '/v1/events/:id',
+    'receiveEvent',
+    { 200: Type.Unknown() },
+    { params: idParams, body: EventBody },
+    false,
+  ),
   health: route(
     'GET',
     '/health',
@@ -797,6 +1008,24 @@ export const routes = {
     'createProvider',
     { 201: Provider },
     { body: ProviderRequest },
+  ),
+  updateProvider: route(
+    'PUT',
+    '/v1/providers/:id',
+    'updateProvider',
+    { 200: Provider },
+    {
+      params: idParams,
+      headers: revisionHeader,
+      body: Type.Object(
+        {
+          ...ProviderRequest.properties,
+          operation_id: ID,
+          api_key: Type.Optional(ProviderRequest.properties.api_key),
+        },
+        strict,
+      ),
+    },
   ),
   messages: route(
     'GET',
@@ -925,6 +1154,9 @@ export const routes = {
         mcp_connections: Type.Array(Type.Unknown()),
         tool_grants: Type.Array(Type.Unknown()),
         tool_calls: Type.Array(Type.Unknown()),
+        assets: Type.Array(Type.Unknown()),
+        model_routes: Type.Array(Type.Unknown()),
+        queued_inputs: Type.Array(Type.Unknown()),
       },
       strict,
     ),

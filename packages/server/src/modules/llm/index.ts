@@ -1,7 +1,9 @@
+import { protocolEndpoint, ProtocolFrames } from './protocol.js';
 import type { Config } from '../../config.js';
 import { Agent, fetch } from 'undici';
-import { decrypt, resolveEndpoint } from '../../security.js';
+import { AppError, decrypt, resolveEndpoint } from '../../security.js';
 import type { Claim, Usage } from '../runs/repository.js';
+import { modelPayload } from './request.js';
 export class ModelError extends Error {
   constructor(
     public code: string,
@@ -29,6 +31,9 @@ export async function streamModel(
     config,
     `${c.run.owner_id}:${c.provider.id}`,
   );
+  const endpoint = protocolEndpoint(c.provider, base, credential);
+  const wirePayload = modelPayload(c);
+  const protocol = new ProtocolFrames(c.provider.protocol ?? 'openai');
   const dispatcher = new Agent({
     connect: {
       lookup: (_host, options, callback) => {
@@ -46,25 +51,16 @@ export async function streamModel(
   });
   let response: Awaited<ReturnType<typeof fetch>>;
   try {
-    response = await fetch(`${base}/chat/completions`, {
+    response = await fetch(endpoint.url, {
       dispatcher,
       method: 'POST',
       redirect: 'error',
       signal,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${credential}`,
+        ...endpoint.headers,
       },
-      body: JSON.stringify({
-        model: c.provider.model,
-        messages: c.messages,
-        stream: true,
-        stream_options: { include_usage: true },
-        max_tokens: c.provider.max_output_tokens,
-        ...(c.tools?.length
-          ? { tools: c.tools, parallel_tool_calls: false, tool_choice: 'auto' }
-          : {}),
-      }),
+      body: JSON.stringify(wirePayload),
     });
   } catch {
     await dispatcher.close();
@@ -186,9 +182,25 @@ export async function streamModel(
       while ((end = buffer.indexOf('\n\n')) >= 0) {
         const raw = buffer.slice(0, end);
         buffer = buffer.slice(end + 2);
-        await frame(raw);
+        if ((c.provider.protocol ?? 'openai') === 'openai') await frame(raw);
+        else {
+          const data = raw
+            .split('\n')
+            .filter((l) => l.startsWith('data:'))
+            .map((l) => l.slice(5).trimStart())
+            .join('\n');
+          if (data)
+            for (const normalized of protocol.frame(JSON.parse(data)))
+              await frame(
+                'data: ' +
+                  (typeof normalized === 'string'
+                    ? normalized
+                    : JSON.stringify(normalized)),
+              );
+        }
       }
     }
+    for (const end of protocol.end()) await frame('data: ' + end);
     if (
       !done ||
       !stopped ||
@@ -199,6 +211,7 @@ export async function streamModel(
     return { content, usage, ...(tool ? { tool } : {}) };
   } catch (e) {
     if (e instanceof ModelError) throw e;
+    if (e instanceof AppError) throw new ModelError(e.code);
     throw new ModelError(
       signal.aborted ? 'model_timeout' : 'model_stream_interrupted',
       !content,

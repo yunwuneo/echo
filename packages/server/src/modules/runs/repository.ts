@@ -1,4 +1,13 @@
+import { relayRun } from '../hosts/relay.js';
+import { validSchedule } from '../schedules/guard.js';
+import { groupScope } from '../groups/index.js';
+import { consumeRecap } from '../prompts/recaps.js';
+import { runtimeProfile } from '../prompts/index.js';
+import { encrypt } from '../../security.js';
 import { enqueueNotification } from '../notifications/index.js';
+import { claimProvider } from '../providers/routes.js';
+import { modelPayload } from '../llm/request.js';
+import { canonical } from '../mcp/schema.js';
 import type { Config } from '../../config.js';
 import { policies, validBackground } from '../autonomy/policy.js';
 import { reserveBackground, settleBackground } from '../memory/usage.js';
@@ -37,6 +46,7 @@ export async function enqueue(
       room,
       content: input.content,
       addressed_actor_ids: input.addressed_actor_ids ?? [],
+      asset_ids: input.asset_ids ?? [],
     }),
   );
   return transaction(db, (tx) =>
@@ -55,6 +65,7 @@ export async function enqueueInTransaction(
     policyRevision: number;
     maxTurns: number;
   },
+  options: { skipRelay?: boolean; trustedOrigin?: any } = {},
 ) {
   // Lock one owner before checking the instance-wide idempotency key; works across rooms.
   await tx.query('SELECT id FROM owners WHERE id=$1 FOR NO KEY UPDATE', [
@@ -82,6 +93,20 @@ export async function enqueueInTransaction(
     )
   ).rows[0];
   if (!roomRow) throw new AppError(404, 'not_found', 'Room not found');
+  if (
+    roomRow.parent_group_id &&
+    !(
+      await tx.query(
+        'SELECT 1 FROM rooms r JOIN room_memberships m ON m.room_id=r.id WHERE r.id=$1 AND NOT r.deleted AND m.actor_id=$2 AND m.left_at IS NULL',
+        [roomRow.parent_group_id, roomRow.lane_actor_id],
+      )
+    ).rowCount
+  )
+    throw new AppError(
+      403,
+      'private_lane_membership',
+      'Original group membership is no longer active',
+    );
   const members = (
     await tx.query(
       'SELECT actor_id FROM room_memberships WHERE room_id=$1 AND left_at IS NULL',
@@ -120,6 +145,11 @@ export async function enqueueInTransaction(
       input.addressed_actor_ids ?? [],
     ],
   );
+  if (roomRow.behavior !== undefined)
+    await tx.query('UPDATE runs SET behavior=$2 WHERE id=$1', [
+      run,
+      JSON.stringify(roomRow.behavior),
+    ]);
   if (background)
     await tx.query(
       'UPDATE runs SET trigger_kind=$2,global_revision=$3,policy_revision=$4,max_background_turns=$5 WHERE id=$1',
@@ -147,6 +177,33 @@ export async function enqueueInTransaction(
       [message, owner, room, run, seq, input.content],
     )
   ).rows[0];
+  const groupSnapshot = await groupScope(tx, owner, room);
+  if (groupSnapshot)
+    await tx.query('UPDATE runs SET group_snapshot=$2 WHERE id=$1', [
+      run,
+      JSON.stringify(groupSnapshot),
+    ]);
+  for (const assetId of input.asset_ids ?? []) {
+    const asset = (
+      await tx.query(
+        'SELECT * FROM assets WHERE owner_id=$1 AND id=$2 AND world_id=$3 FOR UPDATE',
+        [owner, assetId, roomRow.world_id],
+      )
+    ).rows[0];
+    if (!asset || (asset.actor_id && members.some((a) => a !== asset.actor_id)))
+      throw new AppError(
+        404,
+        'resource_missing',
+        'Asset outside message audience',
+      );
+    await tx.query(
+      "INSERT INTO asset_references(owner_id,asset_id,message_id,purpose,input_mode,extracted_text) SELECT $1,$2,$3,'attachment',input_mode,extracted_text FROM assets WHERE id=$2",
+      [owner, assetId, message],
+    );
+    await tx.query('UPDATE assets SET revision=revision+1 WHERE id=$1', [
+      assetId,
+    ]);
+  }
   if (background)
     await tx.query(
       'UPDATE messages SET internal=true,memory_excluded=true WHERE id=$1',
@@ -157,10 +214,52 @@ export async function enqueueInTransaction(
       'INSERT INTO message_audiences(message_id,actor_id) VALUES($1,$2)',
       [message, actor],
     );
-  await tx.query(
-    'INSERT INTO outbox(owner_id,run_id,attempt) VALUES($1,$2,0)',
-    [owner, run],
-  );
+  if (groupSnapshot?.reply_policy === 'silence' && !roomRow.parent_group_id) {
+    await tx.query(
+      "UPDATE runs SET state='completed',speaker_ids='{}' WHERE id=$1",
+      [run],
+    );
+    await tx.query("UPDATE messages SET status='completed' WHERE id=$1", [
+      message,
+    ]);
+    m.status = 'completed';
+  } else {
+    if (groupSnapshot?.reply_policy === 'random' && !roomRow.parent_group_id) {
+      const candidates = input.addressed_actor_ids?.length
+        ? input.addressed_actor_ids
+        : members;
+      const chosen = [...candidates].sort((a, b) =>
+        hash(input.client_command_id + a).localeCompare(
+          hash(input.client_command_id + b),
+        ),
+      )[0];
+      await tx.query('UPDATE runs SET speaker_ids=$2 WHERE id=$1', [
+        run,
+        [chosen],
+      ]);
+    }
+    await tx.query(
+      'INSERT INTO outbox(owner_id,run_id,attempt) VALUES($1,$2,0)',
+      [owner, run],
+    );
+  }
+  if (options.trustedOrigin) {
+    await tx.query('DELETE FROM outbox WHERE run_id=$1', [run]);
+    await tx.query(
+      "UPDATE runs SET state='completed',speaker_ids='{}' WHERE id=$1",
+      [run],
+    );
+    Object.assign(
+      m,
+      (
+        await tx.query(
+          "UPDATE messages SET role='assistant',status='completed',actor_id=$2,external_origin=$3 WHERE id=$1 RETURNING *",
+          [message, members[0], JSON.stringify(options.trustedOrigin)],
+        )
+      ).rows[0],
+    );
+  } else if (!background && !options.skipRelay)
+    await relayRun(tx, owner, run, roomRow, members, input);
   if (!background) await emit(tx, owner, 'message', message, messageView(m));
   await emit(tx, owner, 'run', run, runView(await getRun(tx, owner, run)));
   return { message_id: message, run_id: run };
@@ -178,6 +277,19 @@ export async function cancel(db: pg.Pool, owner: string, id: string) {
     );
     const run = await getRun(tx, owner, id);
     if (terminal(run.state)) return runView(run);
+    if (run.state === 'remote_pending') {
+      const j = (
+        await tx.query(
+          "UPDATE host_jobs SET state=CASE WHEN state='pending' THEN 'cancelled' ELSE 'unknown' END,error_code='cancel_requested',revision=revision+1 WHERE relay_run_id=$1 AND state IN ('pending','accepted','executing','unknown') RETURNING *",
+          [id],
+        )
+      ).rows[0];
+      if (j && j.state === 'unknown')
+        return {
+          ...runView(run),
+          error_code: 'remote_reconciliation_required',
+        };
+    }
     const r = (
       await tx.query(
         "UPDATE runs SET state='cancelled',error_code='user_cancelled' WHERE id=$1 RETURNING *",
@@ -235,6 +347,11 @@ export async function claim(
   ).rows[0];
   if (!initial) return null;
   return transaction(db, async (tx) => {
+    // Configuration edits use this same short owner lock. Freeze all speakers'
+    // routes consistently before allowing a configuration writer to proceed.
+    await tx.query('SELECT id FROM owners WHERE id=$1 FOR NO KEY UPDATE', [
+      initial.owner_id,
+    ]);
     await tx.query(
       'INSERT INTO world_leases(world_id) VALUES($1) ON CONFLICT DO NOTHING',
       [initial.world_id],
@@ -259,16 +376,11 @@ export async function claim(
         [id],
       )
     ).rows[0];
-    if (run.state !== 'queued' || !run.due) return null;
+    if (run.state !== 'queued' || !run.due || run.history_source_run_id)
+      return null;
     const world = await worldLock(tx, run.owner_id, run.world_id);
     const room = (
       await tx.query('SELECT * FROM rooms WHERE id=$1', [run.room_id])
-    ).rows[0];
-    const provider = (
-      await tx.query(
-        'SELECT p.* FROM provider_connections p JOIN rooms r ON r.provider_id=p.id AND r.owner_id=p.owner_id WHERE r.owner_id=$1 AND r.id=$2',
-        [run.owner_id, run.room_id],
-      )
     ).rows[0];
     const members = (
       await tx.query(
@@ -287,25 +399,40 @@ export async function claim(
         run.client_command_id,
       );
     const actorId = speakers[run.step_index] ?? null;
+    let provider: any;
+    let routeError: string | null = null;
+    try {
+      if (!run.speaker_ids) {
+        for (const [index, speaker] of speakers.entries()) {
+          await claimProvider(tx, { ...run, step_index: index }, room, speaker);
+        }
+      }
+      provider = await claimProvider(tx, run, room, actorId);
+    } catch (e) {
+      if (e instanceof AppError) routeError = e.code;
+      else throw e;
+    }
     const toolOnly = await pendingTool(tx, run);
-    const tools = provider?.tools_enabled
-      ? await availableTools(tx, run, actorId)
-      : [];
+    const tools =
+      !run.replacement_message_id && provider?.tools_enabled
+        ? await availableTools(tx, run, actorId)
+        : [];
     const transcript = await toolTranscript(tx, run);
     const toolCost =
       Buffer.byteLength(JSON.stringify(tools.map((t) => t.definition))) +
       Buffer.byteLength(JSON.stringify(transcript)) +
       64;
     const backgroundValid =
-      run.trigger_kind === 'foreground' ||
-      (await validBackground(
-        tx,
-        run.owner_id,
-        run.world_id,
-        run.trigger_kind,
-        run.global_revision,
-        run.policy_revision,
-      ));
+      (await validSchedule(tx, run)) &&
+      (run.trigger_kind === 'foreground' ||
+        (await validBackground(
+          tx,
+          run.owner_id,
+          run.world_id,
+          run.trigger_kind,
+          run.global_revision,
+          run.policy_revision,
+        )));
 
     const sourceInvalid = !!(
       await tx.query(
@@ -313,23 +440,32 @@ export async function claim(
         [run.id],
       )
     ).rowCount;
-    let error: string | null = sourceInvalid
-      ? 'source_invalidated'
-      : !backgroundValid
-        ? 'autonomy_disabled'
-        : run.remaining_ms <= 0
-          ? 'run_deadline_exceeded'
-          : run.deadline_at && new Date(run.deadline_at).getTime() <= Date.now()
+    let error: string | null =
+      routeError ??
+      (sourceInvalid
+        ? 'source_invalidated'
+        : !backgroundValid
+          ? 'autonomy_disabled'
+          : run.remaining_ms <= 0
             ? 'run_deadline_exceeded'
-            : !provider
-              ? 'provider_missing'
-              : room.kind !== 'legacy' &&
-                  (!actorId || !members.some((m) => m.id === actorId))
-                ? 'actor_unavailable'
-                : null;
+            : run.deadline_at &&
+                new Date(run.deadline_at).getTime() <= Date.now()
+              ? 'run_deadline_exceeded'
+              : !provider
+                ? 'provider_missing'
+                : room.kind !== 'legacy' &&
+                    (!actorId || !members.some((m) => m.id === actorId))
+                  ? 'actor_unavailable'
+                  : null);
+    let promptProfile: any;
     let compiled: Awaited<ReturnType<typeof preparePrompt>> | undefined;
     if (!error) {
       try {
+        promptProfile = await runtimeProfile(tx, config, run, actorId);
+        provider = {
+          ...provider,
+          parameters: promptProfile.profile.parameters,
+        };
         compiled = await preparePrompt(
           tx,
           run,
@@ -337,6 +473,7 @@ export async function claim(
           actorId,
           world,
           queryVector,
+          promptProfile,
         );
       } catch (e) {
         if (e instanceof AppError) error = e.code;
@@ -347,6 +484,25 @@ export async function claim(
     if (compiled) {
       compiled.manifest.estimated_input_tokens += toolCost;
       Object.assign(compiled.manifest, {
+        dispatch_kind: toolOnly ? 'tool_execution' : 'model_request',
+        payload_sha256: toolOnly
+          ? null
+          : hash(
+              canonical(
+                modelPayload({
+                  provider,
+                  messages,
+                  tools: tools.map((t) => t.definition),
+                }),
+              ),
+            ),
+        model_route: {
+          provider_id: provider.id,
+          provider_revision: provider.revision,
+          model: provider.model,
+          route: provider.route,
+          actor_id: actorId,
+        },
         tool_grants: tools.map((t) => ({
           id: t.grant.id,
           revision: t.grant.revision,
@@ -473,6 +629,10 @@ export async function claim(
       await tx.query("UPDATE messages SET status='streaming' WHERE id=$1", [
         run.reply_message_id,
       ]);
+    if (run.replacement_message_id)
+      await tx.query('UPDATE messages SET internal=true WHERE id=$1', [
+        run.reply_message_id,
+      ]);
     await tx.query(
       'INSERT INTO message_audiences(message_id,actor_id) SELECT $1,a.actor_id FROM message_audiences a JOIN room_memberships rm ON rm.actor_id=a.actor_id AND rm.room_id=$3 AND rm.left_at IS NULL WHERE a.message_id=$2 ON CONFLICT DO NOTHING',
       [run.reply_message_id, run.user_message_id, run.room_id],
@@ -481,8 +641,32 @@ export async function claim(
       'INSERT INTO prompt_manifests(run_id,attempt,data) VALUES($1,$2,$3)',
       [id, started.attempts, JSON.stringify(compiled!.manifest)],
     );
+    if (config && !toolOnly) {
+      const payload = modelPayload({
+        provider,
+        messages,
+        tools: tools.map((t) => t.definition),
+      });
+      await tx.query(
+        'INSERT INTO request_snapshots(run_id,attempt,owner_id,payload,payload_hash) VALUES($1,$2,$3,$4,$5)',
+        [
+          id,
+          started.attempts,
+          run.owner_id,
+          JSON.stringify(
+            encrypt(
+              JSON.stringify(payload),
+              config,
+              `${run.owner_id}:request:${id}:${started.attempts}`,
+            ),
+          ),
+          hash(canonical(payload)),
+        ],
+      );
+    }
     const sourceIds = [
       run.user_message_id,
+      ...((compiled!.manifest as any).recalled_source_ids ?? []),
       ...compiled!.manifest.decisions
         .filter((d) => d.kind === 'message' && d.included)
         .map((d) => d.id),
@@ -492,7 +676,7 @@ export async function claim(
       .map((d) => d.id);
     const evidence = (
       await tx.query(
-        'SELECT message_id FROM memory_evidence WHERE memory_id=ANY($1::uuid[])',
+        "SELECT message_id FROM memory_evidence WHERE memory_id=ANY($1::uuid[]) UNION SELECT (s->>'id')::uuid AS message_id FROM memory_materials m CROSS JOIN LATERAL jsonb_array_elements(m.source_snapshot) s WHERE m.id=ANY($1::uuid[])",
         [memoryIds],
       )
     ).rows.map((e) => e.message_id);
@@ -599,15 +783,16 @@ export async function finish(
       retryable = false;
     }
     const allowed =
-      c.run.trigger_kind === 'foreground' ||
-      (await validBackground(
-        tx,
-        c.run.owner_id,
-        c.run.world_id,
-        c.run.trigger_kind,
-        c.run.global_revision,
-        c.run.policy_revision,
-      ));
+      (await validSchedule(tx, c.run)) &&
+      (c.run.trigger_kind === 'foreground' ||
+        (await validBackground(
+          tx,
+          c.run.owner_id,
+          c.run.world_id,
+          c.run.trigger_kind,
+          c.run.global_revision,
+          c.run.policy_revision,
+        )));
     const skipped =
       c.run.trigger_kind !== 'foreground' && content.trim() === '<skip>';
     if (!allowed || skipped) {
@@ -651,6 +836,34 @@ export async function finish(
         [c.run.reply_message_id, content, retry ? 'streaming' : state],
       )
     ).rows[0];
+    if (state === 'completed') await consumeRecap(tx, c.run);
+    if (c.run.replacement_message_id && state === 'completed') {
+      const version = randomUUID();
+      await tx.query(
+        "INSERT INTO message_versions(id,owner_id,message_id,content,status,base_context_revision) VALUES($1,$2,$3,$4,'completed',$5)",
+        [
+          version,
+          c.run.owner_id,
+          c.run.replacement_message_id,
+          content,
+          c.run.context_revision,
+        ],
+      );
+
+      const replacement = (
+        await tx.query(
+          "UPDATE messages SET content=$2,status='completed',context_stale=false,selected_version_id=$3 WHERE id=$1 RETURNING *",
+          [c.run.replacement_message_id, content, version],
+        )
+      ).rows[0];
+      await emit(
+        tx,
+        c.run.owner_id,
+        'message',
+        replacement.id,
+        messageView(replacement),
+      );
+    }
     const u = (
       await tx.query('UPDATE messages SET status=$2 WHERE id=$1 RETURNING *', [
         c.run.user_message_id,
@@ -849,6 +1062,7 @@ export async function regenerate(
     const world = await worldLock(tx, owner, original.world_id);
     if (
       original.state !== 'completed' ||
+      original.history_source_run_id !== null ||
       original.has_external_effects ||
       original.trigger_kind !== 'foreground' ||
       !!(

@@ -1,3 +1,4 @@
+import { command } from '../commands/index.js';
 import { randomUUID } from 'node:crypto';
 import { isIP } from 'node:net';
 import type pg from 'pg';
@@ -16,7 +17,17 @@ import { worldLock } from '../worlds/index.js';
 import { canonical, validateArguments } from './schema.js';
 export const connectionView = (r: any) => {
   const { owner_id, credential, ...rest } = r;
-  return { ...rest, credential_present: !!credential };
+  return {
+    ...rest,
+    credential_present: !!credential,
+    connection_state: r.discovery_error
+      ? r.tools?.length
+        ? 'offline_cached'
+        : 'offline'
+      : r.discovered_at
+        ? 'connected'
+        : 'unverified',
+  };
 };
 export const grantView = (r: any) => {
   const { owner_id, ...rest } = r;
@@ -63,7 +74,7 @@ export async function saveConnection(
     );
 
   const connection = id ?? randomUUID();
-  return transaction(db, async (tx) => {
+  const apply = async (tx: pg.PoolClient) => {
     await tx.query('SELECT id FROM owners WHERE id=$1 FOR NO KEY UPDATE', [
       owner,
     ]);
@@ -96,6 +107,12 @@ export async function saveConnection(
       ).rows[0];
       if (!previous || previous.revision !== revision)
         throw new AppError(409, 'revision_conflict', 'Connection changed');
+      if (previous.runtime === 'internal')
+        throw new AppError(
+          409,
+          'internal_connection',
+          'Manage internal tools through grants',
+        );
       // Empty credentials retain the secret only when endpoint and auth identity remain identical.
       const secret =
         credential ??
@@ -162,7 +179,17 @@ export async function saveConnection(
     }
     await emit(tx, owner, 'mcp_connection', connection, connectionView(row));
     return connectionView(row);
-  });
+  };
+  return input.operation_id
+    ? command(
+        db,
+        owner,
+        'mcp.connection.save',
+        input.operation_id,
+        { id, revision, ...input },
+        apply,
+      )
+    : transaction(db, apply);
 }
 export async function refreshTools(
   db: pg.Pool,
@@ -178,6 +205,7 @@ export async function refreshTools(
   ).rows[0];
   if (!c)
     throw new AppError(404, 'not_found', 'Enabled MCP connection not found');
+  if (c.runtime === 'internal') return connectionView(c);
   const signal = AbortSignal.timeout(30000);
   let tools: any[], session: Awaited<ReturnType<typeof connectMcp>> | undefined;
   try {
@@ -194,6 +222,11 @@ export async function refreshTools(
       "UPDATE mcp_connections SET discovery_error='mcp_discovery_failed' WHERE id=$1 AND revision=$2",
       [id, c.revision],
     );
+    const failed = (
+      await db.query('SELECT * FROM mcp_connections WHERE id=$1', [id])
+    ).rows[0];
+    if (failed)
+      await emit(db, owner, 'mcp_connection', id, connectionView(failed));
     throw e;
   } finally {
     await session?.close();
@@ -228,7 +261,7 @@ export async function saveGrant(
   id?: string,
   revision?: number,
 ) {
-  return transaction(db, async (tx) => {
+  const apply = async (tx: pg.PoolClient) => {
     await worldLock(tx, owner, input.world_id);
     const connection = (
       await tx.query(
@@ -247,6 +280,18 @@ export async function saveGrant(
         409,
         'tool_schema_changed',
         'Discover and select a supported current tool',
+      );
+    if (
+      connection.runtime === 'internal' &&
+      input.effect !==
+        (['save_document', 'request_system_action'].includes(input.tool_name)
+          ? 'write'
+          : 'read')
+    )
+      throw new AppError(
+        400,
+        'invalid_effect',
+        'Internal tool effect is fixed by its implementation',
       );
     const actor = (
       await tx.query(
@@ -326,7 +371,17 @@ export async function saveGrant(
     if (!row) throw new AppError(409, 'revision_conflict', 'Grant changed');
     await emit(tx, owner, 'tool_grant', grant, grantView(row));
     return grantView(row);
-  });
+  };
+  return input.operation_id
+    ? command(
+        db,
+        owner,
+        'mcp.grant.save',
+        input.operation_id,
+        { id, revision, ...input },
+        apply,
+      )
+    : transaction(db, apply);
 }
 export async function revokeGrant(db: pg.Pool, owner: string, id: string) {
   return transaction(db, async (tx) => {

@@ -44,6 +44,26 @@ const input: CompileInput = {
   model: 'synthetic-model',
 };
 describe('P2 prompt compiler', () => {
+  it('T08 history-depth insertion uses the declared user role and audits assistant downgrade', () => {
+    for (const role of ['user', 'assistant']) {
+      const c = structuredClone(input);
+      Object.assign(c.lore![0]!.data, {
+        insertion_slot: 'history_depth',
+        injection_role: role,
+      });
+      const result = compilePrompt(c);
+      expect(
+        result.messages.find((m) => m.content === '世界书资料：星港禁止明火')
+          ?.role,
+      ).toBe(role === 'user' ? 'user' : 'system');
+      expect(
+        result.manifest.decisions.find((d: any) => d.kind === 'lore'),
+      ).toMatchObject({
+        requested_role: role,
+        effective_role: role === 'user' ? 'user' : 'system',
+      });
+    }
+  });
   it('keeps imported prompt suggestions out until explicitly enabled and budgets enabled suggestions as core', () => {
     const withSuggestion = (enabled: boolean): CompileInput => ({
       ...input,
@@ -157,4 +177,67 @@ describe('P2 prompt compiler', () => {
     ]);
     expect(selectSpeakers(members, ['c', 'a'], 1, 'seed')).toEqual(['c']);
   });
+});
+
+it('lore budget exemptions still obey the global budget and history tools stay with their complete turn', () => {
+  const lore = {
+    ...input.lore[0]!,
+    data: { ...input.lore[0]!.data, constant: true, content: 'x'.repeat(1500) },
+  };
+  const normal = compilePrompt({ ...input, lore: [lore] });
+  expect(
+    normal.manifest.decisions.find((d) => d.kind === 'lore')?.included,
+  ).toBe(false);
+  const exempt = compilePrompt({
+    ...input,
+    lore: [{ ...lore, data: { ...lore.data, budget_exempt: true } }],
+  });
+  expect(
+    exempt.manifest.decisions.find((d) => d.kind === 'lore')?.included,
+  ).toBe(true);
+  const tooLarge = compilePrompt({
+    ...input,
+    lore: [
+      {
+        ...lore,
+        data: { ...lore.data, budget_exempt: true, content: 'x'.repeat(5000) },
+      },
+    ],
+  });
+  expect(
+    tooLarge.manifest.decisions.find((d) => d.kind === 'lore')?.included,
+  ).toBe(false);
+  const transcript = [
+    {
+      role: 'assistant',
+      content: '',
+      tool_calls: [
+        {
+          id: 'call-a',
+          type: 'function',
+          function: { name: 'read', arguments: '{}' },
+        },
+      ],
+    },
+    { role: 'tool', tool_call_id: 'call-a', content: 'x'.repeat(4000) },
+  ];
+  const history = [
+    {
+      id: 'u',
+      run_id: 'r',
+      role: 'user' as const,
+      content: '历史输入',
+      tool_messages: transcript,
+    },
+    { id: 'a', run_id: 'r', role: 'assistant' as const, content: '历史回答' },
+  ];
+  const trimmed = compilePrompt({ ...input, history });
+  expect(trimmed.messages.some((m) => m.content === '历史回答')).toBe(false);
+  expect(JSON.stringify(trimmed.messages)).not.toContain('call-a');
+  expect(() =>
+    compilePrompt({
+      ...input,
+      current: { id: 'oversized', content: 'x'.repeat(5000) },
+    }),
+  ).toThrow();
 });

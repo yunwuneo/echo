@@ -129,6 +129,15 @@ async function setupTool(
     private_addresses: ['127.0.0.1'],
   });
   connection = await refreshTools(db, config, owner, connection.id);
+  // Group tools now require an explicit group selection in addition to existing grants.
+  await db.query(
+    'INSERT INTO group_policies(owner_id,room_id,mcp_ids) VALUES($1,$2,$3) ON CONFLICT(room_id) DO UPDATE SET mcp_ids=$3',
+    [owner, room.id, [connection.id]],
+  );
+  await db.query(
+    'INSERT INTO group_member_policies(room_id,actor_id,tools_enabled) VALUES($1,$2,true) ON CONFLICT(room_id,actor_id) DO UPDATE SET tools_enabled=true',
+    [room.id, actors[0].id],
+  );
   grant = await saveGrant(db, owner, {
     world_id: world.id,
     actor_id: actors[0].id,
@@ -383,6 +392,57 @@ it('reports unknown after a performed write loses its reply and never reissues i
   expect(modelRequests.at(-1).messages.at(-1).content).toContain(
     'human_reported_outcome',
   );
+});
+it('Q36 preserves an unknown action receipt through source deletion and scrubs its payload after reconciliation without replay', async () => {
+  const { deleteMessage } =
+    await import('../../packages/server/src/modules/memory/repository.js');
+  await setupTool();
+  const p = await pending();
+  await decide(db, owner, p.call.id, 'approve');
+  mcp.setMode('lost');
+  await step(p.run_id);
+  const before = (
+    await db.query('SELECT * FROM tool_calls WHERE id=$1', [p.call.id])
+  ).rows[0];
+  expect(before.state).toBe('outcome_unknown');
+  await cancel(db, owner, p.run_id);
+  await deleteMessage(db, owner, p.message_id);
+  const retained = (
+    await db.query('SELECT * FROM tool_calls WHERE id=$1', [p.call.id])
+  ).rows[0];
+  expect(retained.arguments).toEqual(before.arguments);
+  expect(retained.arguments_hash).toMatch(/^[a-f0-9]{64}$/);
+  expect(retained.arguments_hash).toBe(before.arguments_hash);
+  expect(retained.state).toBe('outcome_unknown');
+  const { beginSnapshot } =
+    await import('../../packages/server/src/modules/sync/index.js');
+  const snapshot = await beginSnapshot(db, owner);
+  await decide(db, owner, p.call.id, 'confirmed_success');
+  expect(
+    (
+      await db.query('SELECT arguments FROM tool_calls WHERE id=$1', [
+        p.call.id,
+      ])
+    ).rows[0].arguments,
+  ).toEqual({});
+  expect(
+    (
+      await db.query('SELECT id FROM sync_snapshots WHERE id=$1', [
+        snapshot.snapshot_id,
+      ])
+    ).rowCount,
+  ).toBe(0);
+  expect(
+    (
+      await db.query(
+        "SELECT 1 FROM sync_events WHERE owner_id=$1 AND kind='tool_call' AND data->'arguments'=$2::jsonb",
+        [owner, JSON.stringify(before.arguments)],
+      )
+    ).rowCount,
+  ).toBe(0);
+  await step(p.run_id);
+  expect(mcp.calls).toBe(1);
+  expect((await getRun(db, owner, p.run_id)).state).toBe('cancelled');
 });
 it('checks live schema again after approval and enforces scopes before dispatch', async () => {
   await setupTool();
@@ -803,4 +863,19 @@ it('lets at most one world reserve the last shared background request', async ()
   expect(
     (await db.query('SELECT requests FROM background_daily')).rows[0].requests,
   ).toBe(1);
+});
+it('T13 revoking a member group tool permission blocks an approved external write before dispatch', async () => {
+  await setupTool('write', 'each');
+  const p = await pending();
+  await decide(db, owner, p.call.id, 'approve');
+  await db.query(
+    'UPDATE group_member_policies SET tools_enabled=false,revision=revision+1 WHERE room_id=$1 AND actor_id=$2',
+    [room.id, actors[0].id],
+  );
+  await step(p.run_id);
+  expect(mcp.calls).toBe(0);
+  expect(
+    (await db.query('SELECT state FROM tool_calls WHERE id=$1', [p.call.id]))
+      .rows[0].state,
+  ).not.toBe('succeeded');
 });

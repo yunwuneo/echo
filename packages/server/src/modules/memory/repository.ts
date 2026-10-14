@@ -1,3 +1,4 @@
+import { canonical } from '../mcp/schema.js';
 import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { transaction, type DB } from '../../db/index.js';
@@ -123,11 +124,7 @@ export async function saveSettings(
         ],
       )
     ).rows[0];
-    if (changed)
-      await tx.query(
-        'DELETE FROM memory_vectors WHERE memory_id IN (SELECT id FROM memories WHERE world_id=$1)',
-        [world],
-      );
+
     await tx.query(
       'UPDATE worlds SET memory_epoch=memory_epoch+1 WHERE id=$1',
       [world],
@@ -171,6 +168,37 @@ export async function invalidateSources(
     )
   ).rows.map((r) => r.id);
   if (!ids.length) return;
+  const materials = (
+    await db.query(
+      "UPDATE memory_materials SET source_missing=true,revision=revision+1 WHERE owner_id=$1 AND NOT independent AND EXISTS(SELECT 1 FROM jsonb_array_elements(source_snapshot) s WHERE s->>'id'=ANY($2::text[])) RETURNING id",
+      [owner, ids],
+    )
+  ).rows;
+  await db.query(
+    'DELETE FROM memory_source_vectors WHERE message_id=ANY($1::uuid[])',
+    [ids],
+  );
+  if (erase) {
+    for (const material of materials)
+      await db.query(
+        "INSERT INTO privacy_deletions(owner_id,entity_id,kind) VALUES($1,$2,'memory') ON CONFLICT DO NOTHING",
+        [owner, material.id],
+      );
+    await db.query(
+      "UPDATE voice_turns SET transcript='' WHERE run_id IN(SELECT run_id FROM messages WHERE id=ANY($1::uuid[]))",
+      [ids],
+    );
+    await db.query(
+      "UPDATE memory_materials SET content='',summary='',title='',content_hash=$3 WHERE owner_id=$1 AND id=ANY($2::uuid[])",
+      [owner, materials.map((m) => m.id), hash('')],
+    );
+    await db.query(
+      "DELETE FROM memory_corrections WHERE owner_id=$1 AND EXISTS(SELECT 1 FROM jsonb_array_elements(changes) c WHERE c->>'id'=ANY($2::text[]))",
+      [owner, materials.map((m) => m.id)],
+    );
+    await db.query('DELETE FROM restore_sessions WHERE owner_id=$1', [owner]);
+  }
+
   await db.query(
     'UPDATE worlds SET memory_epoch=memory_epoch+1 WHERE id=$1 AND owner_id=$2',
     [world, owner],
@@ -179,10 +207,11 @@ export async function invalidateSources(
     'UPDATE messages SET memory_excluded=true WHERE id=ANY($1::uuid[])',
     [ids],
   );
-  // Tool transcripts are derived from the same prompt sources. Erase payloads while retaining side-effect status.
+  // Unreconciled actions retain their independent receipt until reconciled;
+  // erasing a conversation must not destroy the target needed for reconciliation.
   const calls = (
     await db.query(
-      "UPDATE tool_calls SET arguments='{}',result=NULL,error_code='source_invalidated',state=CASE WHEN state IN ('pending','approved') THEN 'denied' ELSE state END WHERE run_id IN (SELECT run_id FROM messages WHERE id=ANY($1::uuid[])) RETURNING *",
+      "UPDATE tool_calls SET arguments=CASE WHEN state IN ('executing','outcome_unknown') THEN arguments ELSE '{}'::jsonb END,result=CASE WHEN state IN ('executing','outcome_unknown') THEN result ELSE NULL END,error_code='source_invalidated',state=CASE WHEN state IN ('pending','approved') THEN 'denied' ELSE state END WHERE run_id IN (SELECT run_id FROM messages WHERE id=ANY($1::uuid[])) RETURNING *",
       [ids],
     )
   ).rows;
@@ -206,7 +235,95 @@ export async function invalidateSources(
     await db.query('DELETE FROM memory_revisions WHERE memory_id=$1', [m.id]);
     await publishMemory(db, m);
   }
+  await db.query(
+    'DELETE FROM time_recaps WHERE room_id IN (SELECT room_id FROM messages WHERE id=ANY($1::uuid[]))',
+    [ids],
+  );
   if (erase) {
+    const runs = (
+      await db.query(
+        'SELECT DISTINCT run_id FROM messages WHERE id=ANY($1::uuid[])',
+        [ids],
+      )
+    ).rows.map((r) => r.run_id);
+    await db.query(
+      'DELETE FROM share_draft_assets WHERE draft_id IN(SELECT id FROM share_drafts WHERE owner_id=$1 AND run_id=ANY($2::uuid[]))',
+      [owner, runs],
+    );
+    await db.query(
+      "UPDATE share_drafts SET content='',asset_ids='{}' WHERE owner_id=$1 AND run_id=ANY($2::uuid[])",
+      [owner, runs],
+    );
+    const jobs = (
+      await db.query(
+        "SELECT * FROM host_jobs WHERE owner_id=$1 AND relay_run_id=ANY($2::uuid[]) AND state NOT IN ('accepted','executing','unknown')",
+        [owner, runs],
+      )
+    ).rows;
+    for (const job of jobs) {
+      await db.query(
+        "UPDATE host_jobs SET payload='{}',payload_hash=$2,result=NULL,error_code='source_invalidated',state=CASE WHEN state='pending' THEN 'cancelled' ELSE state END WHERE id=$1",
+        [
+          job.id,
+          hash(
+            canonical({ scope: job.scope, payload: {}, budget: job.budget }),
+          ),
+        ],
+      );
+      const receipts = (
+        await db.query('SELECT * FROM host_receipts WHERE job_id=$1', [job.id])
+      ).rows;
+      for (const receipt of receipts) {
+        const body = { ...receipt.body, result: { redacted: true } };
+        await db.query(
+          'UPDATE host_receipts SET body=$3,payload_hash=$4 WHERE job_id=$1 AND receipt_id=$2',
+          [
+            job.id,
+            receipt.receipt_id,
+            JSON.stringify(body),
+            hash(canonical(body)),
+          ],
+        );
+      }
+    }
+    await db.query(
+      "UPDATE host_snapshots SET materials='[]',source_hash=$3,revision=revision+1 WHERE owner_id=$1 AND EXISTS(SELECT 1 FROM jsonb_array_elements(materials) m WHERE m->>'id'=ANY($2::text[]))",
+      [owner, materials.map((m) => m.id), hash('[]')],
+    );
+    // Completed command replay can contain a second copy of an erased share or Host result.
+    await db.query(
+      "UPDATE operation_receipts SET result=jsonb_build_object('redacted',true)||jsonb_strip_nulls(jsonb_build_object('id',result->'id','message_id',result->'message_id','run_id',result->'run_id')) WHERE owner_id=$1 AND (command_type LIKE 'host.%' OR command_type LIKE 'platform.%' OR command_type LIKE 'storage.%')",
+      [owner],
+    );
+    await db.query('DELETE FROM restore_sessions WHERE owner_id=$1', [owner]);
+    await db.query(
+      'DELETE FROM request_snapshots WHERE run_id IN (SELECT run_id FROM messages WHERE id=ANY($1::uuid[]))',
+      [ids],
+    );
+    await db.query(
+      'DELETE FROM run_prompt_profiles WHERE run_id IN (SELECT run_id FROM messages WHERE id=ANY($1::uuid[]))',
+      [ids],
+    );
+    // Consumed draft text is a second persisted copy of the user input.
+    await db.query(
+      "UPDATE conversation_inputs SET content='' WHERE owner_id=$1 AND consumed_run_id IN (SELECT run_id FROM messages WHERE id=ANY($2::uuid[]) AND role='user')",
+      [owner, ids],
+    );
+    const assets = (
+      await db.query(
+        'DELETE FROM asset_references WHERE owner_id=$1 AND message_id=ANY($2::uuid[]) RETURNING asset_id',
+        [owner, ids],
+      )
+    ).rows;
+    for (const asset of new Set(assets.map((a) => a.asset_id))) {
+      const row = (
+        await db.query(
+          'UPDATE assets SET revision=revision+1,updated_at=now() WHERE owner_id=$1 AND id=$2 RETURNING id,world_id,actor_id,content_hash,mime,size,revision',
+          [owner, asset],
+        )
+      ).rows[0];
+      if (row) await emit(db, owner, 'asset', row.id, row);
+    }
     await db.query(
       "INSERT INTO privacy_deletions(owner_id,entity_id,kind) SELECT $1,unnest($2::uuid[]),'message' ON CONFLICT DO NOTHING",
       [owner, ids],
@@ -362,7 +479,7 @@ export async function deleteMessage(db: pg.Pool, owner: string, id: string) {
     if (
       (
         await tx.query(
-          "SELECT 1 FROM runs WHERE world_id=$1 AND state IN ('queued','running','awaiting_approval')",
+          "SELECT 1 FROM runs WHERE world_id=$1 AND state IN ('queued','running','awaiting_approval','remote_pending')",
           [source.world_id],
         )
       ).rowCount

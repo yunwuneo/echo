@@ -1,3 +1,4 @@
+import { prepareVariables } from '../prompts/index.js';
 import { executeTool, proposeTool } from '../mcp/gateway.js';
 import { queryEmbedding } from '../memory/embeddings.js';
 import type pg from 'pg';
@@ -11,9 +12,16 @@ export async function execute(
   runId: string,
   stopping?: AbortSignal,
 ) {
-  const vector = await queryEmbedding(db, config, runId, stopping).catch(
-    () => undefined,
-  );
+  if (!(await prepareVariables(db, config, runId))) return;
+  const requiredFailure = (
+    await db.query(
+      'SELECT 1 FROM run_prompt_profiles WHERE run_id=$1 AND variable_error IS NOT NULL LIMIT 1',
+      [runId],
+    )
+  ).rowCount;
+  const vector = requiredFailure
+    ? undefined
+    : await queryEmbedding(db, config, runId, stopping).catch(() => undefined);
   const c = await claim(
     db,
     runId,

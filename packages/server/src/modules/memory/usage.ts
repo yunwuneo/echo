@@ -11,9 +11,10 @@ export async function reserveBackground(
   kind: string,
   input: number,
   output: number,
+  manual = false,
 ) {
   const { g, p } = await policies(db, owner, world, true);
-  if (!backgroundAllowed(g, p, kind))
+  if (!manual && !backgroundAllowed(g, p, kind))
     throw new AppError(
       429,
       'autonomy_disabled',
@@ -81,6 +82,8 @@ export async function reserveBackground(
     'INSERT INTO background_usage(id,owner_id,world_id,kind,input_reserved,output_reserved,day,global_revision,policy_revision) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)',
     [id, owner, world, kind, input, output, day, g.revision, p.revision],
   );
+  if (manual)
+    await db.query('UPDATE background_usage SET manual=true WHERE id=$1', [id]);
   return id;
 }
 export async function settleBackground(

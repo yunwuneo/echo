@@ -130,7 +130,32 @@ export async function prepareRestored(db: pg.Pool, config: Config) {
       "UPDATE tool_calls SET state=CASE WHEN state='executing' THEN 'outcome_unknown' ELSE 'expired' END,error_code='database_restored' WHERE state IN ('pending','approved','executing')",
     );
     await tx.query(
-      "UPDATE runs SET state='interrupted',error_code='database_restored',lease_holder=NULL WHERE state IN ('queued','running','awaiting_approval')",
+      'UPDATE schedules SET enabled=false,epoch=epoch+1,revision=revision+1',
+    );
+    await tx.query(
+      "UPDATE event_triggers SET enabled=false,state='revoke_pending',revision=revision+1",
+    );
+    await tx.query(
+      "UPDATE host_nodes SET revoked_at=now(),grants='{}',token_hash='',revision=revision+1",
+    );
+    await tx.query(
+      "UPDATE host_jobs SET state=CASE WHEN state='pending' THEN 'cancelled' ELSE 'unknown' END WHERE state IN ('pending','accepted','executing')",
+    );
+    await tx.query(
+      "UPDATE system_actions SET state=CASE WHEN state='executing' THEN 'unknown' ELSE 'denied' END WHERE state IN ('pending','approved','executing')",
+    );
+    await tx.query(
+      'UPDATE system_policies SET enabled=false,revision=revision+1',
+    );
+    await tx.query(
+      'UPDATE remote_backup_plans SET enabled=false,revision=revision+1',
+    );
+    await tx.query(
+      "UPDATE execution_delegations SET state='pending',lease_until=now(),revocation_ack=false,epoch=epoch+1",
+    );
+    await tx.query('UPDATE reply_relays SET enabled=false,revision=revision+1');
+    await tx.query(
+      "UPDATE runs SET state='interrupted',error_code='database_restored',lease_holder=NULL WHERE state IN ('queued','running','awaiting_approval','remote_pending')",
     );
     await tx.query(
       "UPDATE messages SET status='interrupted' WHERE status IN ('streaming','accepted') AND run_id IN (SELECT id FROM runs WHERE error_code='database_restored')",
@@ -206,6 +231,14 @@ export async function inventory(db: DB) {
     'character_versions',
     'lore_entries',
     'import_jobs',
+    'assets',
+    'asset_references',
+    'model_routes',
+    'run_route_snapshots',
+    'operation_receipts',
+    'message_versions',
+    'conversation_inputs',
+    'conversation_branches',
   ];
   const data: Record<string, unknown> = {};
   for (const table of tables)

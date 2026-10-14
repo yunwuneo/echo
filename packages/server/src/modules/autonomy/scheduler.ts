@@ -44,7 +44,7 @@ export async function scheduleAutonomy(db: pg.Pool, clock?: Date) {
         if (
           (
             await tx.query(
-              "SELECT 1 FROM runs WHERE owner_id=$1 AND state IN ('queued','running','awaiting_approval') AND (world_id=$2 OR trigger_kind<>'foreground') LIMIT 1",
+              "SELECT 1 FROM runs WHERE owner_id=$1 AND state IN ('queued','running','awaiting_approval','remote_pending') AND (world_id=$2 OR trigger_kind<>'foreground') LIMIT 1",
               [item.owner_id, item.world_id],
             )
           ).rowCount

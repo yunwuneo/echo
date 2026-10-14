@@ -15,6 +15,12 @@ export async function embedding(
   dimensions: number,
   signal: AbortSignal,
 ) {
+  if ((provider.protocol ?? 'openai') !== 'openai')
+    throw new AppError(
+      409,
+      'embedding_protocol_unsupported',
+      'Configure an OpenAI-compatible embedding route',
+    );
   const { base, addresses } = await resolveEndpoint(provider.base_url, config);
   const dispatcher = new Agent({
     connect: {
@@ -186,11 +192,30 @@ export async function rebuildEmbedding(
 ) {
   const m = (
     await db.query(
-      `SELECT m.* FROM memories m JOIN memory_settings s ON s.world_id=m.world_id LEFT JOIN memory_vectors v ON v.memory_id=m.id AND v.revision=m.revision AND v.index_version=s.index_version WHERE m.world_id=$1 AND m.status IN ('active','claimed') AND (m.valid_to IS NULL OR m.valid_to>now()) AND v.memory_id IS NULL ORDER BY m.created_at LIMIT 1`,
+      `SELECT m.* FROM memories m JOIN memory_settings s ON s.world_id=m.world_id LEFT JOIN memory_vectors v ON v.memory_id=m.id AND v.revision=m.revision AND v.index_version=s.index_version WHERE m.world_id=$1 AND m.status IN ('active','claimed') AND (m.valid_to IS NULL OR m.valid_to>now()) AND v.memory_id IS NULL AND NOT EXISTS(SELECT 1 FROM memory_index_shards f WHERE f.memory_id=m.id AND f.index_version=s.index_version AND f.state='skipped') ORDER BY m.created_at LIMIT 1`,
       [worldId],
     )
   ).rows[0];
-  if (!m) return;
+  if (!m) {
+    await transaction(db, async (tx) => {
+      const settings = (
+        await tx.query(
+          'SELECT * FROM memory_settings WHERE world_id=$1 FOR UPDATE',
+          [worldId],
+        )
+      ).rows[0];
+      if (!settings) return;
+      await tx.query(
+        'UPDATE memory_settings SET active_index_version=index_version WHERE world_id=$1',
+        [worldId],
+      );
+      await tx.query(
+        'DELETE FROM memory_vectors WHERE memory_id IN(SELECT id FROM memories WHERE world_id=$1) AND index_version<>$2',
+        [worldId, settings.index_version],
+      );
+    });
+    return;
+  }
   const c = await embedContent(
     db,
     config,
@@ -199,7 +224,13 @@ export async function rebuildEmbedding(
     'memory_embedding',
     stopping,
   );
-  if (!c) return;
+  if (!c) {
+    await db.query(
+      "INSERT INTO memory_index_shards(memory_id,index_version,state,error_code) SELECT $1,index_version,'failed',index_error FROM memory_settings WHERE world_id=$2 AND index_error IS NOT NULL ON CONFLICT(memory_id,index_version) DO UPDATE SET state='failed',error_code=EXCLUDED.error_code",
+      [m.id, worldId],
+    );
+    return;
+  }
   await transaction(db, async (tx) => {
     const world = await worldLock(tx, m.owner_id, worldId);
     if (
@@ -208,9 +239,29 @@ export async function rebuildEmbedding(
     )
       return;
     await tx.query(
-      `INSERT INTO memory_vectors(memory_id,revision,index_version,embedding) SELECT m.id,m.revision,s.index_version,$4::vector FROM memories m JOIN memory_settings s ON s.world_id=m.world_id WHERE m.id=$1 AND m.revision=$2 AND s.index_version=$3 AND m.status IN ('active','claimed') ON CONFLICT(memory_id) DO UPDATE SET revision=EXCLUDED.revision,index_version=EXCLUDED.index_version,embedding=EXCLUDED.embedding`,
+      `INSERT INTO memory_vectors(memory_id,revision,index_version,embedding) SELECT m.id,m.revision,s.index_version,$4::vector FROM memories m JOIN memory_settings s ON s.world_id=m.world_id WHERE m.id=$1 AND m.revision=$2 AND s.index_version=$3 AND m.status IN ('active','claimed') ON CONFLICT(memory_id,index_version) DO UPDATE SET revision=EXCLUDED.revision,embedding=EXCLUDED.embedding`,
       [m.id, m.revision, c.settings.index_version, JSON.stringify(c.vector)],
     );
+    await tx.query(
+      'DELETE FROM memory_index_shards WHERE memory_id=$1 AND index_version=$2',
+      [m.id, c.settings.index_version],
+    );
+    const remaining = (
+      await tx.query(
+        "SELECT 1 FROM memories m LEFT JOIN memory_vectors v ON v.memory_id=m.id AND v.revision=m.revision AND v.index_version=$2 WHERE m.world_id=$1 AND m.status IN ('active','claimed') AND v.memory_id IS NULL AND NOT EXISTS(SELECT 1 FROM memory_index_shards f WHERE f.memory_id=m.id AND f.index_version=$2 AND f.state='skipped') LIMIT 1",
+        [worldId, c.settings.index_version],
+      )
+    ).rowCount;
+    if (!remaining) {
+      await tx.query(
+        'UPDATE memory_settings SET active_index_version=index_version WHERE world_id=$1 AND index_version=$2',
+        [worldId, c.settings.index_version],
+      );
+      await tx.query(
+        'DELETE FROM memory_vectors WHERE memory_id IN(SELECT id FROM memories WHERE world_id=$1) AND index_version<>$2',
+        [worldId, c.settings.index_version],
+      );
+    }
   });
 }
 export async function queryEmbedding(

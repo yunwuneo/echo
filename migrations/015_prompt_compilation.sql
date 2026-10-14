@@ -1,0 +1,4 @@
+CREATE TABLE prompt_presets(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), owner_id uuid NOT NULL REFERENCES owners(id), name text NOT NULL, revision integer NOT NULL DEFAULT 1, data jsonb NOT NULL, UNIQUE(owner_id,id));
+CREATE TABLE prompt_profiles(owner_id uuid NOT NULL REFERENCES owners(id), subject_id uuid NOT NULL, revision integer NOT NULL DEFAULT 1, data jsonb NOT NULL, PRIMARY KEY(owner_id,subject_id));
+CREATE TABLE run_prompt_profiles(run_id uuid NOT NULL REFERENCES runs(id), actor_key text NOT NULL, data jsonb NOT NULL, variables jsonb, variable_error text, PRIMARY KEY(run_id,actor_key));
+CREATE TABLE request_snapshots(run_id uuid NOT NULL REFERENCES runs(id), attempt integer NOT NULL, owner_id uuid NOT NULL REFERENCES owners(id), payload jsonb NOT NULL, payload_hash text NOT NULL, PRIMARY KEY(run_id,attempt));

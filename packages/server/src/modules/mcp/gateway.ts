@@ -1,3 +1,6 @@
+import { validSchedule } from '../schedules/guard.js';
+import { groupToolAllowed } from '../groups/index.js';
+import { executeInternal, documentTools } from '../documents/tools.js';
 import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { transaction, type DB } from '../../db/index.js';
@@ -8,6 +11,7 @@ import { emit, runView, messageView } from '../sync/index.js';
 import { owned, type Claim, type Usage } from '../runs/repository.js';
 import { worldLock } from '../worlds/index.js';
 import { settleBackground } from '../memory/usage.js';
+import { purgeReplay } from '../memory/repository.js';
 import { canonical, validateArguments, boundedResult } from './schema.js';
 import { connectMcp, discover, hideCredential } from './transport.js';
 import { callView } from './connections.js';
@@ -20,8 +24,12 @@ export async function availableTools(db: DB, run: any, actor: string | null) {
       [run.owner_id, run.world_id, actor],
     )
   ).rows;
+  const permitted = [];
+  for (const grant of grants)
+    if (await groupToolAllowed(db, run, actor, grant.connection_id))
+      permitted.push(grant);
   const counts = new Map<string, number>();
-  return grants
+  return permitted
     .flatMap((grant) => {
       const tool = grant.tools.find(
         (t: any) =>
@@ -104,6 +112,18 @@ async function authorized(db: DB, run: any, call: any) {
   );
   const flag = call.effect === 'read' ? 'tools_read' : 'tools_write';
   if (
+    (connection?.runtime === 'internal' &&
+      call.effect !==
+        (['save_document', 'request_system_action'].includes(call.tool_name)
+          ? 'write'
+          : 'read')) ||
+    !(await groupToolAllowed(
+      db,
+      run,
+      actor,
+      call.connection_id ?? connection?.id,
+    )) ||
+    !(await validSchedule(db, run)) ||
     !grant?.enabled ||
     !connection?.enabled ||
     !tool ||
@@ -193,7 +213,7 @@ export async function proposeTool(
         ])
       ).rows[0].count,
     );
-    if (count >= 4)
+    if (count >= (c.run.tool_limit ?? 4))
       throw new AppError(
         400,
         'tool_loop_limit',
@@ -222,6 +242,33 @@ export async function proposeTool(
         'invalid_tool_arguments',
         'Tool arguments must be JSON',
       );
+    }
+    const prior = (
+      await tx.query(
+        'SELECT * FROM tool_calls WHERE run_id=$1 AND model_call_id=$2',
+        [c.run.id, intent.id],
+      )
+    ).rows[0];
+    if (prior) {
+      if (
+        prior.model_name !== intent.name ||
+        prior.arguments_hash !== hash(canonical(args))
+      )
+        throw new AppError(
+          409,
+          'idempotency_conflict',
+          'Tool call identity reused with different arguments',
+        );
+      await release(
+        tx,
+        c,
+        ['pending', 'executing', 'outcome_unknown'].includes(prior.state)
+          ? 'awaiting_approval'
+          : 'queued',
+        null,
+        usage,
+      );
+      return prior;
     }
     const { g, p } = await policies(tx, c.run.owner_id, c.run.world_id, true);
     const grant = selected.grant;
@@ -313,6 +360,39 @@ export async function executeTool(
   try {
     const validated = await owned(db, c, (tx) => authorized(tx, c.run, call));
     if (!validated) return;
+    if (validated.connection.runtime === 'internal') {
+      await owned(db, c, async (tx) => {
+        await authorized(tx, c.run, call);
+        if (
+          !documentTools.some(
+            (t) =>
+              t.name === call.tool_name && t.schema_hash === call.schema_hash,
+          )
+        )
+          throw new AppError(
+            409,
+            'tool_schema_changed',
+            'Internal schema changed',
+          );
+        const fresh = (
+          await tx.query(
+            "SELECT * FROM tool_calls WHERE id=$1 AND state='approved' FOR UPDATE",
+            [call.id],
+          )
+        ).rows[0];
+        if (!fresh) return;
+        const result = boundedResult(await executeInternal(tx, c.run, fresh));
+        const row = (
+          await tx.query(
+            "UPDATE tool_calls SET state='succeeded',result=$2,truncated=$3,dispatched_at=now() WHERE id=$1 RETURNING *",
+            [call.id, result.text, result.truncated],
+          )
+        ).rows[0];
+        await emit(tx, c.run.owner_id, 'tool_call', call.id, callView(row));
+        await release(tx, c, 'queued', null, null);
+      });
+      return;
+    }
     session = await connectMcp(validated.connection, config, signal);
     const tools = await discover(session.client, signal);
     if (
@@ -416,7 +496,7 @@ export async function decide(
       await tx.query('SELECT * FROM tool_calls WHERE id=$1 FOR UPDATE', [id])
     ).rows[0];
     const cancelledReconciliation =
-      freshRun.state === 'cancelled' &&
+      ['cancelled', 'interrupted'].includes(freshRun.state) &&
       call.state === 'outcome_unknown' &&
       ['confirmed_success', 'confirmed_failure'].includes(decision);
     if (freshRun.state !== 'awaiting_approval' && !cancelledReconciliation)
@@ -450,7 +530,7 @@ export async function decide(
     }
     const row = (
       await tx.query(
-        "UPDATE tool_calls SET state=$2,result=CASE WHEN $2='resolved' THEN $3 ELSE result END,decision=$4,decided_at=now() WHERE id=$1 RETURNING *",
+        "UPDATE tool_calls SET state=$2,result=CASE WHEN $2='resolved' THEN $3 ELSE result END,arguments=CASE WHEN $2='resolved' AND error_code='source_invalidated' THEN '{}'::jsonb ELSE arguments END,decision=$4,decided_at=now() WHERE id=$1 RETURNING *",
         [
           id,
           state,
@@ -463,6 +543,8 @@ export async function decide(
         ],
       )
     ).rows[0];
+    if (state === 'resolved' && call.error_code === 'source_invalidated')
+      await purgeReplay(tx, owner);
     if (cancelledReconciliation) {
       await emit(tx, owner, 'tool_call', id, callView(row));
       return callView(row);

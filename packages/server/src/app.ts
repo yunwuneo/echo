@@ -1,4 +1,15 @@
+import { pairHost, hostRPC } from './modules/hosts/index.js';
+import { receiveEvent } from './modules/schedules/index.js';
+import { milestone } from './modules/conversations/api.js';
 import { assertAvailable, diagnostics } from './modules/operations/index.js';
+import {
+  createAsset,
+  readAsset,
+  referenceAsset,
+  previewAssetDeletion,
+  deleteAsset,
+} from './modules/assets/index.js';
+import { listModelRoutes, saveModelRoute } from './modules/providers/routes.js';
 import { exportOwner } from './modules/exports/index.js';
 import {
   notificationStatus,
@@ -56,7 +67,24 @@ import {
   revoke,
   type Identity,
 } from './modules/pairing/auth.js';
-import { createProvider, providerView } from './modules/providers/index.js';
+import {
+  createProvider,
+  updateProvider,
+  providerView,
+} from './modules/providers/index.js';
+import { command } from './modules/commands/index.js';
+import { branchConversation } from './modules/conversations/branches.js';
+import {
+  queuedInputs,
+  queueInput,
+  updateQueuedInput,
+  startQueuedTurn,
+} from './modules/conversations/queue.js';
+import {
+  messageVersions,
+  editMessage,
+  exportConversation,
+} from './modules/conversations/versions.js';
 import {
   cancel,
   enqueue,
@@ -159,6 +187,22 @@ export async function buildApp(
     string,
     (r: FastifyRequest, reply: any) => Promise<unknown>
   > = {
+    hostPair: async (r) => pairHost(db, r.body),
+    hostRPC: async (r) =>
+      hostRPC(
+        db,
+        r.headers.authorization,
+        r.body,
+        String(r.headers['x-echo-signature'] ?? ''),
+      ),
+    receiveEvent: async (r) =>
+      receiveEvent(
+        db,
+        config,
+        id(r),
+        r.body,
+        String(r.headers['x-echo-signature'] ?? ''),
+      ),
     notificationStatus: async (r) =>
       notificationStatus(db, config, identities.get(r)!),
     beginPushBinding: async (r) => beginBinding(db, config, identities.get(r)!),
@@ -409,6 +453,9 @@ export async function buildApp(
           'notifications',
           'owner-export',
           'diagnostics',
+          'actor-model-routes',
+          'asset-references',
+          'message-versions',
         ],
       };
     },
@@ -440,18 +487,111 @@ export async function buildApp(
       reply.code(204);
       return null;
     },
+    createAsset: async (r, reply) => {
+      reply.code(201);
+      return createAsset(
+        db,
+        owner(r),
+        r.body as Parameters<typeof createAsset>[2],
+      );
+    },
+    messageVersions: async (r) => messageVersions(db, owner(r), id(r)),
+    editMessage: async (r) =>
+      editMessage(
+        db,
+        owner(r),
+        id(r),
+        r.body as Parameters<typeof editMessage>[3],
+      ),
+    exportConversation: async (r) => exportConversation(db, owner(r), id(r)),
+    readAsset: async (r) => readAsset(db, owner(r), id(r)),
+    referenceAsset: async (r) =>
+      referenceAsset(
+        db,
+        owner(r),
+        id(r),
+        r.body as Parameters<typeof referenceAsset>[3],
+      ),
+    previewAssetDeletion: async (r) =>
+      previewAssetDeletion(db, owner(r), id(r)),
+    deleteAsset: async (r) =>
+      deleteAsset(
+        db,
+        owner(r),
+        id(r),
+        r.body as Parameters<typeof deleteAsset>[3],
+      ),
+    milestone: async (r) =>
+      milestone(db, config, owner(r), r.body, identities.get(r)!.deviceId),
+    modelRoutes: async (r) => ({ items: await listModelRoutes(db, owner(r)) }),
+    branchConversation: async (r) =>
+      branchConversation(
+        db,
+        owner(r),
+        id(r),
+        r.body as Parameters<typeof branchConversation>[3],
+      ),
+    queuedInputs: async (r) => ({
+      items: await queuedInputs(db, owner(r), id(r)),
+    }),
+    queueInput: async (r) =>
+      queueInput(
+        db,
+        owner(r),
+        id(r),
+        r.body as Parameters<typeof queueInput>[3],
+      ),
+    updateQueuedInput: async (r) =>
+      updateQueuedInput(
+        db,
+        owner(r),
+        id(r),
+        r.body as Parameters<typeof updateQueuedInput>[3],
+      ),
+    startQueuedTurn: async (r) =>
+      startQueuedTurn(
+        db,
+        owner(r),
+        id(r),
+        r.body as Parameters<typeof startQueuedTurn>[3],
+      ),
+    saveModelRoute: async (r) =>
+      saveModelRoute(
+        db,
+        owner(r),
+        r.body as Parameters<typeof saveModelRoute>[2],
+      ),
     providers: async (r) => ({
       items: (
         await db.query(
-          'SELECT id,name,base_url,model,context_window,max_output_tokens,tools_enabled FROM provider_connections WHERE owner_id=$1 ORDER BY id',
+          "SELECT id,name,base_url,model,context_window,max_output_tokens,tools_enabled,vision_enabled,revision,(credential ? 'data') AS credential_present FROM provider_connections WHERE owner_id=$1 ORDER BY id",
           [owner(r)],
         )
       ).rows.map(providerView),
     }),
     createProvider: async (r, reply) => {
       reply.code(201);
-      return createProvider(db, config, owner(r), r.body as ProviderInput);
+      const input = r.body as ProviderInput;
+      return input.operation_id
+        ? command(
+            db,
+            owner(r),
+            'provider.create',
+            input.operation_id,
+            input,
+            (tx) => createProvider(tx, config, owner(r), input),
+          )
+        : createProvider(db, config, owner(r), input);
     },
+    updateProvider: async (r) =>
+      updateProvider(
+        db,
+        config,
+        owner(r),
+        id(r),
+        Number(r.headers['if-match']),
+        r.body as Parameters<typeof updateProvider>[5],
+      ),
     send: async (r, reply) => {
       reply.code(202);
       return enqueue(db, owner(r), id(r), r.body as MessageInput);
@@ -571,9 +711,16 @@ export async function buildApp(
           owner(r),
           resource,
           method,
-          r.body,
+          r.body
+            ? Object.fromEntries(
+                Object.entries(r.body as object).filter(
+                  ([k]) => k !== 'operation_id',
+                ),
+              )
+            : undefined,
           method === 'POST' ? undefined : id(r),
           Number(r.headers['if-match']),
+          (r.body as any)?.operation_id,
         );
         reply.code(method === 'POST' ? 201 : method === 'DELETE' ? 204 : 200);
         return result;
@@ -583,6 +730,9 @@ export async function buildApp(
     app.route({
       ...route,
       ...(name === 'importPreview' ? { bodyLimit: 15 * 1024 * 1024 } : {}),
+      ...(name === 'hostRPC' ? { bodyLimit: 3 * 1024 * 1024 } : {}),
+      ...(name === 'milestone' ? { bodyLimit: 24 * 1024 * 1024 } : {}),
+      ...(name === 'createAsset' ? { bodyLimit: 1500000 } : {}),
       preHandler: async (r) => {
         await assertAvailable(db);
         if (route.schema.security.length)

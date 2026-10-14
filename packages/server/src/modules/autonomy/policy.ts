@@ -119,6 +119,12 @@ export async function validBackground(
 export async function validReservation(db: DB, id: string) {
   const u = (await db.query('SELECT * FROM background_usage WHERE id=$1', [id]))
     .rows[0];
+  if (u?.manual)
+    return !!(
+      await db.query('SELECT 1 FROM worlds WHERE id=$1 AND NOT deleted', [
+        u.world_id,
+      ])
+    ).rowCount;
   return (
     !!u &&
     (await validBackground(

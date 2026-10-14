@@ -1,5 +1,7 @@
 import { createServer, type ServerResponse } from 'node:http';
 export type Mode =
+  | 'memory-invalid-json'
+  | 'recap-failure'
   | 'success'
   | 'partial'
   | 'malformed'
@@ -19,6 +21,27 @@ export async function mockModel() {
     for await (const chunk of req) body += chunk;
     requests.push(JSON.parse(body));
     const parsed = JSON.parse(body);
+    if (
+      parsed.messages?.[0]?.content?.startsWith('整理授权资料') &&
+      (mode === 'success' || mode === 'memory-invalid-json')
+    ) {
+      const content =
+        mode === 'memory-invalid-json'
+          ? '{incomplete'
+          : JSON.stringify({
+              content: '合成整理正文',
+              summary: '合成摘要',
+            });
+      res.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      setTimeout(
+        () =>
+          res.end(
+            `data: ${JSON.stringify({ choices: [{ index: 0, delta: { content } }] })}\n\ndata: ${JSON.stringify({ choices: [{ index: 0, delta: {}, finish_reason: 'stop' }], usage: { prompt_tokens: 20, completion_tokens: 20 } })}\n\ndata: [DONE]\n\n`,
+          ),
+        100,
+      );
+      return;
+    }
     if (parsed.messages?.[0]?.content?.startsWith('从资料提取')) {
       const source = JSON.parse(parsed.messages.at(-1).content).find(
         (m: any) => m.role === 'user',
@@ -41,7 +64,11 @@ export async function mockModel() {
       );
       return;
     }
-    if (mode === 'rate-limit') {
+    if (
+      mode === 'rate-limit' ||
+      (mode === 'recap-failure' &&
+        parsed.messages?.[0]?.content?.startsWith('简要回顾'))
+    ) {
       res.writeHead(429);
       res.end();
       return;

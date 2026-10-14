@@ -60,7 +60,7 @@ export async function retrieve(
       `WITH allowed AS MATERIALIZED (
     SELECT m.* FROM memories m JOIN worlds w ON w.id=m.world_id WHERE m.owner_id=$1 AND m.world_id=$2 AND NOT w.deleted
     AND m.status IN ('active','claimed') AND (m.valid_to IS NULL OR m.valid_to>now()) AND $3=ANY(m.audience_actor_ids)
-    AND NOT EXISTS(SELECT 1 FROM memory_evidence e JOIN messages s ON s.id=e.message_id WHERE e.memory_id=m.id AND (s.memory_excluded OR s.status<>'completed'))
+    AND NOT EXISTS(SELECT 1 FROM memory_evidence e JOIN messages s ON s.id=e.message_id JOIN rooms source_room ON source_room.id=s.room_id WHERE e.memory_id=m.id AND (s.memory_excluded OR s.status<>'completed' OR NOT source_room.memory_participation))
   ) SELECT a.*,NULL::float AS similarity FROM allowed a WHERE pinned OR terms && $4::text[] ORDER BY manual DESC,valid_from DESC LIMIT 200`,
       [owner, world, actor, terms(query)],
     )
@@ -70,10 +70,10 @@ export async function retrieve(
       await db.query(
         `WITH allowed AS MATERIALIZED (
       SELECT m.*,v.embedding FROM memories m JOIN worlds w ON w.id=m.world_id JOIN memory_vectors v ON v.memory_id=m.id AND v.revision=m.revision
-      JOIN memory_settings s ON s.world_id=m.world_id AND s.index_version=v.index_version
+      JOIN memory_settings s ON s.world_id=m.world_id AND s.active_index_version=v.index_version
       WHERE m.owner_id=$1 AND m.world_id=$2 AND NOT w.deleted AND $3=ANY(m.audience_actor_ids) AND m.status IN ('active','claimed')
       AND (m.valid_to IS NULL OR m.valid_to>now()) AND s.index_version=$4 AND s.embedding_dimensions=$5 AND vector_dims(v.embedding)=$5
-      AND NOT EXISTS(SELECT 1 FROM memory_evidence e JOIN messages src ON src.id=e.message_id WHERE e.memory_id=m.id AND (src.memory_excluded OR src.status<>'completed'))
+      AND NOT EXISTS(SELECT 1 FROM memory_evidence e JOIN messages src ON src.id=e.message_id JOIN rooms source_room ON source_room.id=src.room_id WHERE e.memory_id=m.id AND (src.memory_excluded OR src.status<>'completed' OR NOT source_room.memory_participation))
     ) SELECT *,1-(embedding <=> $6::vector) AS similarity FROM allowed ORDER BY embedding <=> $6::vector LIMIT 30`,
         [
           owner,

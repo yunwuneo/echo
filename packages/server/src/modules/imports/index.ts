@@ -120,6 +120,7 @@ export async function commitImport(
       character_id: string | null;
       actor_id: string | null;
       lore_ids: string[];
+      book_id: string | null;
       skipped: string[];
     } = {
       strategy: body.strategy,
@@ -127,6 +128,7 @@ export async function commitImport(
       character_id: null,
       actor_id: null,
       lore_ids: [],
+      book_id: null,
       skipped: [],
     };
     let audience = p.audience_actor_ids;
@@ -188,7 +190,18 @@ export async function commitImport(
         result.skipped.push(`世界书：${entry.name}`);
         continue;
       }
-      const data = { ...entry, audience_actor_ids: audience };
+      const data = {
+        ...entry,
+        audience_actor_ids: audience,
+        timing_unit: 'messages',
+      };
+      if (!result.book_id)
+        result.book_id = (
+          await tx.query(
+            'INSERT INTO worldbooks(owner_id,world_id,name) VALUES($1,$2,$3) RETURNING id',
+            [owner, world.id, p.character?.name ?? '导入设定书'],
+          )
+        ).rows[0].id;
       if (
         body.strategy === 'copy' &&
         p.conflicts.includes(`世界书：${entry.name}`)
@@ -196,8 +209,8 @@ export async function commitImport(
         data.name = `${entry.name.slice(0, 72)}（副本）`;
       const row = (
         await tx.query(
-          'INSERT INTO lore_entries(id,owner_id,world_id,data) VALUES($1,$2,$3,$4) RETURNING *',
-          [randomUUID(), owner, world.id, JSON.stringify(data)],
+          'INSERT INTO lore_entries(id,owner_id,world_id,data,book_id) VALUES($1,$2,$3,$4,$5) RETURNING *',
+          [randomUUID(), owner, world.id, JSON.stringify(data), result.book_id],
         )
       ).rows[0];
       await archiveRevision(tx, owner, 'lore', row.id, loreView(row));

@@ -23,6 +23,11 @@ const tables: Record<string, string> = {
   tool_grants: 'owner_id',
   usage_ledger: 'owner_id',
   background_usage: 'owner_id',
+  model_routes: 'owner_id',
+  asset_references: 'owner_id',
+  message_versions: 'owner_id',
+  conversation_inputs: 'owner_id',
+  conversation_branches: 'owner_id',
 };
 export async function exportOwner(db: pg.Pool, owner: string) {
   return transaction(
@@ -63,6 +68,10 @@ export async function exportOwner(db: pg.Pool, owner: string) {
       await add(
         'provider_connections',
         'SELECT id,name,base_url,model,context_window,max_output_tokens,tools_enabled FROM provider_connections WHERE owner_id=$1 ORDER BY id',
+      );
+      await add(
+        'assets',
+        "SELECT id,world_id,actor_id,content_hash,mime,size,revision,encode(content,'base64') AS content_base64 FROM assets WHERE owner_id=$1 ORDER BY id",
       );
       await add(
         'mcp_connections',

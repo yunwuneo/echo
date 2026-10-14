@@ -1,3 +1,8 @@
+import { tickRemoteBackups } from './modules/storage/index.js';
+import { rebuildSourceVectors } from './modules/memory/source-vectors.js';
+import { tickSchedules } from './modules/schedules/index.js';
+import { processMedia } from './modules/media/index.js';
+import { organizeMemory } from './modules/memory/materials.js';
 import { assertAvailable, runtimeLease } from './modules/operations/index.js';
 import { dispatchNotifications } from './modules/notifications/index.js';
 import { scheduleAutonomy } from './modules/autonomy/scheduler.js';
@@ -43,8 +48,23 @@ export async function startWorker(db: pg.Pool, config: Config) {
       { localConcurrency: 1, pollingIntervalSeconds: 1 },
       async (jobs) => {
         await assertAvailable(db);
-        for (const job of jobs)
+        for (const job of jobs) {
           await executeMemory(db, config, job.data.room, controller.signal);
+          const members = (
+            await db.query(
+              'SELECT r.owner_id,m.actor_id FROM rooms r JOIN room_memberships m ON m.room_id=r.id WHERE r.id=$1 AND r.memory_participation AND m.left_at IS NULL',
+              [job.data.room],
+            )
+          ).rows;
+          for (const m of members)
+            await organizeMemory(
+              db,
+              config,
+              m.owner_id,
+              m.actor_id,
+              job.data.room,
+            ).catch(() => {});
+        }
       },
     );
     await boss.work<{ world: string }>(
@@ -52,9 +72,19 @@ export async function startWorker(db: pg.Pool, config: Config) {
       { localConcurrency: 1, pollingIntervalSeconds: 1 },
       async (jobs) => {
         await assertAvailable(db);
-        for (const job of jobs)
+        for (const job of jobs) {
           await rebuildEmbedding(db, config, job.data.world, controller.signal);
+          await rebuildSourceVectors(
+            db,
+            config,
+            job.data.world,
+            controller.signal,
+          );
+        }
       },
+    );
+    await db.query(
+      "UPDATE runtime_sessions SET status='unknown',network='[]',error_code='runtime_lost' WHERE status='executing' AND expires_at<now()",
     );
     let lastMemory = 0;
     let notifications: Promise<void> | null = null;
@@ -69,7 +99,22 @@ export async function startWorker(db: pg.Pool, config: Config) {
           'INSERT INTO worker_health(singleton,seen_at) VALUES(true,now()) ON CONFLICT(singleton) DO UPDATE SET seen_at=now()',
         );
         await recover(db);
+        await db.query(
+          "UPDATE media_jobs SET state=CASE WHEN external_id IS NULL THEN 'unknown' ELSE 'accepted' END,error_code='worker_lost' WHERE state IN ('submitting','polling') AND updated_at<now()-($1+15000)*interval '1 millisecond'",
+          [config.modelTimeoutMs],
+        );
+        const media = (
+          await db.query(
+            "SELECT id,state FROM media_jobs WHERE state='queued' OR (state IN ('accepted','processing') AND updated_at<now()-interval '10 seconds') ORDER BY created_at LIMIT 1",
+          )
+        ).rows[0];
+        if (media)
+          await processMedia(db, config, media.id, media.state !== 'queued');
         await expireApprovals(db);
+        await db.query(
+          "UPDATE memory_organizations SET state='unknown',error_code='worker_lost' WHERE state='running' AND created_at<now()-($1+15000)*interval '1 millisecond'",
+          [config.modelTimeoutMs],
+        );
         await db.query(
           "UPDATE background_usage SET state='unknown',error_code='worker_lost' WHERE state='reserved' AND created_at<clock_timestamp()-(GREATEST($1::integer,30000)+15000)*interval '1 millisecond'",
           [config.modelTimeoutMs],
@@ -77,6 +122,8 @@ export async function startWorker(db: pg.Pool, config: Config) {
         if (Date.now() - lastPrune > 60000) {
           await pruneSync(db);
           await scheduleAutonomy(db);
+          await tickSchedules(db);
+          await tickRemoteBackups(db, config);
           lastPrune = Date.now();
         }
         if (Date.now() - lastMemory >= 5000) {

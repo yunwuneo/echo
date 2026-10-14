@@ -162,6 +162,18 @@ export async function revoke(db: pg.Pool, identity: Identity, id: string) {
     if (!r.rowCount) throw new AppError(404, 'not_found', 'Device not found');
     await queueRevocation(tx, identity.ownerId, id);
     await tx.query(
+      'UPDATE system_policies SET enabled=false,revision=revision+1 WHERE owner_id=$1 AND device_id=$2',
+      [identity.ownerId, id],
+    );
+    await tx.query(
+      "UPDATE system_actions SET state=CASE WHEN state='executing' THEN 'unknown' ELSE 'denied' END,revision=revision+1 WHERE owner_id=$1 AND device_id=$2 AND state IN ('pending','approved','executing')",
+      [identity.ownerId, id],
+    );
+    await tx.query(
+      "UPDATE schedules SET enabled=false,epoch=epoch+1,revision=revision+1 WHERE owner_id=$1 AND device_id=$2 AND executor='device'",
+      [identity.ownerId, id],
+    );
+    await tx.query(
       'UPDATE device_sessions SET revoked_at=now() WHERE owner_id=$1 AND device_id=$2',
       [identity.ownerId, id],
     );

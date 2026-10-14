@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { transaction } from '../../db/index.js';
 import type { Config } from '../../config.js';
-import { AppError } from '../../security.js';
+import { AppError, hash } from '../../security.js';
 import { worldLock } from '../worlds/index.js';
 import { streamModel } from '../llm/index.js';
 import { validateCandidates, commitCandidates } from './repository.js';
@@ -11,7 +11,7 @@ import { reserveBackground, settleBackground } from './usage.js';
 export async function claimMemory(db: pg.Pool, config: Config, room: string) {
   const initial = (
     await db.query(
-      'SELECT owner_id,world_id FROM rooms WHERE id=$1 AND NOT deleted',
+      'SELECT owner_id,world_id FROM rooms WHERE id=$1 AND NOT deleted AND memory_participation',
       [room],
     )
   ).rows[0];
@@ -163,10 +163,37 @@ export async function finishMemory(
     // Deletion/correction takes the same world lock and changes epoch. Recheck sources as defense in depth.
     const fresh = (
       await tx.query(
-        'SELECT id,status,memory_excluded FROM messages WHERE id=ANY($1::uuid[])',
+        'SELECT id,revision,content,status,memory_excluded FROM messages WHERE id=ANY($1::uuid[])',
         [c.sources.map((s) => s.id)],
       )
     ).rows;
+    if (
+      c.sources.some(
+        (old) =>
+          !fresh.some(
+            (now) =>
+              now.id === old.id &&
+              now.revision === old.revision &&
+              hash(now.content) === hash(old.content),
+          ),
+      )
+    )
+      throw new AppError(
+        409,
+        'source_invalidated',
+        'Extraction source revision changed',
+      );
+    const room = (
+      await tx.query('SELECT memory_participation FROM rooms WHERE id=$1', [
+        c.room,
+      ])
+    ).rows[0];
+    if (!room?.memory_participation)
+      throw new AppError(
+        409,
+        'source_invalidated',
+        'Source participation disabled',
+      );
     if (
       candidates.some((candidate) =>
         candidate.source_ids.some(

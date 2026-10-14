@@ -435,6 +435,14 @@ describe('P3 persistent memory, scope and imports', () => {
       actor_ids: actors.map((a) => a.id),
       max_replies: 1,
     });
+    await db.query(
+      'INSERT INTO group_policies(owner_id,room_id,memory_enabled) VALUES($1,$2,true)',
+      [owner, group.id],
+    );
+    await db.query(
+      'INSERT INTO group_member_policies(room_id,actor_id,memory_enabled) VALUES($1,$2,true)',
+      [group.id, actors[0].id],
+    );
     const a = await chat('暗号是什么', [actors[0].id], group.id);
     expect(JSON.stringify(a.c!.messages)).toContain(m.content);
     const b = await chat('暗号是什么', [actors[1].id], group.id);
@@ -675,7 +683,8 @@ describe('P3 persistent memory, scope and imports', () => {
       embedding_provider_id: provider.id,
       embedding_dimensions: 3,
     });
-    expect((await db.query('SELECT * FROM memory_vectors')).rowCount).toBe(0);
+    // Keep the previous namespace until the replacement is fully built.
+    expect((await db.query('SELECT * FROM memory_vectors')).rowCount).toBe(1);
     await rebuildEmbedding(db, config, world.id);
     expect(
       (await req('GET', `worlds/${world.id}/memory-status`)).json().index_error,
