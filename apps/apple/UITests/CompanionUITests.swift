@@ -42,7 +42,9 @@ import XCTest
     add(shot)
   }
 
-  private func designApp(dark: Bool = false, large: Bool = false) async throws -> XCUIApplication {
+  private func designApp(
+    dark: Bool = false, large: Bool = false, reducedMotion: Bool = false
+  ) async throws -> XCUIApplication {
     _ = try await control("online", method: "POST")
     let code = try await control("code")["code"] as! String
     let app = XCUIApplication()
@@ -51,6 +53,7 @@ import XCTest
     app.launchEnvironment["ECHO2_UI_TEST_RESET"] = "1"
     app.launchEnvironment["ECHO2_UI_TEST_DRAFT"] = ""
     if dark { app.launchEnvironment["ECHO2_UI_TEST_DARK"] = "1" }
+    if reducedMotion { app.launchEnvironment["ECHO2_UI_TEST_REDUCE_MOTION"] = "1" }
     app.launchArguments = [
       "-AppleLanguages", "(zh-Hans)", "-AppleLocale", "zh_CN",
       "-AppleInterfaceStyle", dark ? "Dark" : "Light",
@@ -72,15 +75,77 @@ import XCTest
     if !pair.exists || !pair.isHittable { attach(app, name: "UI 优化 · 配对定位失败现场") }
     XCTAssertTrue(pair.exists && pair.isHittable)
     pair.tap()
-    XCTAssertTrue(app.buttons["设置"].firstMatch.waitForExistence(timeout: 20))
+    waitForRoot(app)
     app.launchEnvironment.removeValue(forKey: "ECHO2_UI_TEST_RESET")
     return app
+  }
+
+  private func waitForRoot(_ app: XCUIApplication) {
+    #if os(iOS)
+      XCTAssertTrue(app.tabBars.buttons["聊天"].waitForExistence(timeout: 20))
+    #else
+      XCTAssertTrue(app.buttons["设置"].firstMatch.waitForExistence(timeout: 20))
+    #endif
+  }
+
+  private func selectTab(_ title: String, in app: XCUIApplication) {
+    // Native iOS 26+ minimization exposes the selected tab as a collapsed
+    // popup. Expand that system control before looking for the other tabs.
+    let collapsed = app.tabBars.descendants(matching: .any)
+      .matching(NSPredicate(format: "value == %@", "已折叠")).firstMatch
+    if collapsed.exists && collapsed.isHittable { collapsed.tap() }
+    let tab = app.tabBars.buttons[title]
+    XCTAssertTrue(tab.waitForExistence(timeout: 10))
+    tab.tap()
+  }
+
+  private func openSettings(_ app: XCUIApplication) {
+    #if os(iOS)
+      selectTab("我", in: app)
+    #else
+      app.buttons["设置"].firstMatch.tap()
+    #endif
+  }
+
+  private func tapSettingsOption(_ identifier: String, in app: XCUIApplication) {
+    let option = app.buttons[identifier].firstMatch
+    for _ in 0..<10 where !option.isHittable { app.swipeUp() }
+    XCTAssertTrue(option.waitForExistence(timeout: 10))
+    XCTAssertTrue(option.isHittable)
+    option.tap()
+  }
+
+  private func closeSettings(_ app: XCUIApplication) {
+    #if os(iOS)
+      selectTab("聊天", in: app)
+    #else
+      app.buttons["close-settings"].tap()
+    #endif
+  }
+
+  private func openWorldSettings(_ app: XCUIApplication) {
+    #if os(iOS)
+      selectTab("TA", in: app)
+      let settings = app.buttons["partner-settings"].firstMatch
+      for _ in 0..<6 where !settings.isHittable { app.swipeUp() }
+      XCTAssertTrue(settings.waitForExistence(timeout: 10))
+      settings.tap()
+    #else
+      let manage = app.buttons["管理「星港联调」"].firstMatch
+      XCTAssertTrue(manage.waitForExistence(timeout: 20))
+      manage.tap()
+    #endif
+  }
+
+  private func returnFromChat(_ app: XCUIApplication) {
+    app.navigationBars.buttons.element(boundBy: 0).tap()
+    waitForRoot(app)
   }
 
   private func openDesignRoom(_ app: XCUIApplication, name: String) {
     let room = app.buttons[name].firstMatch
     let title = app.staticTexts[name].firstMatch
-    XCTAssertTrue(title.waitForExistence(timeout: 20) || room.exists)
+    XCTAssertTrue(room.waitForExistence(timeout: 20) || title.exists)
     if room.exists { room.tap() } else { title.tap() }
     XCTAssertTrue(app.descendants(matching: .any)["chat-input"].waitForExistence(timeout: 10))
   }
@@ -104,6 +169,287 @@ import XCTest
     if !reply.isHittable { attach(app, name: "UI 优化 · 最新回复未显示") }
     XCTAssertTrue(reply.isHittable, "Latest reply must be visible after sending")
     return state.reply
+  }
+
+  func testDockTabsSearchAndDetailNavigation() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      _ = try await control("design-live-clear", method: "POST")
+      let app = try await designApp()
+      XCTAssertEqual(app.tabBars.buttons.count, 4)
+      for name in ["聊天", "回忆", "TA", "我"] {
+        XCTAssertTrue(app.tabBars.buttons[name].isHittable)
+      }
+      XCTAssertFalse(app.descendants(matching: .any)["live-status-accessory"].exists)
+      attach(app, name: "Dock v2 · 浅色空闲无状态条")
+      selectTab("回忆", in: app)
+      XCTAssertTrue(app.navigationBars["回忆"].waitForExistence(timeout: 5))
+      attach(app, name: "Dock v2 · 回忆")
+      selectTab("TA", in: app)
+      XCTAssertTrue(app.buttons["partner-settings"].firstMatch.waitForExistence(timeout: 5))
+      attach(app, name: "Dock v2 · TA")
+      openSettings(app)
+      XCTAssertTrue(app.buttons["open-notifications"].waitForExistence(timeout: 5))
+      attach(app, name: "Dock v2 · 我")
+      selectTab("聊天", in: app)
+      let search = app.searchFields.firstMatch
+      if !search.isHittable { app.swipeDown() }
+      XCTAssertTrue(search.waitForExistence(timeout: 5))
+      search.tap()
+      search.typeText("私聊")
+      XCTAssertTrue(app.buttons["阿岚私聊"].firstMatch.waitForExistence(timeout: 5))
+      XCTAssertFalse(app.buttons["舰桥群聊"].exists)
+      attach(app, name: "Dock v2 · 聊天搜索")
+      search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 2))
+      let cancelSearch = app.buttons["取消"].firstMatch
+      if cancelSearch.exists {
+        cancelSearch.tap()
+      } else if app.buttons["Cancel"].firstMatch.exists {
+        app.buttons["Cancel"].firstMatch.tap()
+      }
+      openDesignRoom(app, name: "阿岚私聊")
+      XCTAssertFalse(app.tabBars.firstMatch.isHittable, "Dock must be hidden in chat details")
+      attach(app, name: "Dock v2 · 详情隐藏 Dock")
+      returnFromChat(app)
+      let restoredDock = NSPredicate(format: "hittable == true")
+      let dockRestored = XCTNSPredicateExpectation(
+        predicate: restoredDock, object: app.tabBars.buttons["聊天"])
+      XCTAssertEqual(XCTWaiter.wait(for: [dockRestored], timeout: 5), .completed)
+      XCTAssertFalse(app.descendants(matching: .any)["live-status-accessory"].exists)
+    #endif
+  }
+
+  func testDockLiveStatusOpensConversationAndDisappears() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      _ = try await control("design-live-clear", method: "POST")
+      let app = try await designApp()
+      _ = try await control("design-live-start", method: "POST")
+      let status = app.descendants(matching: .any)["live-status-accessory"].firstMatch
+      let hasStatus = status.waitForExistence(timeout: 15)
+      if !hasStatus { print(app.debugDescription) }
+      XCTAssertTrue(hasStatus)
+      XCTAssertTrue(status.label.contains("阿岚"))
+      XCTAssertTrue(status.label.contains("正在"))
+      for technicalWord in ["AI", "生成", "模型", "MCP"] {
+        XCTAssertFalse(status.label.contains(technicalWord))
+      }
+      attach(app, name: "Dock v2 · 真实回应状态")
+      status.tap()
+      XCTAssertTrue(app.descendants(matching: .any)["chat-input"].waitForExistence(timeout: 10))
+      XCTAssertFalse(app.tabBars.firstMatch.isHittable)
+      _ = try await control("design-live-clear", method: "POST")
+      returnFromChat(app)
+      XCTAssertTrue(status.waitForNonExistence(timeout: 10))
+      attach(app, name: "Dock v2 · 状态结束后恢复无空条")
+    #endif
+  }
+
+  func testDockApprovalAccessoryOpensRealApproval() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      _ = try await control("design-live-clear", method: "POST")
+      let initialCalls = try await control("state")["mcp_calls"] as? Int ?? 0
+      _ = try await control("p4-seed", method: "POST")
+      let app = try await designApp()
+      let status = app.descendants(matching: .any)["live-status-accessory"].firstMatch
+      let hasStatus = status.waitForExistence(timeout: 15)
+      if !hasStatus { print(app.debugDescription) }
+      XCTAssertTrue(hasStatus)
+      XCTAssertTrue(status.label.contains("同意"))
+      XCTAssertFalse(status.label.contains("MCP"))
+      attach(app, name: "Dock v2 · 待你决定")
+      status.tap()
+      let approve = app.buttons["approve-tool"].firstMatch
+      XCTAssertTrue(approve.waitForExistence(timeout: 10))
+      XCTAssertTrue(
+        app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "模拟器审批测试")).firstMatch
+          .exists)
+      attach(app, name: "Dock v2 · 审批参数")
+      let beforeApproval = try await control("state")
+      XCTAssertEqual(beforeApproval["mcp_calls"] as? Int, initialCalls)
+      approve.tap()
+      let deadline = Date().addingTimeInterval(20)
+      var calls = initialCalls
+      while Date() < deadline {
+        calls = try await control("state")["mcp_calls"] as? Int ?? 0
+        if calls == initialCalls + 1 { break }
+        try await Task.sleep(for: .milliseconds(250))
+      }
+      XCTAssertEqual(calls, initialCalls + 1)
+      app.buttons["完成"].firstMatch.tap()
+      XCTAssertTrue(status.waitForNonExistence(timeout: 15))
+      _ = try await control("design-live-clear", method: "POST")
+    #endif
+  }
+
+  func testDockMemoriesShowSyncedSource() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      _ = try await control("design-live-clear", method: "POST")
+      _ = try await control("p3-seed", method: "POST")
+      let app = try await designApp()
+      selectTab("回忆", in: app)
+      let memory = app.buttons["memory-timeline-item"].firstMatch
+      XCTAssertTrue(memory.waitForExistence(timeout: 10))
+      attach(app, name: "Dock v2 · 有来源的真实回忆")
+      memory.tap()
+      let momentAppeared = app.navigationBars["一段回忆"].waitForExistence(timeout: 10)
+      if !momentAppeared {
+        attach(app, name: "Dock v2 · 回忆详情定位失败")
+        print(app.debugDescription)
+      }
+      XCTAssertTrue(momentAppeared)
+      let original = app.buttons["回到这段聊天"].firstMatch
+      XCTAssertTrue(original.waitForExistence(timeout: 5))
+      attach(app, name: "Dock v2 · 回忆中的原话")
+      original.tap()
+      XCTAssertTrue(app.descendants(matching: .any)["chat-input"].waitForExistence(timeout: 10))
+      XCTAssertFalse(app.tabBars.firstMatch.isHittable)
+    #endif
+  }
+
+  func testDockDarkLargeTextReducedMotion() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      _ = try await control("design-live-clear", method: "POST")
+      let app = try await designApp(dark: true, large: true, reducedMotion: true)
+      for name in ["聊天", "回忆", "TA", "我"] {
+        XCTAssertTrue(app.tabBars.buttons[name].isHittable)
+      }
+      attach(app, name: "Dock v2 · 深色最大字体减弱动态效果")
+      _ = try await control("design-live-start", method: "POST")
+      let status = app.descendants(matching: .any)["quiet-live-status"].firstMatch
+      let hasStatus = status.waitForExistence(timeout: 15)
+      if !hasStatus { print(app.debugDescription) }
+      XCTAssertTrue(hasStatus)
+      XCTAssertTrue(status.isHittable)
+      XCTAssertTrue(status.label.contains("阿岚"))
+      attach(app, name: "Dock v2 · 深色最大字体实时状态")
+      try app.performAccessibilityAudit(for: [.sufficientElementDescription, .textClipped])
+      status.tap()
+      XCTAssertTrue(app.buttons["send-message"].waitForExistence(timeout: 10))
+      XCTAssertFalse(app.tabBars.firstMatch.isHittable)
+      _ = try await control("design-live-clear", method: "POST")
+    #endif
+  }
+
+  func testDockOpenMemoryClosesAfterRemoteForgetting() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      _ = try await control("design-live-clear", method: "POST")
+      _ = try await control("p3-seed", method: "POST")
+      let app = try await designApp()
+      selectTab("回忆", in: app)
+      let memory = app.buttons["memory-timeline-item"].firstMatch
+      XCTAssertTrue(memory.waitForExistence(timeout: 10))
+      memory.tap()
+      let momentAppeared = app.navigationBars["一段回忆"].waitForExistence(timeout: 10)
+      if !momentAppeared {
+        attach(app, name: "Dock v2 · 回忆详情定位失败")
+        print(app.debugDescription)
+      }
+      XCTAssertTrue(momentAppeared)
+      _ = try await control("design-forget-memories", method: "POST")
+      XCTAssertTrue(app.navigationBars["一段回忆"].waitForNonExistence(timeout: 20))
+      XCTAssertFalse(app.buttons["memory-timeline-item"].exists)
+      XCTAssertTrue(app.staticTexts["回忆从聊天开始"].waitForExistence(timeout: 10))
+      attach(app, name: "Dock v2 · 跨端遗忘关闭旧回忆")
+    #endif
+  }
+
+  func testDockSwitchServerClearsChatNavigation() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      _ = try await control("design-live-clear", method: "POST")
+      let app = try await designApp()
+      openDesignRoom(app, name: "阿岚私聊")
+      // Exercise the visible iOS settings route after visiting a conversation.
+      returnFromChat(app)
+      openSettings(app)
+      let change = app.buttons["切换服务器"].firstMatch
+      XCTAssertTrue(change.waitForExistence(timeout: 10))
+      change.tap()
+      XCTAssertTrue(app.buttons["配对"].waitForExistence(timeout: 10))
+      let code = try await control("code")["code"] as! String
+      let codeField = app.secureTextFields["一次性配对码"]
+      XCTAssertTrue(codeField.waitForExistence(timeout: 5))
+      codeField.tap()
+      let existingCodeLength = (codeField.value as? String ?? "").count
+      codeField.typeText(
+        String(repeating: XCUIKeyboardKey.delete.rawValue, count: existingCodeLength) + code)
+      let pair = app.buttons["配对"]
+      for _ in 0..<6 where !pair.isHittable { app.swipeUp() }
+      pair.tap()
+      waitForRoot(app)
+      XCTAssertFalse(app.descendants(matching: .any)["chat-input"].exists)
+      XCTAssertTrue(app.buttons["阿岚私聊"].firstMatch.waitForExistence(timeout: 10))
+      attach(app, name: "Dock v2 · 切换服务器清除详情路径")
+    #endif
+  }
+
+  func testDockScrollKeepsLiveStatusAccessible() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      _ = try await control("design-live-clear", method: "POST")
+      _ = try await control("design-scroll-rooms", method: "POST")
+      let app = try await designApp()
+      _ = try await control("design-live-start", method: "POST")
+      let status = app.descendants(matching: .any)["live-status-accessory"].firstMatch
+      XCTAssertTrue(status.waitForExistence(timeout: 15))
+      app.descendants(matching: .any)["chat-list"].firstMatch.swipeUp()
+      app.descendants(matching: .any)["chat-list"].firstMatch.swipeUp()
+      XCTAssertTrue(status.isHittable)
+      attach(app, name: "Dock v2 · 下滑后系统收起状态")
+      status.tap()
+      XCTAssertTrue(app.descendants(matching: .any)["chat-input"].waitForExistence(timeout: 10))
+      _ = try await control("design-live-clear", method: "POST")
+    #endif
+  }
+
+  func testDockSystemReducedTransparency() async throws {
+    #if os(iOS)
+      continueAfterFailure = false
+      let preferences = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+      preferences.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+      preferences.launch()
+      let accessibility = preferences.staticTexts["Accessibility"].firstMatch
+      for _ in 0..<10 where !accessibility.isHittable { preferences.swipeUp() }
+      XCTAssertTrue(accessibility.waitForExistence(timeout: 5))
+      accessibility.tap()
+      let display = preferences.staticTexts["Display & Text Size"].firstMatch
+      XCTAssertTrue(display.waitForExistence(timeout: 5))
+      display.tap()
+      let transparency = preferences.switches["Reduce Transparency"].firstMatch
+      for _ in 0..<6 where !transparency.isHittable { preferences.swipeUp() }
+      XCTAssertTrue(transparency.waitForExistence(timeout: 5))
+      let original = transparency.value as? String
+      addTeardownBlock { @MainActor in
+        preferences.activate()
+        if transparency.exists && transparency.value as? String != original {
+          transparency.coordinate(withNormalizedOffset: CGVector(dx: 0.93, dy: 0.5)).tap()
+        }
+        XCTAssertEqual(transparency.value as? String, original)
+        preferences.terminate()
+      }
+      if original != "1" {
+        transparency.coordinate(withNormalizedOffset: CGVector(dx: 0.93, dy: 0.5)).tap()
+      }
+      XCTAssertEqual(transparency.value as? String, "1")
+      attach(preferences, name: "Dock v2 · 系统降低透明度已开启")
+      _ = try await control("design-live-clear", method: "POST")
+      let app = try await designApp(dark: true)
+      XCTAssertTrue(app.tabBars.buttons["聊天"].isHittable)
+      _ = try await control("design-live-start", method: "POST")
+      let status = app.descendants(matching: .any)["live-status-accessory"].firstMatch
+      let hasStatus = status.waitForExistence(timeout: 15)
+      if !hasStatus { print(app.debugDescription) }
+      XCTAssertTrue(hasStatus)
+      XCTAssertTrue(status.isHittable)
+      attach(app, name: "Dock v2 · 系统降低透明度深色状态条")
+      try app.performAccessibilityAudit(for: [.sufficientElementDescription])
+      _ = try await control("design-live-clear", method: "POST")
+    #endif
   }
 
   func testUIRefreshLightChatAndForms() async throws {
@@ -225,9 +571,9 @@ import XCTest
       connectionShot.lifetime = .keepAlways
       add(connectionShot)
       app.buttons["配对"].tap()
-      XCTAssertTrue(app.buttons["设置"].firstMatch.waitForExistence(timeout: 20))
+      waitForRoot(app)
       try app.performAccessibilityAudit(for: [.sufficientElementDescription, .textClipped])
-      app.buttons["设置"].firstMatch.tap()
+      openSettings(app)
       XCTAssertTrue(app.buttons["open-notifications"].waitForExistence(timeout: 10))
       app.buttons["open-notifications"].tap()
       XCTAssertTrue(app.buttons["close-notifications"].waitForExistence(timeout: 10))
@@ -250,8 +596,8 @@ import XCTest
     app.launch()
     XCTAssertTrue(app.buttons["配对"].waitForExistence(timeout: 15))
     app.buttons["配对"].tap()
-    XCTAssertTrue(app.buttons["设置"].firstMatch.waitForExistence(timeout: 20))
-    app.buttons["设置"].firstMatch.tap()
+    waitForRoot(app)
+    openSettings(app)
     app.buttons["open-notifications"].tap()
     XCTAssertTrue(app.staticTexts["服务器尚未配置通知中继，仍可正常聊天与同步。"].waitForExistence(timeout: 10))
     let notificationShot = XCTAttachment(screenshot: app.screenshot())
@@ -259,7 +605,7 @@ import XCTest
     notificationShot.lifetime = .keepAlways
     add(notificationShot)
     app.buttons["close-notifications"].tap()
-    app.buttons["open-operations"].tap()
+    tapSettingsOption("open-operations", in: app)
     XCTAssertTrue(
       app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "0.6.0"))
         .firstMatch.waitForExistence(timeout: 10))
@@ -278,7 +624,7 @@ import XCTest
     XCTAssertTrue(save.waitForNonExistence(timeout: 15))
     XCTAssertTrue(app.buttons["close-operations"].waitForExistence(timeout: 15))
     app.buttons["close-operations"].tap()
-    app.buttons["close-settings"].tap()
+    closeSettings(app)
     // DEBUG injection exercises the same authenticated cold-start route, without
     // asserting the simulator is a real APNs-delivered physical notification.
     let event = try await control("p5-event", method: "POST")
@@ -307,10 +653,7 @@ import XCTest
     app.launch()
     XCTAssertTrue(app.buttons["配对"].waitForExistence(timeout: 15))
     app.buttons["配对"].tap()
-    let room = app.buttons["舰桥群聊"].firstMatch
-    let link = app.staticTexts["舰桥群聊"].firstMatch
-    XCTAssertTrue(link.waitForExistence(timeout: 20))
-    if room.exists { room.tap() } else { link.tap() }
+    openDesignRoom(app, name: "舰桥群聊")
     let composer = app.textFields["chat-input"].firstMatch
     let textView = app.textViews.firstMatch
     #if os(macOS)
@@ -346,8 +689,7 @@ import XCTest
     app.terminate()
     app.launchEnvironment.removeValue(forKey: "ECHO2_UI_TEST_RESET")
     app.launch()
-    XCTAssertTrue(link.waitForExistence(timeout: 15))
-    if room.exists { room.tap() } else { link.tap() }
+    openDesignRoom(app, name: "舰桥群聊")
     XCTAssertTrue(
       app.descendants(matching: .any).matching(
         NSPredicate(format: "label CONTAINS %@", "已存到本机 · 联网后发送")
@@ -389,14 +731,13 @@ import XCTest
     app.launch()
     XCTAssertTrue(app.buttons["配对"].waitForExistence(timeout: 15))
     app.buttons["配对"].tap()
-    let manage = app.buttons["管理「星港联调」"].firstMatch
-    XCTAssertTrue(manage.waitForExistence(timeout: 20))
-    app.buttons["设置"].firstMatch.tap()
-    app.buttons["open-activity"].tap()
+    waitForRoot(app)
+    openSettings(app)
+    tapSettingsOption("open-activity", in: app)
     let approve = app.buttons["approve-tool"].firstMatch
     XCTAssertTrue(approve.waitForExistence(timeout: 10))
     let initialState = try await control("state")
-    XCTAssertEqual(initialState["mcp_calls"] as? Int, 0)
+    let initialCalls = initialState["mcp_calls"] as? Int ?? 0
     let approval = XCTAttachment(screenshot: app.screenshot())
     approval.name = "具体工具审批参数"
     approval.lifetime = .keepAlways
@@ -406,13 +747,13 @@ import XCTest
     var count = 0
     while Date() < until {
       count = try await control("state")["mcp_calls"] as? Int ?? 0
-      if count == 1 { break }
+      if count == initialCalls + 1 { break }
       try await Task.sleep(for: .seconds(1))
     }
-    XCTAssertEqual(count, 1)
+    XCTAssertEqual(count, initialCalls + 1)
     app.buttons["完成"].firstMatch.tap()
-    app.buttons["完成"].firstMatch.tap()
-    manage.tap()
+    closeSettings(app)
+    openWorldSettings(app)
     app.buttons["open-autonomy"].tap()
     let enabled = app.switches["autonomy-enabled"].firstMatch
     XCTAssertTrue(enabled.waitForExistence(timeout: 10))
@@ -436,8 +777,8 @@ import XCTest
     XCTAssertTrue(hasRecap)
     app.launchEnvironment.removeValue(forKey: "ECHO2_UI_TEST_RESET")
     app.launch()
-    XCTAssertTrue(manage.waitForExistence(timeout: 20))
-    manage.tap()
+    waitForRoot(app)
+    openWorldSettings(app)
     app.buttons["open-recaps"].tap()
     let recap = app.buttons["recap-item"].firstMatch
     XCTAssertTrue(recap.waitForExistence(timeout: 10))
@@ -464,9 +805,8 @@ import XCTest
     app.launch()
     XCTAssertTrue(app.buttons["配对"].waitForExistence(timeout: 15))
     app.buttons["配对"].tap()
-    let manage = app.buttons["管理「星港联调」"].firstMatch
-    XCTAssertTrue(manage.waitForExistence(timeout: 20))
-    manage.tap()
+    waitForRoot(app)
+    openWorldSettings(app)
     app.buttons["open-memory"].tap()
     let item = app.buttons["memory-item"].firstMatch
     XCTAssertTrue(item.waitForExistence(timeout: 15))
@@ -479,8 +819,8 @@ import XCTest
     XCTAssertTrue(item.waitForExistence(timeout: 10))
     let state = try await control("state")
     let memories = state["memories"] as! [[String: Any]]
-    XCTAssertTrue(
-      memories.contains {
+    let edited = try XCTUnwrap(
+      memories.first {
         ($0["content"] as? String)?.contains("合成测试") == true && ($0["manual"] as? Bool) == true
       })
     item.tap()
@@ -492,9 +832,11 @@ import XCTest
     XCTAssertTrue(forget.exists)
     forget.tap()
     app.buttons["确认忘记"].tap()
-    XCTAssertTrue(
-      app.staticTexts["尚无记忆。开启整理后，服务器在积累 8 条消息或空闲 60 秒后提取；原对话仍可正常使用。"].waitForExistence(timeout: 15)
-    )
+    XCTAssertTrue(app.buttons["forget-memory"].waitForNonExistence(timeout: 15))
+    let afterForgetting = try await control("state")["memories"] as? [[String: Any]] ?? []
+    let forgotten = afterForgetting.first { $0["id"] as? String == edited["id"] as? String }
+    XCTAssertEqual(forgotten?["status"] as? String, "deleted")
+    XCTAssertEqual(forgotten?["content"] as? String, "")
     app.navigationBars["记忆与来源"].buttons["完成"].tap()
     app.buttons["open-import"].tap()
     let json = app.descendants(matching: .any).matching(identifier: "import-json").firstMatch

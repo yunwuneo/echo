@@ -28,6 +28,8 @@ enum EchoMetric {
   static let icon: CGFloat = 30
   static let smallAvatar: CGFloat = 32
   static let rowAvatar: CGFloat = 38
+  static let sidebarAvatar: CGFloat = 28
+  static let accessoryAvatar: CGFloat = 28
   static let heroIcon: CGFloat = 56
   static let statusDot: CGFloat = 8
   static let formWidth: CGFloat = 620

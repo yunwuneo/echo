@@ -29,7 +29,7 @@ import Testing
     causeDescription: "request failed",
     underlyingError: APIError(status: 400, code: "invalid_import"))
   let message = userFacingError(error)
-  #expect(message.contains("角色卡或世界书"))
+  #expect(message.contains("角色卡或设定集"))
   #expect(message.contains("重新导出"))
   #expect(!message.contains("invalid_import"))
 }

@@ -38,7 +38,8 @@ import UserNotifications
       ])
     else {
       throw NSError(
-        domain: "EchoPush", code: 403, userInfo: [NSLocalizedDescriptionKey: "请在系统设置中允许 Echo 通知"])
+        domain: "EchoPush", code: 403,
+        userInfo: [NSLocalizedDescriptionKey: String(localized: "请在系统设置中允许 Echo 通知")])
     }
     registrationError = nil
     register()
@@ -72,6 +73,7 @@ import UserNotifications
       didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
       PushCoordinator.shared.start()
+      SystemBackground.register()
       return true
     }
     func application(
@@ -81,7 +83,7 @@ import UserNotifications
     func application(
       _ application: UIApplication,
       didFailToRegisterForRemoteNotificationsWithError error: any Error
-    ) { PushCoordinator.shared.registrationError = "无法注册系统推送，请检查网络与签名配置。" }
+    ) { PushCoordinator.shared.registrationError = String(localized: "无法注册系统推送，请检查网络与签名配置。") }
   }
 #else
   final class PushAppDelegate: NSObject, NSApplicationDelegate {
@@ -95,7 +97,7 @@ import UserNotifications
     func application(
       _ application: NSApplication,
       didFailToRegisterForRemoteNotificationsWithError error: any Error
-    ) { PushCoordinator.shared.registrationError = "无法注册系统推送，请检查网络与签名配置。" }
+    ) { PushCoordinator.shared.registrationError = String(localized: "无法注册系统推送，请检查网络与签名配置。") }
   }
 #endif
 
@@ -110,28 +112,34 @@ struct NotificationsView: View {
   var body: some View {
     NavigationStack {
       Form {
-        Section("系统通知") {
+        Section(String(localized: "系统通知")) {
           if status == .null {
-            if failure == nil { ProgressView("正在读取通知设置…") }
+            if failure == nil { ProgressView(String(localized: "正在读取通知设置…")) }
           } else {
-            Text(status["enabled"].bool ? "此设备已开启通知" : "此设备未开启通知")
-            Text("通知只显示通用文案。聊天与剧情始终保存在你的服务器，打开 App 后同步。").font(.caption)
+            Text(
+              status["enabled"].bool ? String(localized: "此设备已开启通知") : String(localized: "此设备未开启通知")
+            )
+            Text(String(localized: "通知只显示通用文案。聊天与剧情始终保存在你的服务器，打开 App 后同步。")).font(EchoFont.caption)
             if status["available"].bool {
-              Text(status["relay_url"].string).font(.caption).textSelection(.enabled)
-              Button("允许系统通知") {
+              Text(status["relay_url"].string).font(EchoFont.caption).textSelection(.enabled)
+              Button(String(localized: "允许系统通知")) {
                 Task {
                   do { try await push.authorize() } catch { failure = userFacingError(error) }
                 }
               }
-              if !push.token.isEmpty { Text("已取得设备推送地址").foregroundStyle(.secondary) }
+              if !push.token.isEmpty {
+                Text(String(localized: "已取得设备推送地址")).foregroundStyle(.secondary)
+              }
               if let error = push.registrationError {
                 Label(error, systemImage: "exclamationmark.circle").foregroundStyle(
                   Color.echo.warning
                 )
                 .fixedSize(horizontal: false, vertical: true)
               }
-              LabeledContent("中继一次性邀请") { SecureField("填写邀请", text: $invitation) }
-              Button("绑定或续期此设备") {
+              LabeledContent(String(localized: "中继一次性邀请")) {
+                SecureField(String(localized: "填写邀请"), text: $invitation)
+              }
+              Button(String(localized: "绑定或续期此设备")) {
                 busy = true
                 Task {
                   defer { busy = false }
@@ -147,8 +155,9 @@ struct NotificationsView: View {
                 }
               }.disabled(busy || invitation.isEmpty || push.token.isEmpty)
               if status["enabled"].bool {
-                Text("到期时间：\(status["expires_at"].string)").font(.caption)
-                Button("关闭此设备通知", role: .destructive) {
+                Text(String(localized: "到期时间：\(status["expires_at"].string)")).font(
+                  EchoFont.caption)
+                Button(String(localized: "关闭此设备通知"), role: .destructive) {
                   Task {
                     do {
                       try await model.disablePush()
@@ -158,13 +167,14 @@ struct NotificationsView: View {
                 }
               }
             } else {
-              Text("服务器尚未配置通知中继，仍可正常聊天与同步。").foregroundStyle(.secondary)
+              Text(String(localized: "服务器尚未配置通知中继，仍可正常聊天与同步。")).foregroundStyle(.secondary)
             }
           }
-          Button("刷新通知设置") { Task { await refresh() } }
+          Button(String(localized: "刷新通知设置")) { Task { await refresh() } }
         }
-        Section("最近投递") {
-          Text("“已受理”表示中继取得 APNs 接受响应，不代表设备已显示。系统可能延迟或抑制通知。").font(.caption)
+        Section(String(localized: "最近投递")) {
+          Text(String(localized: "“已受理”表示中继取得 APNs 接受响应，不代表设备已显示。系统可能延迟或抑制通知。")).font(
+            EchoFont.caption)
           ForEach(Array(status["deliveries"].array.enumerated()), id: \.offset) { _, item in
             LabeledContent(item["updated_at"].string, value: stateName(item["state"].string)).font(
               .caption)
@@ -175,10 +185,11 @@ struct NotificationsView: View {
             .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
         }
       }.formStyle(.grouped).scrollContentBackground(.hidden)
-        .background(Color.echo.surfaceSunken).navigationTitle("通知")
+        .background(Color.echo.surfaceSunken).navigationTitle(String(localized: "通知"))
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
-            Button("完成") { dismiss() }.accessibilityIdentifier("close-notifications")
+            Button(String(localized: "完成")) { dismiss() }.accessibilityIdentifier(
+              "close-notifications")
           }
         }
         .task { await refresh() }
@@ -192,8 +203,9 @@ struct NotificationsView: View {
   }
   private func stateName(_ state: String) -> String {
     [
-      "pending": "待投递", "sending": "投递中", "accepted": "APNs 已受理", "failed": "投递失败",
-      "suppressed": "已停止", "unknown": "结果未知",
+      "pending": String(localized: "待投递"), "sending": String(localized: "投递中"),
+      "accepted": String(localized: "APNs 已受理"), "failed": String(localized: "投递失败"),
+      "suppressed": String(localized: "已停止"), "unknown": String(localized: "结果未知"),
     ][state] ?? state
   }
 }

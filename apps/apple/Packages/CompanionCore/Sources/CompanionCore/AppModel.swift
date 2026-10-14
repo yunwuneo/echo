@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import Observation
 
@@ -17,6 +18,7 @@ import Observation
   private var flushing: Set<UUID> = []
   private var syncing: Set<UUID> = []
   public init(cache: CacheStore) { self.cache = cache }
+  public func suspendSynchronization() { loop?.cancel(); loop = nil }
   public func restore() async {
     guard let url = UserDefaults.standard.string(forKey: "echo2.activeServer") else { return }
     do { if let connection = try KeychainStore.read(url) { try activate(connection) } } catch {
@@ -86,6 +88,14 @@ import Observation
   }
   public func draft(room: String) -> String {
     pending.first { $0.room == room && $0.state == "draft" }?.content ?? ""
+  }
+  /// Persist before any external system action; failure must stop execution. Namespace is captured before awaiting.
+  public func storeExecutionReceipt(namespace: String, id: String, value: String) throws {
+    try cache.draft(namespace: namespace, room: "system-execution/" + id, content: value)
+    if connection?.namespace == namespace { try reload() }
+  }
+  public func executionReceipt(namespace: String, id: String) throws -> String {
+    try cache.commands(namespace: namespace).first { $0.room == "system-execution/" + id && $0.state == "draft" }?.content ?? ""
   }
   public func saveDraft(room: String, content: String) {
     do {
@@ -202,7 +212,17 @@ import Observation
       try cache.replace(namespace: namespace, snapshot: snap)
     }
     while version == generation {
-      let batch = try await api.sync(cursor: cache.cursor(namespace: namespace))
+      let batch: JSONValue
+      do {
+        batch = try await api.sync(cursor: cache.cursor(namespace: namespace))
+      } catch {
+        guard APIConnection.apiError(error)?.status == 410 else { throw error }
+        let snapshot = try await api.snapshot()
+        guard version == generation else { return }
+        try cache.replace(namespace: namespace, snapshot: snapshot)
+        try reload()
+        return
+      }
       guard version == generation else { return }
       try cache.apply(
         namespace: namespace, events: batch["items"].array, cursor: batch["next_cursor"].string)
@@ -265,6 +285,7 @@ import Observation
     do { try await api.save(resource: resource, id: id, revision: revision, body: body) } catch {
       if APIConnection.apiError(error)?.status == 409 {
         try? await catchUp(api: api, saved: saved, version: version)
+        if resource == "providers" { try? await refreshSettings() }
       }
       throw error
     }
@@ -304,11 +325,30 @@ import Observation
       throw APIError(status: 401, code: "not_connected")
     }
     let version = generation
-    let value = try await api.autonomy(action: action, id: id, revision: revision, body: body)
+    var input = body
+    let dedupKey = "command/" + action + "/" + id
+    let mutating = ["createConnection", "updateConnection", "createGrant", "updateGrant"].contains(
+      action)
+    if mutating {
+      let encoder = JSONEncoder()
+      encoder.outputFormatting = [.sortedKeys]
+      let digest =
+        SHA256.hash(data: try encoder.encode(body)).map { String(format: "%02x", $0) }.joined()
+        + "/\(revision)"
+      let savedCommand = draft(room: dedupKey).split(separator: "|").map(String.init)
+      let operation =
+        savedCommand.count == 2 && savedCommand[0] == digest ? savedCommand[1] : UUID().uuidString
+      saveDraft(room: dedupKey, content: digest + "|" + operation)
+      var object = body.object
+      object["operation_id"] = .string(operation)
+      input = .object(object)
+    }
+    let value = try await api.autonomy(action: action, id: id, revision: revision, body: input)
     guard version == generation else { throw APIError(status: 409, code: "connection_changed") }
     if !["global", "policy", "recaps", "usage", "connections", "grants", "calls"].contains(action) {
       try await catchUp(api: api, saved: saved, version: version)
     }
+    if mutating { saveDraft(room: dedupKey, content: "") }
     return value
   }
   public func operations(action: String, id: String = "", body: JSONValue = .null) async throws
@@ -321,7 +361,15 @@ import Observation
     try await validate(api, saved: saved)
     let result = try await api.operations(action: action, id: id, body: body)
     guard version == generation else { throw APIError(status: 409, code: "connection_changed") }
-    if action == "resolvePush" { try await catchUp(api: api, saved: saved, version: version) }
+    if [
+      "resolvePush", "editMessage", "saveModelRoute", "queueInput", "updateQueuedInput",
+      "startQueuedTurn", "branchConversation", "milestone", "createAsset", "sendAttached",
+    ].contains(action) {
+      try await catchUp(api: api, saved: saved, version: version)
+    }
+    if action == "milestone" && body["action"].string == "restoreBackup" {
+      try await refreshSettings()
+    }
     return result
   }
   public func bindPush(invitation: String, apnsToken: String, topic: String, environment: String)

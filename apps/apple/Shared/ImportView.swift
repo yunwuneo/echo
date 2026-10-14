@@ -34,18 +34,22 @@ struct ImportView: View {
   var body: some View {
     NavigationStack {
       Form {
-        Section("选择来源") {
-          Button("选择 JSON 或 PNG 文件") { picking = true }.disabled(busy)
-          Text("或粘贴角色卡／世界书 JSON").font(.caption)
+        Section(String(localized: "选择来源")) {
+          Button(String(localized: "选择 JSON 或 PNG 文件")) { picking = true }.disabled(busy)
+          Text(String(localized: "或粘贴角色卡／设定集 JSON")).font(EchoFont.caption)
           JSONSourceEditor(text: $json).frame(minHeight: 160)
-            .accessibilityLabel("角色卡或世界书 JSON 内容")
-          Button("预览粘贴内容") { prepare(Data(json.utf8), format: "json", name: "粘贴的 JSON") }.disabled(
+            .accessibilityLabel(String(localized: "角色卡或设定集 JSON 内容"))
+          Button(String(localized: "预览粘贴内容")) {
+            prepare(Data(json.utf8), format: "json", name: String(localized: "粘贴的 JSON"))
+          }.disabled(
             busy || json.isEmpty
           ).accessibilityIdentifier("preview-import")
-          Text("JSON 最多 5 MiB，PNG 最多 10 MiB。只映射兼容子集，不请求文件中的远程地址。").font(.caption).foregroundStyle(
+          Text(String(localized: "JSON 最多 5 MiB，PNG 最多 10 MiB。只映射兼容子集，不请求文件中的远程地址。")).font(
+            EchoFont.caption
+          ).foregroundStyle(
             .secondary)
         }
-        Section("独立世界书的可知角色 · 不选表示世界内公开") {
+        Section(String(localized: "独立设定集的可知角色 · 不选表示当前设定内公开")) {
           ForEach(model.items("actor").filter { $0["world_id"].string == world }) { actor in
             Toggle(
               actor.name,
@@ -56,21 +60,22 @@ struct ImportView: View {
                   preview = .null
                 }))
           }
-          Text("角色卡附带的世界书仅绑定新导入角色。调整可知角色后需要重新预览。").font(.caption).foregroundStyle(.secondary)
+          Text(String(localized: "角色卡附带的设定集仅绑定新导入角色。调整可知角色后需要重新预览。")).font(EchoFont.caption)
+            .foregroundStyle(.secondary)
         }
         if !preview["id"].string.isEmpty {
-          Section("导入预览 · \(filename)") {
+          Section(String(localized: "导入预览 · \(filename)")) {
             if !preview["character"]["name"].string.isEmpty {
-              Text("角色：\(preview["character"]["name"].string)")
+              Text(String(localized: "角色：\(preview["character"]["name"].string)"))
             }
-            Text("世界书条目：\(preview["entries"].array.count)")
+            Text(String(localized: "设定集条目：\(preview["entries"].array.count)"))
             ForEach(Array(preview["mapping"].array.enumerated()), id: \.offset) { _, row in
-              Text(row.string).font(.caption)
+              Text(row.string).font(EchoFont.caption)
             }
           }
-          Section("兼容性报告") {
+          Section(String(localized: "兼容性报告")) {
             ForEach(Array(preview["warnings"].array.enumerated()), id: \.offset) { _, row in
-              Text(row.string).font(.caption).foregroundStyle(Color.echo.warning)
+              Text(row.string).font(EchoFont.caption).foregroundStyle(Color.echo.warning)
             }
             ForEach(Array(preview["errors"].array.enumerated()), id: \.offset) { _, row in
               Text(row.string).foregroundStyle(Color.echo.error)
@@ -80,7 +85,7 @@ struct ImportView: View {
             || !preview["character"]["prompt_suggestions"]["post_history_instructions"].string
               .isEmpty
           {
-            Section("角色提示建议 · 默认关闭") {
+            Section(String(localized: "角色提示建议 · 默认关闭")) {
               if !preview["character"]["prompt_suggestions"]["system_prompt"].string.isEmpty {
                 Text(preview["character"]["prompt_suggestions"]["system_prompt"].string)
                   .textSelection(.enabled)
@@ -91,21 +96,21 @@ struct ImportView: View {
                 Text(preview["character"]["prompt_suggestions"]["post_history_instructions"].string)
                   .textSelection(.enabled)
               }
-              Toggle("启用这些角色提示建议", isOn: $enableSuggestions)
+              Toggle(String(localized: "启用这些角色提示建议"), isOn: $enableSuggestions)
                 .disabled(busy || result != .null)
-              Text("建议不能授予工具权限或访问其他角色的秘密。").font(.caption)
+              Text(String(localized: "建议不能授予工具权限或访问其他角色的秘密。")).font(EchoFont.caption)
             }
           }
-          Section("冲突处理") {
+          Section(String(localized: "冲突处理")) {
             ForEach(Array(preview["conflicts"].array.enumerated()), id: \.offset) { _, row in
               Text(row.string)
             }
-            Picker("同名内容", selection: $strategy) {
-              Text("跳过同名项").tag("skip")
-              Text("创建副本").tag("copy")
+            Picker(String(localized: "同名内容"), selection: $strategy) {
+              Text(String(localized: "跳过同名项")).tag("skip")
+              Text(String(localized: "创建副本")).tag("copy")
             }.disabled(busy || result != .null)
-            Text("同一文件与目标世界只提交一次。不会替换现有角色、世界书或历史。").font(.caption)
-            Button("确认导入") {
+            Text(String(localized: "同一文件与目标设定只提交一次。不会替换现有角色、设定集或历史。")).font(EchoFont.caption)
+            Button(String(localized: "确认导入")) {
               busy = true
               Task {
                 defer { busy = false }
@@ -124,13 +129,16 @@ struct ImportView: View {
               .accessibilityIdentifier("commit-import")
           }
           if result != .null {
-            Section("导入已完成") {
+            Section(String(localized: "导入已完成")) {
               if !result["character_id"].string.isEmpty {
-                Text("已新增角色：\(preview["character"]["name"].string)")
+                Text(String(localized: "已新增角色：\(preview["character"]["name"].string)"))
               }
               Text(
-                "新增 \(result["lore_ids"].array.count) 条世界书；跳过 \(result["skipped"].array.count) 项。")
-              Button("保存原始文件（含未知扩展）") {
+                String(
+                  localized:
+                    "新增 \(result["lore_ids"].array.count) 条设定集；跳过 \(result["skipped"].array.count) 项。"
+                ))
+              Button(String(localized: "保存原始文件（含未知扩展）")) {
                 Task {
                   do {
                     let value = try await model.continuity(
@@ -145,21 +153,28 @@ struct ImportView: View {
             }
           }
         }
-        if busy { ProgressView("正在处理导入内容…") }
+        if busy { ProgressView(String(localized: "正在处理导入内容…")) }
         if let failure {
           Label(failure, systemImage: "exclamationmark.circle")
             .foregroundStyle(Color.echo.error).fixedSize(horizontal: false, vertical: true)
         }
       }.formStyle(.grouped).toggleStyle(.switch).scrollContentBackground(.hidden)
-        .background(Color.echo.surfaceSunken).navigationTitle("导入角色与世界书")
-        .alert("导入已完成", isPresented: $imported) {
-          Button("好") {}
+        .background(Color.echo.surfaceSunken).navigationTitle(String(localized: "导入角色与设定集"))
+        .alert(String(localized: "导入已完成"), isPresented: $imported) {
+          Button(String(localized: "好")) {}
         } message: {
           Text(
-            "角色与世界书已保存。新增 \(result["lore_ids"].array.count) 条世界书，跳过 \(result["skipped"].array.count) 项。"
+            String(
+              localized:
+                "角色与设定集已保存。新增 \(result["lore_ids"].array.count) 条设定集，跳过 \(result["skipped"].array.count) 项。"
+            )
           )
         }
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("完成") { dismiss() } } }
+        .toolbar {
+          ToolbarItem(placement: .cancellationAction) {
+            Button(String(localized: "完成")) { dismiss() }
+          }
+        }
         .fileImporter(isPresented: $picking, allowedContentTypes: [.json, .png]) { selection in
           do {
             let url = try selection.get()

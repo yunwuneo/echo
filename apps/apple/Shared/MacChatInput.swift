@@ -30,7 +30,7 @@
       input.autoresizingMask = [.width]
       input.textContainerInset = NSSize(width: 0, height: 8)
       input.setAccessibilityIdentifier("chat-input")
-      input.setAccessibilityLabel("消息")
+      input.setAccessibilityLabel(String(localized: "消息"))
       input.string = text
       scroll.documentView = input
       return scroll

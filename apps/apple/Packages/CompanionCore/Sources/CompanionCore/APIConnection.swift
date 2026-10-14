@@ -151,6 +151,8 @@ public actor APIConnection {
       "run": "runs", "memory": "memories", "memory_settings": "memory_settings",
       "autonomy_settings": "autonomy_settings", "autonomy_policy": "autonomy_policies",
       "mcp_connection": "mcp_connections", "tool_grant": "tool_grants", "tool_call": "tool_calls",
+      "asset": "assets", "model_route": "model_routes",
+      "queued_input": "queued_inputs",
     ]
     for key in mapping.values { data[key] = .array([]) }
     var cursor = "0"
@@ -252,6 +254,11 @@ public actor APIConnection {
         ).ok
       case ("providers", nil):
         _ = try await client.createProvider(body: .json(try converted(body))).created
+      case ("providers", let id?):
+        _ = try await client.updateProvider(
+          path: .init(id: id),
+          headers: .init(if_hyphen_match: String(revision)), body: .json(try converted(body))
+        ).ok
       case ("state", let id?):
         _ = try await client.correctWorldState(
           path: .init(id: id), headers: .init(if_hyphen_match: String(revision)),
@@ -391,6 +398,15 @@ public actor APIConnection {
   {
     try await call { client in
       switch action {
+      case "createAsset":
+        return try await converted(
+          client.createAsset(body: .json(try converted(body))).created.body.json)
+      case "sendAttached":
+        return try await converted(
+          client.sendMessage(path: .init(id: id), body: .json(try converted(body))).accepted.body
+            .json)
+      case "milestone":
+        return try await converted(client.milestone(body: .json(try converted(body))).ok.body.json)
       case "notifications": return try await converted(client.notificationStatus().ok.body.json)
       case "beginPush": return try await converted(client.beginPushBinding().ok.body.json)
       case "enablePush":
@@ -402,6 +418,34 @@ public actor APIConnection {
         return try await converted(client.resolvePush(path: .init(id: id)).ok.body.json)
       case "export": return try await converted(client.exportData().ok.body.json)
       case "diagnostics": return try await converted(client.diagnostics().ok.body.json)
+      case "modelRoutes": return try await converted(client.listModelRoutes().ok.body.json)
+      case "saveModelRoute":
+        return try await converted(
+          client.saveModelRoute(body: .json(try converted(body))).ok.body.json)
+      case "messageVersions":
+        return try await converted(client.messageVersions(path: .init(id: id)).ok.body.json)
+      case "editMessage":
+        return try await converted(
+          client.editMessage(path: .init(id: id), body: .json(try converted(body))).ok.body.json)
+      case "exportConversation":
+        return try await converted(client.exportConversation(path: .init(id: id)).ok.body.json)
+      case "queuedInputs":
+        return try await converted(client.queuedInputs(path: .init(id: id)).ok.body.json)
+      case "branchConversation":
+        return try await converted(
+          client.branchConversation(path: .init(id: id), body: .json(try converted(body))).ok.body
+            .json)
+      case "queueInput":
+        return try await converted(
+          client.queueInput(path: .init(id: id), body: .json(try converted(body))).ok.body.json)
+      case "updateQueuedInput":
+        return try await converted(
+          client.updateQueuedInput(path: .init(id: id), body: .json(try converted(body))).ok.body
+            .json)
+      case "startQueuedTurn":
+        return try await converted(
+          client.startQueuedTurn(path: .init(id: id), body: .json(try converted(body))).ok.body.json
+        )
       default: throw APIError(status: 400, code: "unsupported_action")
       }
     }

@@ -1,0 +1,7643 @@
+{
+  "sourceLanguage" : "zh-Hans",
+  "strings" : {
+    "" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    " · 未读" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " · 未读"
+          }
+        }
+      }
+    },
+    " · 核心记忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " · 核心记忆"
+          }
+        }
+      }
+    },
+    " · 私聊" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " · 私聊"
+          }
+        }
+      }
+    },
+    " · 群聊" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " · 群聊"
+          }
+        }
+      }
+    },
+    "，还有 %lld 件" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "，还有 %lld 件"
+          }
+        }
+      }
+    },
+    "“已受理”表示中继取得 APNs 接受响应，不代表设备已显示。系统可能延迟或抑制通知。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“已受理”表示中继取得 APNs 接受响应，不代表设备已显示。系统可能延迟或抑制通知。"
+          }
+        }
+      }
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ · %@ · %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$@ · %3$@"
+          }
+        }
+      }
+    },
+    "%@ 准备回应…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 准备回应…"
+          }
+        }
+      }
+    },
+    "%@ 已尝试 %lld 次。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 已尝试 %2$lld 次。"
+          }
+        }
+      }
+    },
+    "%@ 想做一件事，需要你同意" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 想做一件事，需要你同意"
+          }
+        }
+      }
+    },
+    "%@ 正在准备回应…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 正在准备回应…"
+          }
+        }
+      }
+    },
+    "%@ 正在给你写消息…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 正在给你写消息…"
+          }
+        }
+      }
+    },
+    "%@ 正在输入…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 正在输入…"
+          }
+        }
+      }
+    },
+    "%@ 的一件事，需要你核对结果" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 的一件事，需要你核对结果"
+          }
+        }
+      }
+    },
+    "%@ 等你决定" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 等你决定"
+          }
+        }
+      }
+    },
+    "%@ 等你核对" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 等你核对"
+          }
+        }
+      }
+    },
+    "%@，%@，聊天与成员" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@，%2$@，聊天与成员"
+          }
+        }
+      }
+    },
+    "%@最多 %@ 个字符。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@最多 %2$@ 个字符。"
+          }
+        }
+      }
+    },
+    "%@需为 %@–%@ %@的整数。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@需为 %2$@–%3$@ %4$@的整数。"
+          }
+        }
+      }
+    },
+    "%@需为 %@–%@ tokens 的整数。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@需为 %2$@–%3$@ tokens 的整数。"
+          }
+        }
+      }
+    },
+    "%lld %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld %2$@"
+          }
+        }
+      }
+    },
+    "%lld 位角色 · %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld 位角色 · %2$@"
+          }
+        }
+      }
+    },
+    "%lld 次请求 · 输入 %lld / 输出 %lld tokens" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld 次请求 · 输入 %2$lld / 输出 %3$lld tokens"
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%%"
+          }
+        }
+      }
+    },
+    "0" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0"
+          }
+        }
+      }
+    },
+    "1–4,096" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1–4,096"
+          }
+        }
+      }
+    },
+    "120" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "120"
+          }
+        }
+      }
+    },
+    "AI 状态权限" : {
+
+    },
+    "API Key" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Key"
+          }
+        }
+      }
+    },
+    "API Key 留空保留原凭据。修改连接会让仍使用旧配置的轮次停止，避免把新凭据发往旧地址。" : {
+
+    },
+    "APNs 已受理" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APNs 已受理"
+          }
+        }
+      }
+    },
+    "Bearer" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearer"
+          }
+        }
+      }
+    },
+    "Claude Messages" : {
+
+    },
+    "Echo" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Echo"
+          }
+        }
+      }
+    },
+    "Gemini" : {
+
+    },
+    "Host 使用自己的角色与数据。配对后仍需授权能力、目录并绑定独立身份。执行结果未知时先对账，不自动切换执行端。" : {
+
+    },
+    "Host 已授权的目录代号" : {
+
+    },
+    "HTML / JavaScript" : {
+
+    },
+    "https://example.com/mcp" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/mcp"
+          }
+        }
+      }
+    },
+    "JSON 最多 5 MiB，PNG 最多 10 MiB。只映射兼容子集，不请求文件中的远程地址。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON 最多 5 MiB，PNG 最多 10 MiB。只映射兼容子集，不请求文件中的远程地址。"
+          }
+        }
+      }
+    },
+    "JSON 包含选中正文和去重附件原件；Markdown 与 PDF 为正文导出。所有旧版本使用加密备份保存。" : {
+
+    },
+    "Key 会加密保存到你的服务器，以便客户端关闭时继续运行。单次输出必须小于上下文上限。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key 会加密保存到你的服务器，以便客户端关闭时继续运行。单次输出必须小于上下文上限。"
+          }
+        }
+      }
+    },
+    "MCP 连接" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MCP 连接"
+          }
+        }
+      }
+    },
+    "MCP 连接与授权" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MCP 连接与授权"
+          }
+        }
+      }
+    },
+    "OpenAI 兼容" : {
+
+    },
+    "Python" : {
+
+    },
+    "Python 输入 JSON" : {
+
+    },
+    "Streamable HTTP" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streamable HTTP"
+          }
+        }
+      }
+    },
+    "TA" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA"
+          }
+        }
+      }
+    },
+    "TA 什么时候找你，以及别打扰的时段" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 什么时候找你，以及别打扰的时段"
+          }
+        }
+      }
+    },
+    "TA 好像走神了 · 这条回复未完成" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 好像走神了 · 这条回复未完成"
+          }
+        }
+      }
+    },
+    "TA 提到过 · 还未确认" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 提到过 · 还未确认"
+          }
+        }
+      }
+    },
+    "TA 的设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 的设定"
+          }
+        }
+      }
+    },
+    "TA 的设定 · %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 的设定 · %@"
+          }
+        }
+      }
+    },
+    "TA 的设定与回忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 的设定与回忆"
+          }
+        }
+      }
+    },
+    "TA 的设定与设定集" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 的设定与设定集"
+          }
+        }
+      }
+    },
+    "TA 的资料" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 的资料"
+          }
+        }
+      }
+    },
+    "TA 记住的事" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 记住的事"
+          }
+        }
+      }
+    },
+    "TA 记住的事会留在这里，慢慢积攒属于你们的经历。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TA 记住的事会留在这里，慢慢积攒属于你们的经历。"
+          }
+        }
+      }
+    },
+    "tokens" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tokens"
+          }
+        }
+      }
+    },
+    "Vertex Gemini" : {
+
+    },
+    "Vertex 使用访问令牌，模型填写 projects/项目/locations/区域/publishers/google/models/模型。连接测试可能产生费用，仅在明确点击时运行。" : {
+
+    },
+    "X-API-Key" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X-API-Key"
+          }
+        }
+      }
+    },
+    "一次" : {
+
+    },
+    "一次性配对码" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一次性配对码"
+          }
+        }
+      }
+    },
+    "一段回忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一段回忆"
+          }
+        }
+      }
+    },
+    "一起回复（%lld 条）" : {
+
+    },
+    "上下文上限" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上下文上限"
+          }
+        }
+      }
+    },
+    "上方仍保留你的编辑，请比较后再决定。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上方仍保留你的编辑，请比较后再决定。"
+          }
+        }
+      }
+    },
+    "不占设定专用预算（仍受总预算限制）" : {
+
+    },
+    "不启用，使用词项召回" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不启用，使用词项召回"
+          }
+        }
+      }
+    },
+    "不替代" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不替代"
+          }
+        }
+      }
+    },
+    "不错过新的消息与需要你决定的事" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不错过新的消息与需要你决定的事"
+          }
+        }
+      }
+    },
+    "业务备份始终排除密钥。这里另存加密凭据包；导入前核对连接身份与版本，不自动联网测试。" : {
+
+    },
+    "中继一次性邀请" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中继一次性邀请"
+          }
+        }
+      }
+    },
+    "为你们留下一片天地，认识角色，让故事从第一句话开始。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为你们留下一片天地，认识角色，让故事从第一句话开始。"
+          }
+        }
+      }
+    },
+    "为故事留个位置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为故事留个位置"
+          }
+        }
+      }
+    },
+    "为此计划立即生成恢复点" : {
+
+    },
+    "为角色授权工具" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为角色授权工具"
+          }
+        }
+      }
+    },
+    "主动消息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主动消息"
+          }
+        }
+      }
+    },
+    "主动消息与后台活动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主动消息与后台活动"
+          }
+        }
+      }
+    },
+    "主动消息与自主互动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主动消息与自主互动"
+          }
+        }
+      }
+    },
+    "主动消息设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主动消息设置"
+          }
+        }
+      }
+    },
+    "主动联系" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主动联系"
+          }
+        }
+      }
+    },
+    "主动联系你" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主动联系你"
+          }
+        }
+      }
+    },
+    "主题" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主题"
+          }
+        }
+      }
+    },
+    "书名 / 条目名" : {
+
+    },
+    "事件与 Host 高级配置" : {
+
+    },
+    "事实索引待处理片段" : {
+
+    },
+    "云端" : {
+
+    },
+    "人工核对未知系统结果" : {
+
+    },
+    "人工纠正 · " : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "人工纠正 · "
+          }
+        }
+      }
+    },
+    "什么时候联系你" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "什么时候联系你"
+          }
+        }
+      }
+    },
+    "仅主人可见" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅主人可见"
+          }
+        }
+      }
+    },
+    "仅你可见" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅你可见"
+          }
+        }
+      }
+    },
+    "仅元数据" : {
+
+    },
+    "仅在以下参数范围内长期授权" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅在以下参数范围内长期授权"
+          }
+        }
+      }
+    },
+    "仅当前消息" : {
+
+    },
+    "仅本次授权该来源" : {
+
+    },
+    "仅查询权限状态" : {
+
+    },
+    "仅迁移选定凭据" : {
+
+    },
+    "今天 %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天 %@"
+          }
+        }
+      }
+    },
+    "今日来源，逐项刷新" : {
+
+    },
+    "从 Markdown 导入指令" : {
+
+    },
+    "从左侧选一段私聊或群聊，也可以开启一段新的相遇。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从左侧选一段私聊或群聊，也可以开启一段新的相遇。"
+          }
+        }
+      }
+    },
+    "从指定消息开始" : {
+
+    },
+    "从模板添加角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从模板添加角色"
+          }
+        }
+      }
+    },
+    "以下是已经保存的角色发言，按实际发生顺序摘录。点击可跳到原文。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以下是已经保存的角色发言，按实际发生顺序摘录。点击可跳到原文。"
+          }
+        }
+      }
+    },
+    "任务与 Host" : {
+
+    },
+    "任务内容" : {
+
+    },
+    "任务名称" : {
+
+    },
+    "优先级：%lld" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "优先级：%lld"
+          }
+        }
+      }
+    },
+    "何时想起这条设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "何时想起这条设定"
+          }
+        }
+      }
+    },
+    "作品名" : {
+
+    },
+    "作品源码" : {
+
+    },
+    "作用范围" : {
+
+    },
+    "你" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你"
+          }
+        }
+      }
+    },
+    "你们的故事" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你们的故事"
+          }
+        }
+      }
+    },
+    "你创建的快捷指令名称" : {
+
+    },
+    "你在这套设定中的身份" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你在这套设定中的身份"
+          }
+        }
+      }
+    },
+    "你好" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你好"
+          }
+        }
+      }
+    },
+    "你的记录" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的记录"
+          }
+        }
+      }
+    },
+    "你的记录 · 仅你可见" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的记录 · 仅你可见"
+          }
+        }
+      }
+    },
+    "你离开时，故事里发生了什么" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你离开时，故事里发生了什么"
+          }
+        }
+      }
+    },
+    "使用上方选定的 Host 与目录代号。后台分块上传并验证完整哈希；失败或未知结果不会删除旧恢复点。" : {
+
+    },
+    "使用你自己的服务地址与 API Key" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用你自己的服务地址与 API Key"
+          }
+        }
+      }
+    },
+    "使用当前密码与保留数量启用此计划" : {
+
+    },
+    "使用房间的聊天模型，受全实例后台预算限制。失败不影响聊天。默认每日 20 次请求、10 万输入与 1 万输出额度，由服务器配置。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用房间的聊天模型，受全实例后台预算限制。失败不影响聊天。默认每日 20 次请求、10 万输入与 1 万输出额度，由服务器配置。"
+          }
+        }
+      }
+    },
+    "使用技能的对话" : {
+
+    },
+    "使用方式" : {
+
+    },
+    "使用自定义转写服务" : {
+
+    },
+    "使用角色最近的普通私聊。云端执行需开启对应世界的主动联系权限。重复任务错过后只补最近一次；错过的单次任务需明确补跑。" : {
+
+    },
+    "供应商参数（保存不调用服务）" : {
+
+    },
+    "保存" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
+          }
+        }
+      }
+    },
+    "保存不会调用模型。关闭后不会回退到其他模型；尚未设置全局默认时，继承会沿用房间原有连接。" : {
+
+    },
+    "保存中…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存中…"
+          }
+        }
+      }
+    },
+    "保存会检查读取时的版本及正文哈希；冲突不会覆盖服务器内容。" : {
+
+    },
+    "保存修改" : {
+
+    },
+    "保存共享预设" : {
+
+    },
+    "保存原始文件（含未知扩展）" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存原始文件（含未知扩展）"
+          }
+        }
+      }
+    },
+    "保存回应配置" : {
+
+    },
+    "保存媒体参数" : {
+
+    },
+    "保存已播放部分" : {
+
+    },
+    "保存并开启" : {
+
+    },
+    "保存文档" : {
+
+    },
+    "保存新的备份计划" : {
+
+    },
+    "保存权限" : {
+
+    },
+    "保存条目" : {
+
+    },
+    "保存模式" : {
+
+    },
+    "保存源码" : {
+
+    },
+    "保存纠正" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存纠正"
+          }
+        }
+      }
+    },
+    "保存群配置" : {
+
+    },
+    "保存设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存设置"
+          }
+        }
+      }
+    },
+    "保存资源的输入方式" : {
+
+    },
+    "保留" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保留"
+          }
+        }
+      }
+    },
+    "保留全部恢复点" : {
+
+    },
+    "保留最近 %lld 个已验证恢复点" : {
+
+    },
+    "保留最近 %lld 天诊断正文" : {
+
+    },
+    "保留存在冲突的本地内容" : {
+
+    },
+    "保留并标明旧上下文" : {
+
+    },
+    "保留我的编辑，准备重新保存" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保留我的编辑，准备重新保存"
+          }
+        }
+      }
+    },
+    "保留文字并作为新条目" : {
+
+    },
+    "保留的状态冲突副本" : {
+
+    },
+    "保留草稿" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保留草稿"
+          }
+        }
+      }
+    },
+    "修改对象" : {
+
+    },
+    "修改暂存内容" : {
+
+    },
+    "修订记录" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修订记录"
+          }
+        }
+      }
+    },
+    "候选 %lld 项。保留每段对话最近的完整请求及执行中、结果未知记录；逻辑删除不代表文件立即缩小。" : {
+
+    },
+    "停止录音" : {
+
+    },
+    "停止本次回应" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止本次回应"
+          }
+        }
+      }
+    },
+    "停止此对话参与记忆" : {
+
+    },
+    "允许后台活动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许后台活动"
+          }
+        }
+      }
+    },
+    "允许向所选连接发送一次可能收费的测试请求？" : {
+
+    },
+    "允许已授权的写入工具" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许已授权的写入工具"
+          }
+        }
+      }
+    },
+    "允许已授权的读取工具" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许已授权的读取工具"
+          }
+        }
+      }
+    },
+    "允许成员群工具" : {
+
+    },
+    "允许成员群记忆" : {
+
+    },
+    "允许此对话参与记忆" : {
+
+    },
+    "允许此角色在此设备使用该动作" : {
+
+    },
+    "允许的内网 IP" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许的内网 IP"
+          }
+        }
+      }
+    },
+    "允许系统通知" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许系统通知"
+          }
+        }
+      }
+    },
+    "允许运行" : {
+
+    },
+    "允许这套设定后台运行" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许这套设定后台运行"
+          }
+        }
+      }
+    },
+    "先在系统来源中核实真实结果。此操作只登记核对证据，不再次执行系统动作；原设备不可用时也可在当前设备处理。" : {
+
+    },
+    "先读取外部基线，再明确写入。外部内容不会自动覆盖项目文档；冲突时保留外部与本地两份内容，修改后重新读取核对。" : {
+
+    },
+    "全局后台活动已开启" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全局后台活动已开启"
+          }
+        }
+      }
+    },
+    "全局后台活动已暂停" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全局后台活动已暂停"
+          }
+        }
+      }
+    },
+    "全局默认" : {
+
+    },
+    "全部历史" : {
+
+    },
+    "全部故事" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全部故事"
+          }
+        }
+      }
+    },
+    "共享预设库" : {
+
+    },
+    "共同的回忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共同的回忆"
+          }
+        }
+      }
+    },
+    "关联文档" : {
+
+    },
+    "关键词" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关键词"
+          }
+        }
+      }
+    },
+    "关键词，用逗号分隔" : {
+
+    },
+    "关闭" : {
+
+    },
+    "关闭对话生成" : {
+
+    },
+    "关闭成员群工具" : {
+
+    },
+    "关闭成员群记忆" : {
+
+    },
+    "关闭此设备通知" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭此设备通知"
+          }
+        }
+      }
+    },
+    "兼容性报告" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "兼容性报告"
+          }
+        }
+      }
+    },
+    "内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内容"
+          }
+        }
+      }
+    },
+    "内容来源" : {
+
+    },
+    "最多填写 20 个话题，每个不超过 500 个字符。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最多填写 20 个话题，每个不超过 500 个字符。"
+          }
+        }
+      }
+    },
+    "最多填写 32 个触发词，每个不超过 120 个字符。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最多填写 32 个触发词，每个不超过 120 个字符。"
+          }
+        }
+      }
+    },
+    "最多选择 8 位可知角色。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最多选择 8 位可知角色。"
+          }
+        }
+      }
+    },
+    "最多选择 8 位在场角色。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最多选择 8 位在场角色。"
+          }
+        }
+      }
+    },
+    "最短间隔" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最短间隔"
+          }
+        }
+      }
+    },
+    "最短间隔，分钟" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最短间隔，分钟"
+          }
+        }
+      }
+    },
+    "最近两条带图消息" : {
+
+    },
+    "最近投递" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近投递"
+          }
+        }
+      }
+    },
+    "最近条数（完整回合）" : {
+
+    },
+    "最近的回忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近的回忆"
+          }
+        }
+      }
+    },
+    "写下名字、性格与故事背景" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写下名字、性格与故事背景"
+          }
+        }
+      }
+    },
+    "写下名字和性格，把故事里的那个人带到这里。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写下名字和性格，把故事里的那个人带到这里。"
+          }
+        }
+      }
+    },
+    "写下希望记住的内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写下希望记住的内容"
+          }
+        }
+      }
+    },
+    "写入审批" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写入审批"
+          }
+        }
+      }
+    },
+    "写入现实系统" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写入现实系统"
+          }
+        }
+      }
+    },
+    "冲突" : {
+
+    },
+    "冲突处理" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "冲突处理"
+          }
+        }
+      }
+    },
+    "决定后台活动的范围和每日用量" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "决定后台活动的范围和每日用量"
+          }
+        }
+      }
+    },
+    "冷却 %lld 轮" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "冷却 %lld 轮"
+          }
+        }
+      }
+    },
+    "减少使用" : {
+
+    },
+    "凭据" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "凭据"
+          }
+        }
+      }
+    },
+    "分享与系统提问草稿" : {
+
+    },
+    "分享扩展只保存草稿；这里明确发送后才请求模型。" : {
+
+    },
+    "分钟" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分钟"
+          }
+        }
+      }
+    },
+    "切换" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换"
+          }
+        }
+      }
+    },
+    "切换 TA" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换 TA"
+          }
+        }
+      }
+    },
+    "切换服务器" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换服务器"
+          }
+        }
+      }
+    },
+    "切换模式保留原有资料。资料目录只提供简介，正文须明确读取。" : {
+
+    },
+    "创作内容" : {
+
+    },
+    "创建 TA 的设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建 TA 的设定"
+          }
+        }
+      }
+    },
+    "创建副本" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建副本"
+          }
+        }
+      }
+    },
+    "创建可运行作品（默认不允许运行）" : {
+
+    },
+    "创建待确认动作" : {
+
+    },
+    "创建或导入角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建或导入角色"
+          }
+        }
+      }
+    },
+    "创建独立分支" : {
+
+    },
+    "创建角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建角色"
+          }
+        }
+      }
+    },
+    "创建设定书" : {
+
+    },
+    "创建项目" : {
+
+    },
+    "创建预设" : {
+
+    },
+    "初始背景" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "初始背景"
+          }
+        }
+      }
+    },
+    "删除" : {
+
+    },
+    "删除%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除%@"
+          }
+        }
+      }
+    },
+    "删除%@后，该内容将从工作区移除。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除%@后，该内容将从工作区移除。"
+          }
+        }
+      }
+    },
+    "删除原文及依赖的消息和记忆？此操作无法在客户端撤销。" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除原文及依赖的消息和记忆？此操作无法在客户端撤销。"
+          }
+        }
+      }
+    },
+    "删除原文及依赖的消息和记忆？此操作无法在客户端撤销。结果未明的外部动作会保留核对凭据，待你核对后清除参数。" : {
+
+    },
+    "删除后，这项内容会从工作区移除。请确认不再需要后再操作。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除后，这项内容会从工作区移除。请确认不再需要后再操作。"
+          }
+        }
+      }
+    },
+    "删除旧版本" : {
+
+    },
+    "删除这条原文及依赖内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除这条原文及依赖内容"
+          }
+        }
+      }
+    },
+    "到期时间：%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "到期时间：%@"
+          }
+        }
+      }
+    },
+    "刷新" : {
+
+    },
+    "刷新全局状态" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刷新全局状态"
+          }
+        }
+      }
+    },
+    "刷新列表" : {
+
+    },
+    "刷新列表并保留草稿" : {
+
+    },
+    "刷新原任务" : {
+
+    },
+    "刷新影响范围并保留草稿" : {
+
+    },
+    "刷新整理状态" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刷新整理状态"
+          }
+        }
+      }
+    },
+    "刷新服务器状态" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刷新服务器状态"
+          }
+        }
+      }
+    },
+    "刷新测试结果" : {
+
+    },
+    "刷新版本并保留当前选择" : {
+
+    },
+    "刷新这一来源" : {
+
+    },
+    "刷新通知设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刷新通知设置"
+          }
+        }
+      }
+    },
+    "剧情与事件" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "剧情与事件"
+          }
+        }
+      }
+    },
+    "剧情与来源" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "剧情与来源"
+          }
+        }
+      }
+    },
+    "剧情时间" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "剧情时间"
+          }
+        }
+      }
+    },
+    "剧情状态" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "剧情状态"
+          }
+        }
+      }
+    },
+    "加入「%@」" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加入「%@」"
+          }
+        }
+      }
+    },
+    "加入待回复" : {
+
+    },
+    "加密业务备份" : {
+
+    },
+    "加密备份与恢复" : {
+
+    },
+    "加载更多" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加载更多"
+          }
+        }
+      }
+    },
+    "动作" : {
+
+    },
+    "包含身份、对话版本、文档、原始资源和引用关系。排除模型及 MCP 密钥、设备登录、推送和执行队列。恢复后连接与授权需重新检查。当前上限 16 MiB；更大实例使用服务器维护备份。" : {
+
+    },
+    "匹配方式" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匹配方式"
+          }
+        }
+      }
+    },
+    "区分大小写" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "区分大小写"
+          }
+        }
+      }
+    },
+    "协议" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "协议"
+          }
+        }
+      }
+    },
+    "单次输出上限" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "单次输出上限"
+          }
+        }
+      }
+    },
+    "单次输出上限必须小于上下文上限。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "单次输出上限必须小于上下文上限。"
+          }
+        }
+      }
+    },
+    "单独计费的辅助回顾" : {
+
+    },
+    "历史中" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "历史中"
+          }
+        }
+      }
+    },
+    "历史会按完整回合对齐，并受模型总预算限制。图片需要连接声明支持视觉；不会静默丢弃当前图片。" : {
+
+    },
+    "历史前" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "历史前"
+          }
+        }
+      }
+    },
+    "历史版本" : {
+
+    },
+    "历史版本 %lld" : {
+
+    },
+    "历史窗口" : {
+
+    },
+    "历史窗口与导出" : {
+
+    },
+    "历史预算" : {
+
+    },
+    "原图" : {
+
+    },
+    "原图与文字" : {
+
+    },
+    "原始资源字节" : {
+
+    },
+    "原文不在当前缓存中" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原文不在当前缓存中"
+          }
+        }
+      }
+    },
+    "原文证据" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原文证据"
+          }
+        }
+      }
+    },
+    "原话索引待处理片段" : {
+
+    },
+    "去聊一聊" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "去聊一聊"
+          }
+        }
+      }
+    },
+    "参与度" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "参与度"
+          }
+        }
+      }
+    },
+    "参与角色 · 最多 8 位" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "参与角色 · 最多 8 位"
+          }
+        }
+      }
+    },
+    "参与角色 · 选择 1 位" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "参与角色 · 选择 1 位"
+          }
+        }
+      }
+    },
+    "双方消息" : {
+
+    },
+    "发现工具" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发现工具"
+          }
+        }
+      }
+    },
+    "发现损坏，请保留原件并检查备份" : {
+
+    },
+    "发送" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送"
+          }
+        }
+      }
+    },
+    "发送一次测试" : {
+
+    },
+    "发送中…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送中…"
+          }
+        }
+      }
+    },
+    "发送到私密支线" : {
+
+    },
+    "发送图片与文字" : {
+
+    },
+    "发送方式" : {
+
+    },
+    "发送消息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送消息"
+          }
+        }
+      }
+    },
+    "发送这份草稿" : {
+
+    },
+    "取消" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        }
+      }
+    },
+    "取消后续运行" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消后续运行"
+          }
+        }
+      }
+    },
+    "只对这位成员发送" : {
+
+    },
+    "只导入当前勾选连接的凭据" : {
+
+    },
+    "只读" : {
+
+    },
+    "只读检查请求哈希与存储占用" : {
+
+    },
+    "召回" : {
+
+    },
+    "可填写 parameters、body、variables。变量声明包含 name、url、method、required、json_path；凭据仅使用 credential_ref。保留字段如 model、messages、tools 由服务器拒绝。" : {
+
+    },
+    "可知角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可知角色"
+          }
+        }
+      }
+    },
+    "可知角色 · 不选表示当前设定内公开" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可知角色 · 不选表示当前设定内公开"
+          }
+        }
+      }
+    },
+    "可知角色 · 只能缩小来源范围" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可知角色 · 只能缩小来源范围"
+          }
+        }
+      }
+    },
+    "可编辑作品" : {
+
+    },
+    "可设置 image.size、video.seconds / size、tts.voice。音色克隆仅在后续供应商适配器确认支持后开放。" : {
+
+    },
+    "可设置 required_groups、whole_word、scan_depth、sticky_turns / cooldown_turns / delay_turns（均按消息数）、probability、priority、exclusion_group、weight、keyword_scoring、recursion、max_recursion、insertion_slot、injection_depth、injection_role。零递归上限仍受预算和工作量硬限制。" : {
+
+    },
+    "可读写" : {
+
+    },
+    "可读导出" : {
+
+    },
+    "可运行作品" : {
+
+    },
+    "同一文件与目标设定只提交一次。不会替换现有角色、设定集或历史。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同一文件与目标设定只提交一次。不会替换现有角色、设定集或历史。"
+          }
+        }
+      }
+    },
+    "同一设定里可以有许多角色，也有属于你们的私聊与群聊。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同一设定里可以有许多角色，也有属于你们的私聊与群聊。"
+          }
+        }
+      }
+    },
+    "同名内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同名内容"
+          }
+        }
+      }
+    },
+    "名字、性格与相处方式" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名字、性格与相处方式"
+          }
+        }
+      }
+    },
+    "名称" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称"
+          }
+        }
+      }
+    },
+    "后台整理" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "后台整理"
+          }
+        }
+      }
+    },
+    "后台活动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "后台活动"
+          }
+        }
+      }
+    },
+    "后台活动与预算" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "后台活动与预算"
+          }
+        }
+      }
+    },
+    "后台进程" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "后台进程"
+          }
+        }
+      }
+    },
+    "后续历史" : {
+
+    },
+    "向 Echo 提问" : {
+
+    },
+    "向量来源" : {
+
+    },
+    "启用内部文档工具目录" : {
+
+    },
+    "启用提示建议" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用提示建议"
+          }
+        }
+      }
+    },
+    "启用条目" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用条目"
+          }
+        }
+      }
+    },
+    "启用这些角色提示建议" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用这些角色提示建议"
+          }
+        }
+      }
+    },
+    "启用连接" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用连接"
+          }
+        }
+      }
+    },
+    "和 TA 聊聊" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "和 TA 聊聊"
+          }
+        }
+      }
+    },
+    "回到最新消息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回到最新消息"
+          }
+        }
+      }
+    },
+    "回到这段聊天" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回到这段聊天"
+          }
+        }
+      }
+    },
+    "回复上限" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回复上限"
+          }
+        }
+      }
+    },
+    "回复未完成" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回复未完成"
+          }
+        }
+      }
+    },
+    "回复补充提示" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回复补充提示"
+          }
+        }
+      }
+    },
+    "回应方式" : {
+
+    },
+    "回应未完成，消息已保留" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回应未完成，消息已保留"
+          }
+        }
+      }
+    },
+    "回应设置" : {
+
+    },
+    "回应配置" : {
+
+    },
+    "回忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回忆"
+          }
+        }
+      }
+    },
+    "回忆与记忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回忆与记忆"
+          }
+        }
+      }
+    },
+    "回忆从聊天开始" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回忆从聊天开始"
+          }
+        }
+      }
+    },
+    "回忆检索" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回忆检索"
+          }
+        }
+      }
+    },
+    "回顾会单独请求模型并计入用量；成功后仅用于两轮，失败不阻止普通对话。" : {
+
+    },
+    "固定为核心记忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定为核心记忆"
+          }
+        }
+      }
+    },
+    "固定资源参数" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定资源参数"
+          }
+        }
+      }
+    },
+    "固定资源参数 JSON" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "固定资源参数 JSON"
+          }
+        }
+      }
+    },
+    "固定间隔" : {
+
+    },
+    "图像、视频与语音服务" : {
+
+    },
+    "图片历史" : {
+
+    },
+    "图片消息" : {
+
+    },
+    "图片转文字" : {
+
+    },
+    "图片输入方式" : {
+
+    },
+    "图片附言" : {
+
+    },
+    "在「%@」开始聊天" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在「%@」开始聊天"
+          }
+        }
+      }
+    },
+    "在场角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在场角色"
+          }
+        }
+      }
+    },
+    "在本设备执行" : {
+
+    },
+    "地址未变时可留空" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地址未变时可留空"
+          }
+        }
+      }
+    },
+    "地点" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地点"
+          }
+        }
+      }
+    },
+    "基本信息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "基本信息"
+          }
+        }
+      }
+    },
+    "填写 API Key" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "填写 API Key"
+          }
+        }
+      }
+    },
+    "填写自部署服务器地址与一次性配对码。聊天、角色和剧情保存在服务器；离线时仍可阅读已同步内容。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "填写自部署服务器地址与一次性配对码。聊天、角色和剧情保存在服务器；离线时仍可阅读已同步内容。"
+          }
+        }
+      }
+    },
+    "填写连接凭据" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "填写连接凭据"
+          }
+        }
+      }
+    },
+    "填写邀请" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "填写邀请"
+          }
+        }
+      }
+    },
+    "处理方式" : {
+
+    },
+    "备份与恢复" : {
+
+    },
+    "备份密码（至少 12 个字符）" : {
+
+    },
+    "备份或凭据包密码（至少 12 字符）" : {
+
+    },
+    "复制" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制"
+          }
+        }
+      }
+    },
+    "复制为独立预设" : {
+
+    },
+    "复制到此处完整回合的已选消息；当前编辑草稿不会保存到分支。原对话保持原样，外部动作不会重放。原文的隐私删除仍会清除派生副本。" : {
+
+    },
+    "外观" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外观"
+          }
+        }
+      }
+    },
+    "外部目录" : {
+
+    },
+    "大家都在这里，先打个招呼吧。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大家都在这里，先打个招呼吧。"
+          }
+        }
+      }
+    },
+    "失败" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "失败"
+          }
+        }
+      }
+    },
+    "好" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好"
+          }
+        }
+      }
+    },
+    "始终提供这条设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "始终提供这条设定"
+          }
+        }
+      }
+    },
+    "媒体创作" : {
+
+    },
+    "媒体服务参数 JSON" : {
+
+    },
+    "存储与诊断" : {
+
+    },
+    "安全正则" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安全正则"
+          }
+        }
+      }
+    },
+    "安静后自动发送" : {
+
+    },
+    "安静时段 · 别打扰我" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安静时段 · 别打扰我"
+          }
+        }
+      }
+    },
+    "安静时段仍可推进角色互动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安静时段仍可推进角色互动"
+          }
+        }
+      }
+    },
+    "安静等待 %lld 毫秒" : {
+
+    },
+    "完成" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        }
+      }
+    },
+    "定时任务" : {
+
+    },
+    "定时任务与 Host" : {
+
+    },
+    "实例" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "实例"
+          }
+        }
+      }
+    },
+    "实时字幕与待发送文本" : {
+
+    },
+    "实际影响" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "实际影响"
+          }
+        }
+      }
+    },
+    "实际请求记录" : {
+
+    },
+    "密钥请求头" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "密钥请求头"
+          }
+        }
+      }
+    },
+    "对话" : {
+
+    },
+    "对话 ID" : {
+
+    },
+    "对话历史与导出" : {
+
+    },
+    "对话成员" : {
+
+    },
+    "对话模型" : {
+
+    },
+    "对话示例" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "对话示例"
+          }
+        }
+      }
+    },
+    "对话设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "对话设置"
+          }
+        }
+      }
+    },
+    "导入 MCP 连接整库" : {
+
+    },
+    "导入作品" : {
+
+    },
+    "导入包不含密钥；安装不自动授予工具或网络权限。网页会话按扩展隔离。" : {
+
+    },
+    "导入已完成" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入已完成"
+          }
+        }
+      }
+    },
+    "导入角色与设定集" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入角色与设定集"
+          }
+        }
+      }
+    },
+    "导入角色卡" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入角色卡"
+          }
+        }
+      }
+    },
+    "导入角色卡到「%@」" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入角色卡到「%@」"
+          }
+        }
+      }
+    },
+    "导入角色卡或设定集" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入角色卡或设定集"
+          }
+        }
+      }
+    },
+    "导入预览 · %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入预览 · %@"
+          }
+        }
+      }
+    },
+    "导出包含 TA 的设定、角色、消息、记忆与原始导入文件，可能含私人内容，请妥善保管。模型 Key 与设备凭据不会导出。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出包含 TA 的设定、角色、消息、记忆与原始导入文件，可能含私人内容，请妥善保管。模型 Key 与设备凭据不会导出。"
+          }
+        }
+      }
+    },
+    "导出已选择的连接凭据" : {
+
+    },
+    "导出当前版本 JSON" : {
+
+    },
+    "导出当前版本 Markdown" : {
+
+    },
+    "导出当前版本 PDF" : {
+
+    },
+    "导出我的数据" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出我的数据"
+          }
+        }
+      }
+    },
+    "导出源码和素材" : {
+
+    },
+    "导出诊断信息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出诊断信息"
+          }
+        }
+      }
+    },
+    "将保留所有旧版本，并用所选内容创建新版本。" : {
+
+    },
+    "将影响后续 %lld 条消息。已发生的外部操作不会撤销，也不会重新执行；相关记忆将失效。" : {
+
+    },
+    "将按预览恢复业务数据，所有恢复任务保持暂停。" : {
+
+    },
+    "尚无记忆。开启整理后，服务器在积累 8 条消息或空闲 60 秒后提取；原对话仍可正常使用。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚无记忆。开启整理后，服务器在积累 8 条消息或空闲 60 秒后提取；原对话仍可正常使用。"
+          }
+        }
+      }
+    },
+    "尚未确认保存的状态" : {
+
+    },
+    "嵌入模型连接" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "嵌入模型连接"
+          }
+        }
+      }
+    },
+    "嵌入连接必须支持 embeddings 接口。修改连接或维度会重建索引；重建期间保留词项召回。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "嵌入连接必须支持 embeddings 接口。修改连接或维度会重建索引；重建期间保留词项召回。"
+          }
+        }
+      }
+    },
+    "工具" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工具"
+          }
+        }
+      }
+    },
+    "工具审批与运行记录" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工具审批与运行记录"
+          }
+        }
+      }
+    },
+    "工具权限独立于后台活动开关，也用于你主动发起的对话。仍需为具体角色授权；写入默认逐次批准。剧情中的许可不会授予现实权限。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工具权限独立于后台活动开关，也用于你主动发起的对话。仍需为具体角色授权；写入默认逐次批准。剧情中的许可不会授予现实权限。"
+          }
+        }
+      }
+    },
+    "工具返回%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工具返回%@"
+          }
+        }
+      }
+    },
+    "已人工核对" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已人工核对"
+          }
+        }
+      }
+    },
+    "已保存资料" : {
+
+    },
+    "已停止" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已停止"
+          }
+        }
+      }
+    },
+    "已停用" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已停用"
+          }
+        }
+      }
+    },
+    "已取得设备推送地址" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已取得设备推送地址"
+          }
+        }
+      }
+    },
+    "已启用" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已启用"
+          }
+        }
+      }
+    },
+    "已失效" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已失效"
+          }
+        }
+      }
+    },
+    "已存到本机 · 联网后发送" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已存到本机 · 联网后发送"
+          }
+        }
+      }
+    },
+    "已完成" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已完成"
+          }
+        }
+      }
+    },
+    "已开启记忆整理；还需自主总开关和当前设定的记忆类别允许" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已开启记忆整理；还需自主总开关和当前设定的记忆类别允许"
+          }
+        }
+      }
+    },
+    "已批准，等待执行" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已批准，等待执行"
+          }
+        }
+      }
+    },
+    "已拒绝" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已拒绝"
+          }
+        }
+      }
+    },
+    "已接收" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已接收"
+          }
+        }
+      }
+    },
+    "已撤销" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已撤销"
+          }
+        }
+      }
+    },
+    "已新增角色：%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已新增角色：%@"
+          }
+        }
+      }
+    },
+    "已有项目文档 ID" : {
+
+    },
+    "已核实成功" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已核实成功"
+          }
+        }
+      }
+    },
+    "已核实未执行" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已核实未执行"
+          }
+        }
+      }
+    },
+    "已点名 %lld 位" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已点名 %lld 位"
+          }
+        }
+      }
+    },
+    "已确认剧情" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已确认剧情"
+          }
+        }
+      }
+    },
+    "已确认失败" : {
+
+    },
+    "已移除角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已移除角色"
+          }
+        }
+      }
+    },
+    "已绑定 Host 身份" : {
+
+    },
+    "已被新的回应替代" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已被新的回应替代"
+          }
+        }
+      }
+    },
+    "已被替代" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已被替代"
+          }
+        }
+      }
+    },
+    "已过时" : {
+
+    },
+    "已过期" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已过期"
+          }
+        }
+      }
+    },
+    "已送达 · 正在同步…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已送达 · 正在同步…"
+          }
+        }
+      }
+    },
+    "已配对设备" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已配对设备"
+          }
+        }
+      }
+    },
+    "已验证连接" : {
+
+    },
+    "常驻" : {
+
+    },
+    "应用此纠正" : {
+
+    },
+    "延迟 %lld 轮" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "延迟 %lld 轮"
+          }
+        }
+      }
+    },
+    "建议不能授予工具权限或访问其他角色的秘密。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建议不能授予工具权限或访问其他角色的秘密。"
+          }
+        }
+      }
+    },
+    "开发调试：允许本机 HTTP" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开发调试：允许本机 HTTP"
+          }
+        }
+      }
+    },
+    "开启一段聊天" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开启一段聊天"
+          }
+        }
+      }
+    },
+    "开启自动备份" : {
+
+    },
+    "开场白" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开场白"
+          }
+        }
+      }
+    },
+    "开场问候" : {
+
+    },
+    "开始录音" : {
+
+    },
+    "开始时间" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始时间"
+          }
+        }
+      }
+    },
+    "开始语音会话" : {
+
+    },
+    "引用回复" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "引用回复"
+          }
+        }
+      }
+    },
+    "引用已有资源" : {
+
+    },
+    "当前 revision %lld" : {
+
+    },
+    "当前剧情" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前剧情"
+          }
+        }
+      }
+    },
+    "当前地点" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前地点"
+          }
+        }
+      }
+    },
+    "当前设定集全局" : {
+
+    },
+    "当前项目" : {
+
+    },
+    "待回复内容" : {
+
+    },
+    "待处理冲突" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "待处理冲突"
+          }
+        }
+      }
+    },
+    "待批准" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "待批准"
+          }
+        }
+      }
+    },
+    "待投递" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "待投递"
+          }
+        }
+      }
+    },
+    "忘记后，来源及其派生内容不再参与召回或自动提取。删除原文还会清除相关聊天内容。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "忘记后，来源及其派生内容不再参与召回或自动提取。删除原文还会清除相关聊天内容。"
+          }
+        }
+      }
+    },
+    "忘记后不能从旧任务自动恢复，继续？" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "忘记后不能从旧任务自动恢复，继续？"
+          }
+        }
+      }
+    },
+    "忘记这条记忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "忘记这条记忆"
+          }
+        }
+      }
+    },
+    "快捷指令登记" : {
+
+    },
+    "性格" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "性格"
+          }
+        }
+      }
+    },
+    "恢复为新版本" : {
+
+    },
+    "恢复此备份" : {
+
+    },
+    "恢复版本" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复版本"
+          }
+        }
+      }
+    },
+    "恢复预览" : {
+
+    },
+    "想和大家说点什么…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "想和大家说点什么…"
+          }
+        }
+      }
+    },
+    "想对%@说点什么…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "想对%@说点什么…"
+          }
+        }
+      }
+    },
+    "想说的话，就从这里开始。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "想说的话，就从这里开始。"
+          }
+        }
+      }
+    },
+    "成功" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成功"
+          }
+        }
+      }
+    },
+    "我" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我"
+          }
+        }
+      }
+    },
+    "我的设备" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我的设备"
+          }
+        }
+      }
+    },
+    "或粘贴角色卡／设定集 JSON" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "或粘贴角色卡／设定集 JSON"
+          }
+        }
+      }
+    },
+    "截断后续消息" : {
+
+    },
+    "房间" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "房间"
+          }
+        }
+      }
+    },
+    "房间成员" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "房间成员"
+          }
+        }
+      }
+    },
+    "房间类型" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "房间类型"
+          }
+        }
+      }
+    },
+    "打个招呼" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打个招呼"
+          }
+        }
+      }
+    },
+    "打开 Echo 对话" : {
+
+    },
+    "打开对话" : {
+
+    },
+    "打开新的离线会话" : {
+
+    },
+    "打开独立网页会话" : {
+
+    },
+    "打开聊天…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开聊天…"
+          }
+        }
+      }
+    },
+    "打开这段聊天" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开这段聊天"
+          }
+        }
+      }
+    },
+    "打开连接设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开连接设置"
+          }
+        }
+      }
+    },
+    "打断播放" : {
+
+    },
+    "执行 Python" : {
+
+    },
+    "执行中" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "执行中"
+          }
+        }
+      }
+    },
+    "执行位置" : {
+
+    },
+    "扩展与技能" : {
+
+    },
+    "扩展包 JSON" : {
+
+    },
+    "扫描最近 %lld 条可见消息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "扫描最近 %lld 条可见消息"
+          }
+        }
+      }
+    },
+    "批准仅适用于这些参数，有效至 %@。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "批准仅适用于这些参数，有效至 %@。"
+          }
+        }
+      }
+    },
+    "批准当前参数" : {
+
+    },
+    "批准此动作" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "批准此动作"
+          }
+        }
+      }
+    },
+    "把熟悉的人物与设定带进来" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把熟悉的人物与设定带进来"
+          }
+        }
+      }
+    },
+    "把角色加入 TA 的设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "把角色加入 TA 的设定"
+          }
+        }
+      }
+    },
+    "投递中" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "投递中"
+          }
+        }
+      }
+    },
+    "投递失败" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "投递失败"
+          }
+        }
+      }
+    },
+    "拒绝" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拒绝"
+          }
+        }
+      }
+    },
+    "拒绝授权不会显示为空数据。健康读取权限由系统保密，无结果时不显示为零。计时器安排本 App 通知，不承诺后台生成或系统闹钟准点响铃。" : {
+
+    },
+    "持久任务" : {
+
+    },
+    "持久保存状态" : {
+
+    },
+    "持续 %lld 轮" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "持续 %lld 轮"
+          }
+        }
+      }
+    },
+    "指定模型" : {
+
+    },
+    "按 %@ 的当地时间执行，可以跨午夜。开始与结束相同表示不设安静时段。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按 %@ 的当地时间执行，可以跨午夜。开始与结束相同表示不设安静时段。"
+          }
+        }
+      }
+    },
+    "按下方处理方式重新生成此回复" : {
+
+    },
+    "按已读基线写入外部文件" : {
+
+    },
+    "按当前角色成功回复计数。预览和失败重试不计数；延迟要求连续命中，冷却从持续期结束后开始。正则使用 RE2 兼容规则。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按当前角色成功回复计数。预览和失败重试不计数；延迟要求连续命中，冷却从持续期结束后开始。正则使用 RE2 兼容规则。"
+          }
+        }
+      }
+    },
+    "按服务端字段填写参数；修改时使用当前记录 revision。所有命令均由服务端重新检查权限和版本。" : {
+
+    },
+    "按此编号核对，继续查询" : {
+
+    },
+    "按此预览清理" : {
+
+    },
+    "按输入预算" : {
+
+    },
+    "按预览安装 / 替换" : {
+
+    },
+    "换一种回答" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "换一种回答"
+          }
+        }
+      }
+    },
+    "换一种回答会替换这一轮所有角色的回应，并更新相关回忆。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "换一种回答会替换这一轮所有角色的回应，并更新相关回忆。"
+          }
+        }
+      }
+    },
+    "授权" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授权"
+          }
+        }
+      }
+    },
+    "授权具体工具" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授权具体工具"
+          }
+        }
+      }
+    },
+    "授权到期" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授权到期"
+          }
+        }
+      }
+    },
+    "排除词，用逗号分隔" : {
+
+    },
+    "接听邀请（有效期 15 分钟）" : {
+
+    },
+    "接收系统入口中的草稿" : {
+
+    },
+    "推送地址更新失败，请在通知设置中重新绑定。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推送地址更新失败，请在通知设置中重新绑定。"
+          }
+        }
+      }
+    },
+    "描述" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述"
+          }
+        }
+      }
+    },
+    "提交任务（使用所选服务）" : {
+
+    },
+    "提交配置" : {
+
+    },
+    "提供给角色的位置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提供给角色的位置"
+          }
+        }
+      }
+    },
+    "提取文字" : {
+
+    },
+    "提问" : {
+
+    },
+    "插入位置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "插入位置"
+          }
+        }
+      }
+    },
+    "搜索" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "搜索"
+          }
+        }
+      }
+    },
+    "搜索聊天或名字" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "搜索聊天或名字"
+          }
+        }
+      }
+    },
+    "撤销" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撤销"
+          }
+        }
+      }
+    },
+    "撤销授权" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撤销授权"
+          }
+        }
+      }
+    },
+    "撤销此纠正" : {
+
+    },
+    "撤销设备" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撤销设备"
+          }
+        }
+      }
+    },
+    "撤销设备「%@」" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撤销设备「%@」"
+          }
+        }
+      }
+    },
+    "撤销设备后，需要新的配对码才能再次连接。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撤销设备后，需要新的配对码才能再次连接。"
+          }
+        }
+      }
+    },
+    "撤销该动作许可" : {
+
+    },
+    "操作" : {
+
+    },
+    "操作未完成" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "操作未完成"
+          }
+        }
+      }
+    },
+    "支持 {{char}}、{{user}}、{{content}}、{{date}}、{{time}} 和已声明变量。此处编辑第一条指令，保留其余条目及参数。" : {
+
+    },
+    "支持 Streamable HTTP 和旧 SSE；Bearer / API Key。暂不支持 OAuth、STDIO 或工具服务上传。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支持 Streamable HTTP 和旧 SSE；Bearer / API Key。暂不支持 OAuth、STDIO 或工具服务上传。"
+          }
+        }
+      }
+    },
+    "放弃修改" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放弃修改"
+          }
+        }
+      }
+    },
+    "放弃修改并重新读取" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放弃修改并重新读取"
+          }
+        }
+      }
+    },
+    "放弃尚未保存的修改？" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放弃尚未保存的修改？"
+          }
+        }
+      }
+    },
+    "故事" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "故事"
+          }
+        }
+      }
+    },
+    "故事在这里继续" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "故事在这里继续"
+          }
+        }
+      }
+    },
+    "故事背景" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "故事背景"
+          }
+        }
+      }
+    },
+    "故事背景、共同设定与角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "故事背景、共同设定与角色"
+          }
+        }
+      }
+    },
+    "故事里的设定与背景" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "故事里的设定与背景"
+          }
+        }
+      }
+    },
+    "数据与诊断" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数据与诊断"
+          }
+        }
+      }
+    },
+    "数据健康" : {
+
+    },
+    "数据导出" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数据导出"
+          }
+        }
+      }
+    },
+    "数据导出、设备缓存与运行情况" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数据导出、设备缓存与运行情况"
+          }
+        }
+      }
+    },
+    "整实例备份与恢复由服务器管理员在维护模式下执行。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "整实例备份与恢复由服务器管理员在维护模式下执行。"
+          }
+        }
+      }
+    },
+    "整张数据关系图一次提交。中断后重新选择相同备份即可续导；不会重放历史模型调用、工具或计划。" : {
+
+    },
+    "整理模式" : {
+
+    },
+    "整理记忆与语义索引" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "整理记忆与语义索引"
+          }
+        }
+      }
+    },
+    "整理间隔 %lld 秒" : {
+
+    },
+    "文件、恢复点与存储" : {
+
+    },
+    "文字提取会使用此对话首位成员的视觉服务；仅元数据不会把原图发给模型。" : {
+
+    },
+    "文字提取结果" : {
+
+    },
+    "文字转语音" : {
+
+    },
+    "文本额度" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文本额度"
+          }
+        }
+      }
+    },
+    "文档" : {
+
+    },
+    "文档正文" : {
+
+    },
+    "文档附件引用" : {
+
+    },
+    "新增" : {
+
+    },
+    "新增 %lld 条设定集；跳过 %lld 项。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增 %1$lld 条设定集；跳过 %2$lld 项。"
+          }
+        }
+      }
+    },
+    "新增内容" : {
+
+    },
+    "新增资料" : {
+
+    },
+    "新对话名称" : {
+
+    },
+    "新对话默认行为" : {
+
+    },
+    "新建" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建"
+          }
+        }
+      }
+    },
+    "新建 TA 的设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建 TA 的设定"
+          }
+        }
+      }
+    },
+    "新建 TA 的设定、角色，或导入角色卡" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建 TA 的设定、角色，或导入角色卡"
+          }
+        }
+      }
+    },
+    "新建文档" : {
+
+    },
+    "新建私聊或群聊" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建私聊或群聊"
+          }
+        }
+      }
+    },
+    "新建角色模板" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建角色模板"
+          }
+        }
+      }
+    },
+    "新建设定条目" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新建设定条目"
+          }
+        }
+      }
+    },
+    "新建预设" : {
+
+    },
+    "新成员无法读取加入前的消息或先前已接收的输入。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新成员无法读取加入前的消息或先前已接收的输入。"
+          }
+        }
+      }
+    },
+    "新的对话" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新的对话"
+          }
+        }
+      }
+    },
+    "新的对话、角色或导入角色卡" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新的对话、角色或导入角色卡"
+          }
+        }
+      }
+    },
+    "新项目名称" : {
+
+    },
+    "无" : {
+
+    },
+    "无法打开本地缓存" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法打开本地缓存"
+          }
+        }
+      }
+    },
+    "无法注册系统推送，请检查网络与签名配置。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法注册系统推送，请检查网络与签名配置。"
+          }
+        }
+      }
+    },
+    "无需认证" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无需认证"
+          }
+        }
+      }
+    },
+    "日常陪伴" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日常陪伴"
+          }
+        }
+      }
+    },
+    "日记" : {
+
+    },
+    "旧 SSE" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旧 SSE"
+          }
+        }
+      }
+    },
+    "时间" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时间"
+          }
+        }
+      }
+    },
+    "明确补跑这一时次" : {
+
+    },
+    "昨天 %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "昨天 %@"
+          }
+        }
+      }
+    },
+    "暂停并撤销旧执行版本" : {
+
+    },
+    "暂停期间仍可修正未通过校验的字段；设置会在保存后生效。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂停期间仍可修正未通过校验的字段；设置会在保存后生效。"
+          }
+        }
+      }
+    },
+    "暂停此计划" : {
+
+    },
+    "暂存不会立即回复。点击一起回复时，只使用当前列表中这些版本；之后新增的内容留给下一轮。" : {
+
+    },
+    "暂存并一起回复" : {
+
+    },
+    "暂无工具动作。工具调用由服务器按角色授权和审批执行。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无工具动作。工具调用由服务器按角色授权和审批执行。"
+          }
+        }
+      }
+    },
+    "更新" : {
+
+    },
+    "替代另一条记忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "替代另一条记忆"
+          }
+        }
+      }
+    },
+    "替换草稿" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "替换草稿"
+          }
+        }
+      }
+    },
+    "替换输入框里的草稿？" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "替换输入框里的草稿？"
+          }
+        }
+      }
+    },
+    "有件事等你决定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有件事等你决定"
+          }
+        }
+      }
+    },
+    "有件事需要你决定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有件事需要你决定"
+          }
+        }
+      }
+    },
+    "有未保存的修改" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有未保存的修改"
+          }
+        }
+      }
+    },
+    "有来源的记忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有来源的记忆"
+          }
+        }
+      }
+    },
+    "服务协议" : {
+
+    },
+    "服务器 HTTPS URL" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器 HTTPS URL"
+          }
+        }
+      }
+    },
+    "服务器、通知与设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器、通知与设置"
+          }
+        }
+      }
+    },
+    "服务器与设备" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器与设备"
+          }
+        }
+      }
+    },
+    "服务器地址" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器地址"
+          }
+        }
+      }
+    },
+    "服务器尚未配置通知中继，仍可正常聊天与同步。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器尚未配置通知中继，仍可正常聊天与同步。"
+          }
+        }
+      }
+    },
+    "服务器当前版本：%lld" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器当前版本：%lld"
+          }
+        }
+      }
+    },
+    "服务器状态" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务器状态"
+          }
+        }
+      }
+    },
+    "服务地址" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务地址"
+          }
+        }
+      }
+    },
+    "服务端视频任务编号（结果未知时核对）" : {
+
+    },
+    "朗读此回复（使用 TTS 服务）" : {
+
+    },
+    "未填写的参数继承全局。共享预设按引用使用，修改后在下一次请求生效；已开始的请求保持原配置。" : {
+
+    },
+    "未完成话题" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未完成话题"
+          }
+        }
+      }
+    },
+    "未完成话题 · 每行一个" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未完成话题 · 每行一个"
+          }
+        }
+      }
+    },
+    "未开启自动整理" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未开启自动整理"
+          }
+        }
+      }
+    },
+    "未指定，使用全部" : {
+
+    },
+    "未检测到近期心跳" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未检测到近期心跳"
+          }
+        }
+      }
+    },
+    "未能%@。%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未能%1$@。%2$@"
+          }
+        }
+      }
+    },
+    "未连接" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未连接"
+          }
+        }
+      }
+    },
+    "未连接服务器" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未连接服务器"
+          }
+        }
+      }
+    },
+    "本机运行机会" : {
+
+    },
+    "本次允许的 HTTPS 来源，例如 https://example.com" : {
+
+    },
+    "本次回应已停止" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本次回应已停止"
+          }
+        }
+      }
+    },
+    "本次重建跳过" : {
+
+    },
+    "本轮内容" : {
+
+    },
+    "本轮明确使用此技能" : {
+
+    },
+    "权限与数据" : {
+
+    },
+    "条" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "条"
+          }
+        }
+      }
+    },
+    "条数：%lld" : {
+
+    },
+    "条目" : {
+
+    },
+    "来源事件" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "来源事件"
+          }
+        }
+      }
+    },
+    "来源对话" : {
+
+    },
+    "来源已失效，保留资料供人工检查" : {
+
+    },
+    "来自修改前的上下文" : {
+
+    },
+    "查看" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看"
+          }
+        }
+      }
+    },
+    "查看、修正与保留共同的经历" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看、修正与保留共同的经历"
+          }
+        }
+      }
+    },
+    "查看全局开关与预算" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看全局开关与预算"
+          }
+        }
+      }
+    },
+    "查看最近活动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看最近活动"
+          }
+        }
+      }
+    },
+    "查看工具参数定义" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看工具参数定义"
+          }
+        }
+      }
+    },
+    "查看待你确认的操作和执行结果" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看待你确认的操作和执行结果"
+          }
+        }
+      }
+    },
+    "查看新消息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看新消息"
+          }
+        }
+      }
+    },
+    "查看聊天与成员" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看聊天与成员"
+          }
+        }
+      }
+    },
+    "查看这件事并决定是否同意" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看这件事并决定是否同意"
+          }
+        }
+      }
+    },
+    "查询时间使用 ISO 8601。写入参数需要 title、start/end 或 id；修改与删除需查询结果的 base_hash。健康 metric 支持 steps、weight、heart_rate。快捷指令只运行已登记名称，将切换应用。" : {
+
+    },
+    "查询语音并播放" : {
+
+    },
+    "标准" : {
+
+    },
+    "标记已读" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标记已读"
+          }
+        }
+      }
+    },
+    "标题" : {
+
+    },
+    "核实的外部对象 ID" : {
+
+    },
+    "核实结果" : {
+
+    },
+    "核对 Host 回执" : {
+
+    },
+    "核对依据" : {
+
+    },
+    "核对原文、修正记忆与整理规则" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "核对原文、修正记忆与整理规则"
+          }
+        }
+      }
+    },
+    "核对并恢复状态" : {
+
+    },
+    "核对本机持久回执（不重做动作）" : {
+
+    },
+    "检查正文与资源哈希" : {
+
+    },
+    "检查通过" : {
+
+    },
+    "模型 API 地址" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型 API 地址"
+          }
+        }
+      }
+    },
+    "模型 ID" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型 ID"
+          }
+        }
+      }
+    },
+    "模型向量维度" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型向量维度"
+          }
+        }
+      }
+    },
+    "模型支持工具调用" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型支持工具调用"
+          }
+        }
+      }
+    },
+    "模型线路" : {
+
+    },
+    "模型连接" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型连接"
+          }
+        }
+      }
+    },
+    "模式与召回" : {
+
+    },
+    "模板版本" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模板版本"
+          }
+        }
+      }
+    },
+    "模板版本：%lld" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模板版本：%lld"
+          }
+        }
+      }
+    },
+    "次" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次"
+          }
+        }
+      }
+    },
+    "正在准备…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在准备…"
+          }
+        }
+      }
+    },
+    "正在处理导入内容…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在处理导入内容…"
+          }
+        }
+      }
+    },
+    "正在读取服务器状态…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在读取服务器状态…"
+          }
+        }
+      }
+    },
+    "正在读取设置…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在读取设置…"
+          }
+        }
+      }
+    },
+    "正在读取通知设置…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在读取通知设置…"
+          }
+        }
+      }
+    },
+    "正在输入" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在输入"
+          }
+        }
+      }
+    },
+    "正在配对…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在配对…"
+          }
+        }
+      }
+    },
+    "正常使用" : {
+
+    },
+    "此设备已开启通知" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此设备已开启通知"
+          }
+        }
+      }
+    },
+    "此设备未开启通知" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此设备未开启通知"
+          }
+        }
+      }
+    },
+    "此通知来自其他服务器或旧恢复版本，请连接对应服务器后查看。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此通知来自其他服务器或旧恢复版本，请连接对应服务器后查看。"
+          }
+        }
+      }
+    },
+    "每个服务器分别保存聊天缓存、草稿和待发送内容。切换后，你可以继续回到原来的设定。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每个服务器分别保存聊天缓存、草稿和待发送内容。切换后，你可以继续回到原来的设定。"
+          }
+        }
+      }
+    },
+    "每周" : {
+
+    },
+    "每天" : {
+
+    },
+    "每天主动联系" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每天主动联系"
+          }
+        }
+      }
+    },
+    "每天角色互动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每天角色互动"
+          }
+        }
+      }
+    },
+    "每套设定中的角色独立保留经历。模板更新后，你可以在这里选择采用的版本；参与度影响未点名时的发言机会。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每套设定中的角色独立保留经历。模板更新后，你可以在这里选择采用的版本；参与度影响未点名时的发言机会。"
+          }
+        }
+      }
+    },
+    "每套设定需要分别开启。暂停后会停止后续后台活动；已经发出的外部请求仍需查看实际结果。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每套设定需要分别开启。暂停后会停止后续后台活动；已经发出的外部请求仍需查看实际结果。"
+          }
+        }
+      }
+    },
+    "每日后台预算" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每日后台预算"
+          }
+        }
+      }
+    },
+    "每日请求次数" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每日请求次数"
+          }
+        }
+      }
+    },
+    "每日输入上限" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每日输入上限"
+          }
+        }
+      }
+    },
+    "每日输出上限" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每日输出上限"
+          }
+        }
+      }
+    },
+    "每次最多发言" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每次最多发言"
+          }
+        }
+      }
+    },
+    "每次批准" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每次批准"
+          }
+        }
+      }
+    },
+    "每次说多少" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每次说多少"
+          }
+        }
+      }
+    },
+    "每类请求上限" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每类请求上限"
+          }
+        }
+      }
+    },
+    "每轮最多 %lld 条回复" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每轮最多 %lld 条回复"
+          }
+        }
+      }
+    },
+    "永久删除所选旧版本" : {
+
+    },
+    "永久删除所选旧版本？当前选中正文不受影响。" : {
+
+    },
+    "没发出去 · 轻点重试" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没发出去 · 轻点重试"
+          }
+        }
+      }
+    },
+    "没有找到这段聊天" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有找到这段聊天"
+          }
+        }
+      }
+    },
+    "活动房间" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "活动房间"
+          }
+        }
+      }
+    },
+    "浅色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "浅色"
+          }
+        }
+      }
+    },
+    "测试会向此连接发送一条短模型请求，可能产生供应商费用。保存配置本身不会发送请求。未知结果不自动重试。" : {
+
+    },
+    "测试此连接" : {
+
+    },
+    "测试连接与历史结果" : {
+
+    },
+    "消息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消息"
+          }
+        }
+      }
+    },
+    "消息内容" : {
+
+    },
+    "消息正文" : {
+
+    },
+    "消息状态暂不可用，请稍后同步查看" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消息状态暂不可用，请稍后同步查看"
+          }
+        }
+      }
+    },
+    "深入" : {
+
+    },
+    "深色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "深色"
+          }
+        }
+      }
+    },
+    "添加 MCP 连接" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加 MCP 连接"
+          }
+        }
+      }
+    },
+    "添加模型连接" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加模型连接"
+          }
+        }
+      }
+    },
+    "清除搜索" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除搜索"
+          }
+        }
+      }
+    },
+    "温度（空白继承）" : {
+
+    },
+    "源码（保存不运行）" : {
+
+    },
+    "点击保存后更新引用。旧版本和其他文档仍保留原件。" : {
+
+    },
+    "版本" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本"
+          }
+        }
+      }
+    },
+    "版本 %lld · %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "版本 %1$lld · %2$@"
+          }
+        }
+      }
+    },
+    "独立 Host" : {
+
+    },
+    "独立分支" : {
+
+    },
+    "独立设定集的可知角色 · 不选表示当前设定内公开" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "独立设定集的可知角色 · 不选表示当前设定内公开"
+          }
+        }
+      }
+    },
+    "玩家" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "玩家"
+          }
+        }
+      }
+    },
+    "玩家发言" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "玩家发言"
+          }
+        }
+      }
+    },
+    "玩家名字" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "玩家名字"
+          }
+        }
+      }
+    },
+    "玩家描述" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "玩家描述"
+          }
+        }
+      }
+    },
+    "玩家确认／纠正" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "玩家确认／纠正"
+          }
+        }
+      }
+    },
+    "玩家身份" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "玩家身份"
+          }
+        }
+      }
+    },
+    "现实工具权限" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "现实工具权限"
+          }
+        }
+      }
+    },
+    "生图" : {
+
+    },
+    "生成加密备份" : {
+
+    },
+    "生成十分钟配对码" : {
+
+    },
+    "用 JSON 指定必须完全相等的参数，例如 {\"calendar\":\"我的日历\"}。长期写授权必须至少固定一个资源参数。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用 JSON 指定必须完全相等的参数，例如 {\"calendar\":\"我的日历\"}。长期写授权必须至少固定一个资源参数。"
+          }
+        }
+      }
+    },
+    "用一句话概括" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用一句话概括"
+          }
+        }
+      }
+    },
+    "用户消息" : {
+
+    },
+    "用户陈述" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用户陈述"
+          }
+        }
+      }
+    },
+    "用途" : {
+
+    },
+    "用逗号分隔" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用逗号分隔"
+          }
+        }
+      }
+    },
+    "用量已记录" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用量已记录"
+          }
+        }
+      }
+    },
+    "用量待确认" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用量待确认"
+          }
+        }
+      }
+    },
+    "登记名称（不会执行）" : {
+
+    },
+    "目录内相对路径" : {
+
+    },
+    "直接发送" : {
+
+    },
+    "看看故事走到了哪里" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "看看故事走到了哪里"
+          }
+        }
+      }
+    },
+    "知识、创作与群协作" : {
+
+    },
+    "知识与创作" : {
+
+    },
+    "确认保存" : {
+
+    },
+    "确认修改消息及所选后续历史？" : {
+
+    },
+    "确认删除原文" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确认删除原文"
+          }
+        }
+      }
+    },
+    "确认卸载" : {
+
+    },
+    "确认发送本段" : {
+
+    },
+    "确认只清除状态" : {
+
+    },
+    "确认导入" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确认导入"
+          }
+        }
+      }
+    },
+    "确认忘记" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确认忘记"
+          }
+        }
+      }
+    },
+    "确认恢复" : {
+
+    },
+    "确认或纠正剧情" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确认或纠正剧情"
+          }
+        }
+      }
+    },
+    "确认解散并擦除群对话" : {
+
+    },
+    "示例" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "示例"
+          }
+        }
+      }
+    },
+    "视频" : {
+
+    },
+    "离开超过两小时后生成辅助回顾" : {
+
+    },
+    "离线 · 可继续写消息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "离线 · 可继续写消息"
+          }
+        }
+      }
+    },
+    "离线 · 消息先存到本机，联网后发送" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "离线 · 消息先存到本机，联网后发送"
+          }
+        }
+      }
+    },
+    "离线回顾" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "离线回顾"
+          }
+        }
+      }
+    },
+    "离线缓存：最近握手失败，目录仅供查看" : {
+
+    },
+    "私密内容" : {
+
+    },
+    "私密支线" : {
+
+    },
+    "私聊" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "私聊"
+          }
+        }
+      }
+    },
+    "私聊需要选择 1 位角色。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "私聊需要选择 1 位角色。"
+          }
+        }
+      }
+    },
+    "移除后保留历史内容和共享原件。涉及 %lld 个房间、%lld 个资源、%lld 个项目。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "移除后保留历史内容和共享原件。涉及 %1$lld 个房间、%2$lld 个资源、%3$lld 个项目。"
+          }
+        }
+      }
+    },
+    "移除本机待发送内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除本机待发送内容"
+          }
+        }
+      }
+    },
+    "移除此处引用" : {
+
+    },
+    "窗口" : {
+
+    },
+    "窗口内全部图片" : {
+
+    },
+    "立即整理（使用模型服务）" : {
+
+    },
+    "第 %lld 版：%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %1$lld 版：%2$@"
+          }
+        }
+      }
+    },
+    "等候回应…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等候回应…"
+          }
+        }
+      }
+    },
+    "等待更新" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待更新"
+          }
+        }
+      }
+    },
+    "简介" : {
+
+    },
+    "管理 TA 的设定、角色、回忆与主动消息" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "管理 TA 的设定、角色、回忆与主动消息"
+          }
+        }
+      }
+    },
+    "管理外部工具及其可执行的操作" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "管理外部工具及其可执行的操作"
+          }
+        }
+      }
+    },
+    "类型" : {
+
+    },
+    "粘贴的 JSON" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "粘贴的 JSON"
+          }
+        }
+      }
+    },
+    "系统与今日" : {
+
+    },
+    "系统动作参数 JSON" : {
+
+    },
+    "系统授权" : {
+
+    },
+    "系统通知" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统通知"
+          }
+        }
+      }
+    },
+    "绑定" : {
+
+    },
+    "绑定或续期此设备" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "绑定或续期此设备"
+          }
+        }
+      }
+    },
+    "绑定选中范围" : {
+
+    },
+    "结束会话" : {
+
+    },
+    "结束时间" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "结束时间"
+          }
+        }
+      }
+    },
+    "结构化" : {
+
+    },
+    "结果未知" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "结果未知"
+          }
+        }
+      }
+    },
+    "结算时区" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "结算时区"
+          }
+        }
+      }
+    },
+    "给连接起个名字" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "给连接起个名字"
+          }
+        }
+      }
+    },
+    "继承全局预设" : {
+
+    },
+    "继承全局额外指令" : {
+
+    },
+    "继承默认" : {
+
+    },
+    "继续编辑" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续编辑"
+          }
+        }
+      }
+    },
+    "维" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "维"
+          }
+        }
+      }
+    },
+    "编辑" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑"
+          }
+        }
+      }
+    },
+    "编辑 TA 的设定与玩家身份" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑 TA 的设定与玩家身份"
+          }
+        }
+      }
+    },
+    "编辑与历史版本" : {
+
+    },
+    "编辑图片" : {
+
+    },
+    "编辑当前内容" : {
+
+    },
+    "编辑连接与认证" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑连接与认证"
+          }
+        }
+      }
+    },
+    "网络有点慢，还在发" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "网络有点慢，还在发"
+          }
+        }
+      }
+    },
+    "网络权限" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "网络权限"
+          }
+        }
+      }
+    },
+    "群可读取各成员少量私有记忆" : {
+
+    },
+    "群工具（默认不选择）" : {
+
+    },
+    "群成员" : {
+
+    },
+    "群生图服务" : {
+
+    },
+    "群聊" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "群聊"
+          }
+        }
+      }
+    },
+    "群聊需要选择 1–8 位角色。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "群聊需要选择 1–8 位角色。"
+          }
+        }
+      }
+    },
+    "群额外指令" : {
+
+    },
+    "聊天" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天"
+          }
+        }
+      }
+    },
+    "聊天与成员" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天与成员"
+          }
+        }
+      }
+    },
+    "聊天成员、TA 的设定与回忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天成员、TA 的设定与回忆"
+          }
+        }
+      }
+    },
+    "聊天成员与回应方式" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天成员与回应方式"
+          }
+        }
+      }
+    },
+    "聊天选项" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天选项"
+          }
+        }
+      }
+    },
+    "聊天选项：%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天选项：%@"
+          }
+        }
+      }
+    },
+    "联系你的时机、角色互动与每日限额" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "联系你的时机、角色互动与每日限额"
+          }
+        }
+      }
+    },
+    "背景" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "背景"
+          }
+        }
+      }
+    },
+    "能力" : {
+
+    },
+    "自主总开关与预算" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自主总开关与预算"
+          }
+        }
+      }
+    },
+    "自动 · 按参与规则" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动 · 按参与规则"
+          }
+        }
+      }
+    },
+    "自动备份周期" : {
+
+    },
+    "自动整理" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动整理"
+          }
+        }
+      }
+    },
+    "自动整理长期记忆" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动整理长期记忆"
+          }
+        }
+      }
+    },
+    "范围" : {
+
+    },
+    "行动与确认" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "行动与确认"
+          }
+        }
+      }
+    },
+    "补充提示" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "补充提示"
+          }
+        }
+      }
+    },
+    "角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色"
+          }
+        }
+      }
+    },
+    "角色：%@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色：%@"
+          }
+        }
+      }
+    },
+    "角色与 TA 的设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色与 TA 的设定"
+          }
+        }
+      }
+    },
+    "角色与设定集已保存。新增 %lld 条设定集，跳过 %lld 项。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色与设定集已保存。新增 %1$lld 条设定集，跳过 %2$lld 项。"
+          }
+        }
+      }
+    },
+    "角色之间互动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色之间互动"
+          }
+        }
+      }
+    },
+    "角色之间互动需要选择群聊。你最近发消息后的 10 分钟内，主动联系和角色互动会暂缓。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色之间互动需要选择群聊。你最近发消息后的 10 分钟内，主动联系和角色互动会暂缓。"
+          }
+        }
+      }
+    },
+    "角色之间互动需要选择群聊房间。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色之间互动需要选择群聊房间。"
+          }
+        }
+      }
+    },
+    "角色互动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色互动"
+          }
+        }
+      }
+    },
+    "角色卡或设定集 JSON" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色卡或设定集 JSON"
+          }
+        }
+      }
+    },
+    "角色卡或设定集 JSON 内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色卡或设定集 JSON 内容"
+          }
+        }
+      }
+    },
+    "角色卡附带的设定集仅绑定新导入角色。调整可知角色后需要重新预览。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色卡附带的设定集仅绑定新导入角色。调整可知角色后需要重新预览。"
+          }
+        }
+      }
+    },
+    "角色只读参考资料" : {
+
+    },
+    "角色声称" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色声称"
+          }
+        }
+      }
+    },
+    "角色声称 · 未确认" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色声称 · 未确认"
+          }
+        }
+      }
+    },
+    "角色工具授权" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色工具授权"
+          }
+        }
+      }
+    },
+    "角色描述" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色描述"
+          }
+        }
+      }
+    },
+    "角色提示建议" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色提示建议"
+          }
+        }
+      }
+    },
+    "角色提示建议 · 默认关闭" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色提示建议 · 默认关闭"
+          }
+        }
+      }
+    },
+    "角色模板" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色模板"
+          }
+        }
+      }
+    },
+    "角色系统动作" : {
+
+    },
+    "角色补充提示" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色补充提示"
+          }
+        }
+      }
+    },
+    "角色设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色设定"
+          }
+        }
+      }
+    },
+    "角色设定前" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色设定前"
+          }
+        }
+      }
+    },
+    "角色设定后" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色设定后"
+          }
+        }
+      }
+    },
+    "角色设置影响该角色在当前设定中的所有对话；其他设定中的同名角色不受影响。正在进行的回应保留原配置。" : {
+
+    },
+    "解密并预览匹配连接" : {
+
+    },
+    "解除选中范围" : {
+
+    },
+    "触发词 · 每行一个" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "触发词 · 每行一个"
+          }
+        }
+      }
+    },
+    "认证" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "认证"
+          }
+        }
+      }
+    },
+    "认证方式" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "认证方式"
+          }
+        }
+      }
+    },
+    "认识一个新的 TA" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "认识一个新的 TA"
+          }
+        }
+      }
+    },
+    "认识一位新的 TA，或邀请熟悉的朋友开始聊天。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "认识一位新的 TA，或邀请熟悉的朋友开始聊天。"
+          }
+        }
+      }
+    },
+    "认识新的 TA" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "认识新的 TA"
+          }
+        }
+      }
+    },
+    "让一位新朋友加入这段故事" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让一位新朋友加入这段故事"
+          }
+        }
+      }
+    },
+    "记录故事的规则、地点与关系" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记录故事的规则、地点与关系"
+          }
+        }
+      }
+    },
+    "记忆、语义查询和自主剧情共享预算；0 表示不分配额度。按结算时区重置，未知用量暂时保留预留额度。服务器上限仍有效。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆、语义查询和自主剧情共享预算；0 表示不分配额度。按结算时区重置，未知用量暂时保留预留额度。服务器上限仍有效。"
+          }
+        }
+      }
+    },
+    "记忆与嵌入设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆与嵌入设置"
+          }
+        }
+      }
+    },
+    "记忆与来源" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆与来源"
+          }
+        }
+      }
+    },
+    "记忆与资料" : {
+
+    },
+    "记忆内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆内容"
+          }
+        }
+      }
+    },
+    "记忆整理" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆整理"
+          }
+        }
+      }
+    },
+    "记忆整理还需在「记忆与来源」中开启。全局暂停时，保留这套设定的设置。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆整理还需在「记忆与来源」中开启。全局暂停时，保留这套设定的设置。"
+          }
+        }
+      }
+    },
+    "记忆模式与资料" : {
+
+    },
+    "记忆设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆设置"
+          }
+        }
+      }
+    },
+    "记忆详情" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆详情"
+          }
+        }
+      }
+    },
+    "许多相遇，许多故事" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "许多相遇，许多故事"
+          }
+        }
+      }
+    },
+    "设备名称" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设备名称"
+          }
+        }
+      }
+    },
+    "设定中的角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设定中的角色"
+          }
+        }
+      }
+    },
+    "设定书" : {
+
+    },
+    "设定书库" : {
+
+    },
+    "设定内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设定内容"
+          }
+        }
+      }
+    },
+    "设定正文" : {
+
+    },
+    "设定背景，以及你在故事里的样子" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设定背景，以及你在故事里的样子"
+          }
+        }
+      }
+    },
+    "设定集" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设定集"
+          }
+        }
+      }
+    },
+    "设定集、角色与共同的故事" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设定集、角色与共同的故事"
+          }
+        }
+      }
+    },
+    "设定集条目" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设定集条目"
+          }
+        }
+      }
+    },
+    "设定集条目：%lld" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设定集条目：%lld"
+          }
+        }
+      }
+    },
+    "设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置"
+          }
+        }
+      }
+    },
+    "设置已加载，近期用量暂时无法读取。你仍可修改并保存设置。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置已加载，近期用量暂时无法读取。你仍可修改并保存设置。"
+          }
+        }
+      }
+    },
+    "诊断仅包含版本、迁移校验和、任务状态数量与后台心跳，不包含正文、密钥或工具返回。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "诊断仅包含版本、迁移校验和、任务状态数量与后台心跳，不包含正文、密钥或工具返回。"
+          }
+        }
+      }
+    },
+    "词项与语义召回，已索引 %lld 条" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "词项与语义召回，已索引 %lld 条"
+          }
+        }
+      }
+    },
+    "词项召回 · 语义索引未启用或暂不可用" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "词项召回 · 语义索引未启用或暂不可用"
+          }
+        }
+      }
+    },
+    "试试 TA 的名字，或清除搜索看看。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试试 TA 的名字，或清除搜索看看。"
+          }
+        }
+      }
+    },
+    "语义索引" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语义索引"
+          }
+        }
+      }
+    },
+    "语气" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语气"
+          }
+        }
+      }
+    },
+    "语言" : {
+
+    },
+    "语音对话" : {
+
+    },
+    "语音转文字" : {
+
+    },
+    "说话风格" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "说话风格"
+          }
+        }
+      }
+    },
+    "请在系统设置中允许 Echo 通知" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在系统设置中允许 Echo 通知"
+          }
+        }
+      }
+    },
+    "请填写 1–4,096 之间的向量维度。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请填写 1–4,096 之间的向量维度。"
+          }
+        }
+      }
+    },
+    "请填写%@。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请填写%@。"
+          }
+        }
+      }
+    },
+    "请填写完整的 http:// 或 https:// 模型 API 地址。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请填写完整的 http:// 或 https:// 模型 API 地址。"
+          }
+        }
+      }
+    },
+    "请按工具的实际行为分类。服务端的只读提示不代表安全承诺。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请按工具的实际行为分类。服务端的只读提示不代表安全承诺。"
+          }
+        }
+      }
+    },
+    "请检查消息内容与聊天设置后重试。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请检查消息内容与聊天设置后重试。"
+          }
+        }
+      }
+    },
+    "请求 %lld" : {
+
+    },
+    "请求可能已在目标系统执行。请先核对目标系统，再记录核对结果；不会自动重发。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请求可能已在目标系统执行。请先核对目标系统，再记录核对结果；不会自动重发。"
+          }
+        }
+      }
+    },
+    "请求快照与回顾用量" : {
+
+    },
+    "请求授权" : {
+
+    },
+    "请选择" : {
+
+    },
+    "请选择主动联系和互动使用的房间。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请选择主动联系和互动使用的房间。"
+          }
+        }
+      }
+    },
+    "请选择有效的结算时区。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请选择有效的结算时区。"
+          }
+        }
+      }
+    },
+    "请选择模型连接。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请选择模型连接。"
+          }
+        }
+      }
+    },
+    "请选择角色模板。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请选择角色模板。"
+          }
+        }
+      }
+    },
+    "读取" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "读取"
+          }
+        }
+      }
+    },
+    "读取外部基线" : {
+
+    },
+    "读取设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "读取设置"
+          }
+        }
+      }
+    },
+    "谁来回应 · 自动" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "谁来回应 · 自动"
+          }
+        }
+      }
+    },
+    "资料正文" : {
+
+    },
+    "资料编辑" : {
+
+    },
+    "起点" : {
+
+    },
+    "超出 %lld 字，删减后可发送" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "超出 %lld 字，删减后可发送"
+          }
+        }
+      }
+    },
+    "距历史结尾 %lld 条" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "距历史结尾 %lld 条"
+          }
+        }
+      }
+    },
+    "跟随系统" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跟随系统"
+          }
+        }
+      }
+    },
+    "跳过同名项" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跳过同名项"
+          }
+        }
+      }
+    },
+    "转写失败保留系统文本" : {
+
+    },
+    "轮次" : {
+
+    },
+    "轮流" : {
+
+    },
+    "轻量" : {
+
+    },
+    "输入资源（需要时选择）" : {
+
+    },
+    "运行" : {
+
+    },
+    "运行中" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "运行中"
+          }
+        }
+      }
+    },
+    "近期用量 · 含预留" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "近期用量 · 含预留"
+          }
+        }
+      }
+    },
+    "返回回顾" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "返回回顾"
+          }
+        }
+      }
+    },
+    "还有 %lld 件" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还有 %lld 件"
+          }
+        }
+      }
+    },
+    "还没有剧情事件。开始聊天后，发生过的故事会保存在这里。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还没有剧情事件。开始聊天后，发生过的故事会保存在这里。"
+          }
+        }
+      }
+    },
+    "还没有后台剧情或主动消息。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还没有后台剧情或主动消息。"
+          }
+        }
+      }
+    },
+    "还没有聊过天" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还没有聊过天"
+          }
+        }
+      }
+    },
+    "还没有聊过天，先打个招呼吧" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还没有聊过天，先打个招呼吧"
+          }
+        }
+      }
+    },
+    "还需要确认" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还需要确认"
+          }
+        }
+      }
+    },
+    "这件事被提到过 · 还未确认" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这件事被提到过 · 还未确认"
+          }
+        }
+      }
+    },
+    "这件事还需要确认" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这件事还需要确认"
+          }
+        }
+      }
+    },
+    "这套设定中的角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这套设定中的角色"
+          }
+        }
+      }
+    },
+    "这是尚未确认的回忆，可以在「我」的记忆与来源中核对、修正。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这是尚未确认的回忆，可以在「我」的记忆与来源中核对、修正。"
+          }
+        }
+      }
+    },
+    "这条消息来自修改前的上下文" : {
+
+    },
+    "这段回忆已更新或移除。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这段回忆已更新或移除。"
+          }
+        }
+      }
+    },
+    "这段对话尚未保存在本机，连接服务器后再来看看。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这段对话尚未保存在本机，连接服务器后再来看看。"
+          }
+        }
+      }
+    },
+    "这段聊天" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这段聊天"
+          }
+        }
+      }
+    },
+    "这里保存由你确认的剧情事实。角色在聊天中的主观说法会保留为角色声称。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这里保存由你确认的剧情事实。角色在聊天中的主观说法会保留为角色声称。"
+          }
+        }
+      }
+    },
+    "这里填写虚构身份，角色会通过这个身份认识你。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这里填写虚构身份，角色会通过这个身份认识你。"
+          }
+        }
+      }
+    },
+    "这项内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这项内容"
+          }
+        }
+      }
+    },
+    "远程 MCP 连接" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "远程 MCP 连接"
+          }
+        }
+      }
+    },
+    "远端加密恢复点" : {
+
+    },
+    "连接" : {
+
+    },
+    "连接你的 Echo" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接你的 Echo"
+          }
+        }
+      }
+    },
+    "连接信息" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接信息"
+          }
+        }
+      }
+    },
+    "连接尚未验证或已离线" : {
+
+    },
+    "连接已配对的服务器" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接已配对的服务器"
+          }
+        }
+      }
+    },
+    "连接支持图片理解" : {
+
+    },
+    "连接测试" : {
+
+    },
+    "退出并撤销本次网络权限" : {
+
+    },
+    "选择 JSON 或 PNG 文件" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择 JSON 或 PNG 文件"
+          }
+        }
+      }
+    },
+    "选择加密凭据包" : {
+
+    },
+    "选择回应者，每轮最多 %lld 位" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择回应者，每轮最多 %lld 位"
+          }
+        }
+      }
+    },
+    "选择图片" : {
+
+    },
+    "选择图片只准备附件，明确发送后才会请求模型。每张最多 1 MiB；支持 PNG、JPEG、WebP 和 GIF。" : {
+
+    },
+    "选择备份文件" : {
+
+    },
+    "选择工具" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择工具"
+          }
+        }
+      }
+    },
+    "选择房间" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择房间"
+          }
+        }
+      }
+    },
+    "选择扩展包 / 连接 JSON" : {
+
+    },
+    "选择来源" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择来源"
+          }
+        }
+      }
+    },
+    "选择模型" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择模型"
+          }
+        }
+      }
+    },
+    "选择模板" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择模板"
+          }
+        }
+      }
+    },
+    "选择要导入的 TA 的设定" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择要导入的 TA 的设定"
+          }
+        }
+      }
+    },
+    "选择角色" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择角色"
+          }
+        }
+      }
+    },
+    "选择这段对话的参与者" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择这段对话的参与者"
+          }
+        }
+      }
+    },
+    "选择适合此刻的明暗" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择适合此刻的明暗"
+          }
+        }
+      }
+    },
+    "通知" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通知"
+          }
+        }
+      }
+    },
+    "通知只显示通用文案。聊天与剧情始终保存在你的服务器，打开 App 后同步。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通知只显示通用文案。聊天与剧情始终保存在你的服务器，打开 App 后同步。"
+          }
+        }
+      }
+    },
+    "那时说过的话" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "那时说过的话"
+          }
+        }
+      }
+    },
+    "配对" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "配对"
+          }
+        }
+      }
+    },
+    "配置各能力服务" : {
+
+    },
+    "采用服务器版本" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "采用服务器版本"
+          }
+        }
+      }
+    },
+    "重复" : {
+
+    },
+    "重新加载" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新加载"
+          }
+        }
+      }
+    },
+    "重新编辑" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新编辑"
+          }
+        }
+      }
+    },
+    "重新编辑这条提问" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新编辑这条提问"
+          }
+        }
+      }
+    },
+    "重新读取会替换尚未保存的修改。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新读取会替换尚未保存的修改。"
+          }
+        }
+      }
+    },
+    "重新读取服务器设置" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新读取服务器设置"
+          }
+        }
+      }
+    },
+    "重试失败任务" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重试失败任务"
+          }
+        }
+      }
+    },
+    "重试此片段" : {
+
+    },
+    "问题" : {
+
+    },
+    "间隔 %lld 秒" : {
+
+    },
+    "间隔至少 120 分钟，最多 10,080 分钟（7 天）。角色发言与每天次数同时受后台预算约束。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "间隔至少 120 分钟，最多 10,080 分钟（7 天）。角色发言与每天次数同时受后台预算约束。"
+          }
+        }
+      }
+    },
+    "随机一人" : {
+
+    },
+    "静音" : {
+
+    },
+    "静默" : {
+
+    },
+    "项目" : {
+
+    },
+    "项目与文档" : {
+
+    },
+    "预览卸载" : {
+
+    },
+    "预览可清理的历史请求正文" : {
+
+    },
+    "预览粘贴内容" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "预览粘贴内容"
+          }
+        }
+      }
+    },
+    "预览纠正" : {
+
+    },
+    "预览解散与隐私擦除" : {
+
+    },
+    "预览重置状态" : {
+
+    },
+    "预设与请求配置" : {
+
+    },
+    "预设名称" : {
+
+    },
+    "预设首条指令" : {
+
+    },
+    "额外指令" : {
+
+    },
+    "额度已预留" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "额度已预留"
+          }
+        }
+      }
+    },
+    "首次连接时，填写服务器提供的配对码。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首次连接时，填写服务器提供的配对码。"
+          }
+        }
+      }
+    },
+    "验证密码并预览恢复" : {
+
+    },
+    "验证并预览" : {
+
+    },
+    "高级" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高级"
+          }
+        }
+      }
+    },
+    "高级世界书规则 JSON" : {
+
+    },
+    "高级触发与注入规则" : {
+
+    },
+    "高级配置与外部变量" : {
+
+    },
+    "默认保存草稿。只有你在此快捷指令中开启直接发送，打开 App 后才会发送。" : {
+
+    },
+    "默认只允许公共 HTTPS。需要内网服务时，在此列出该连接允许的精确 IP；云元数据和 link-local 地址始终禁止。" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认只允许公共 HTTPS。需要内网服务时，在此列出该连接允许的精确 IP；云元数据和 link-local 地址始终禁止。"
+          }
+        }
+      }
+    },
+    "默认行为只用于新建对话，不改动已有对话。" : {
+
+    }
+  },
+  "version" : "1.0"
+}

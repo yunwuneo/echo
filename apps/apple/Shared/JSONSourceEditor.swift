@@ -5,7 +5,7 @@ import SwiftUI
   import UIKit
   struct JSONSourceEditor: UIViewRepresentable {
     @Binding var text: String
-    var accessibilityTitle = "角色卡或世界书 JSON"
+    var accessibilityTitle = String(localized: "角色卡或设定集 JSON")
     var identifier = "import-json"
     func makeCoordinator() -> Coordinator { Coordinator(self) }
     func makeUIView(context: Context) -> UITextView {
@@ -36,7 +36,7 @@ import SwiftUI
   import AppKit
   struct JSONSourceEditor: NSViewRepresentable {
     @Binding var text: String
-    var accessibilityTitle = "角色卡或世界书 JSON"
+    var accessibilityTitle = String(localized: "角色卡或设定集 JSON")
     var identifier = "import-json"
     func makeCoordinator() -> Coordinator { Coordinator(self) }
     func makeNSView(context: Context) -> NSScrollView {

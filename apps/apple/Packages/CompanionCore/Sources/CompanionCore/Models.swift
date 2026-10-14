@@ -80,6 +80,10 @@ public struct Connection: Codable, Sendable {
 public struct APIError: Error, LocalizedError, Sendable {
   public let status: Int
   public let code: String
+  public init(status: Int, code: String) {
+    self.status = status
+    self.code = code
+  }
   public var errorDescription: String? {
     userFacingFailure(code: code, status: status)
   }

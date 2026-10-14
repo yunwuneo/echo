@@ -19,6 +19,11 @@ struct ChatView: View {
   @State private var activity = false
   @State private var memory = false
   @State private var autonomy = false
+  @State private var modelRoute = false
+  @State private var historySettings = false
+  @State private var attachments = false
+  @State private var manualQueue = false
+  @State private var historyTarget: Record?
   @State private var scrollPosition = ScrollPosition(idType: String.self)
   @State private var nearBottom = true
   @State private var followLatest = true
@@ -43,20 +48,22 @@ struct ChatView: View {
         && !messages.contains { $0.id == command.messageID }
     }
   }
-  private var runs: [Record] {
-    model.items("run").filter {
-      $0["room_id"].string == room.id
-        && ["queued", "running", "awaiting_approval"].contains($0["state"].string)
+  private var runs: [ChatRun] {
+    model.items("run").map(ChatRun.init).filter { $0.roomID == room.id && $0.state.isActive }
+  }
+  private var live: LiveStatus.Item? {
+    LiveStatus(records: model.records, isConnected: model.ready).items.first {
+      $0.roomID == room.id
     }
   }
-  private var needsApproval: Bool { runs.contains { $0["state"].string == "awaiting_approval" } }
-  private var replying: Bool { model.ready && runs.contains { $0["state"].string == "running" } }
+  private var needsApproval: Bool { runs.contains { $0.state == .awaitingApproval } }
+  private var replying: Bool { live?.isComposing == true }
   private var subtitle: String {
-    if !model.ready { return "离线 · 可继续写消息" }
-    if needsApproval { return "有件事需要你决定" }
-    if replying { return "正在输入…" }
-    if !runs.isEmpty { return "等候回应…" }
-    return isGroup ? "\(members.count) 位角色 · \(worldName)" : worldName
+    if !model.ready { return String(localized: "离线 · 可继续写消息") }
+    if needsApproval { return String(localized: "有件事需要你决定") }
+    if let live { return live.shortText }
+    if !runs.isEmpty { return String(localized: "等候回应…") }
+    return isGroup ? String(localized: "\(members.count) 位角色 · \(worldName)") : worldName
   }
   private var worldName: String {
     model.items("world").first { $0.id == room["world_id"].string }?.name ?? ""
@@ -93,7 +100,7 @@ struct ChatView: View {
               TypingDots().padding(.horizontal, EchoSpacing.md).padding(.vertical, EchoSpacing.sm)
                 .background(Color.echo.surface, in: Capsule())
                 .overlay(Capsule().stroke(Color.echo.border, lineWidth: 1))
-            }.padding(.top, EchoSpacing.md).accessibilityLabel("正在输入")
+            }.padding(.top, EchoSpacing.md).accessibilityLabel(String(localized: "正在输入"))
           }
           Color.clear.frame(height: EchoSpacing.md).id("end")
         }
@@ -147,7 +154,9 @@ struct ChatView: View {
           }
           .buttonStyle(.plain).padding(EchoSpacing.md)
           .accessibilityIdentifier("return-to-latest")
-          .accessibilityLabel(hasNewMessages ? "查看新消息" : "回到最新消息").help("回到最新消息")
+          .accessibilityLabel(
+            hasNewMessages ? String(localized: "查看新消息") : String(localized: "回到最新消息")
+          ).help(String(localized: "回到最新消息"))
         }
       }
     }
@@ -167,6 +176,7 @@ struct ChatView: View {
     #endif
     .navigationTitle(title)
     #if os(iOS)
+      .toolbar(.hidden, for: .tabBar)
       .navigationBarTitleDisplayMode(.inline)
       .toolbarBackground(Color.echo.bg, for: .navigationBar)
       .toolbarBackground(.visible, for: .navigationBar)
@@ -177,15 +187,26 @@ struct ChatView: View {
       #endif
       ToolbarItem {
         Menu {
-          Button("聊天与成员", systemImage: "person.2") { editing = true }
-          Button("剧情与来源", systemImage: "book.closed") { details = true }
-          Button("回忆与记忆", systemImage: "text.book.closed") { memory = true }
-          Button("主动消息设置", systemImage: "moon.stars") { autonomy = true }
-          Button(needsApproval ? "有待你决定的工具操作" : "工具审批与记录", systemImage: "checkmark.shield") {
+          Button(String(localized: "聊天与成员"), systemImage: "person.2") { editing = true }
+          Button(String(localized: "暂存并一起回复"), systemImage: "text.badge.plus") {
+            manualQueue = true
+          }
+          Button("发送图片与文字") { attachments = true }
+          Button("历史窗口与导出") { historySettings = true }
+          Button(String(localized: "回应设置"), systemImage: "slider.horizontal.3") {
+            modelRoute = true
+          }
+          Button(String(localized: "剧情与来源"), systemImage: "book.closed") { details = true }
+          Button(String(localized: "回忆与记忆"), systemImage: "text.book.closed") { memory = true }
+          Button(String(localized: "主动消息设置"), systemImage: "moon.stars") { autonomy = true }
+          Button(
+            needsApproval ? String(localized: "有件事等你决定") : String(localized: "行动与确认"),
+            systemImage: "checkmark.shield"
+          ) {
             activity = true
           }
           if !runs.isEmpty {
-            Button("停止本次回应", systemImage: "stop.circle") {
+            Button(String(localized: "停止本次回应"), systemImage: "stop.circle") {
               Task {
                 for run in runs {
                   do { try await model.cancel(id: run.id) } catch { model.report(error) }
@@ -198,7 +219,7 @@ struct ChatView: View {
             .overlay(alignment: .topTrailing) {
               if needsApproval { Circle().fill(Color.echo.accent).frame(width: 8, height: 8) }
             }
-        }.accessibilityLabel("聊天选项").help("聊天选项")
+        }.accessibilityLabel(String(localized: "聊天选项")).help(String(localized: "聊天选项"))
       }
     }
     .onAppear {
@@ -234,22 +255,27 @@ struct ChatView: View {
         target: EditTarget(resource: "rooms", record: room, world: room["world_id"].string))
     }
     .sheet(isPresented: $activity) { ToolActivityView(model: model) }
+    .sheet(isPresented: $attachments) { AttachmentComposerView(model: model, room: room) }
+    .sheet(isPresented: $historySettings) { ConversationSettingsView(model: model, room: room) }
+    .sheet(isPresented: $modelRoute) { ChatModelRouteView(model: model, members: members) }
+    .sheet(isPresented: $manualQueue) { ConversationQueueView(model: model, room: room) }
+    .sheet(item: $historyTarget) { message in MessageVersionEditor(model: model, message: message) }
     .sheet(isPresented: $details) { StoryView(model: model, world: room["world_id"].string) }
     .sheet(isPresented: $memory) { MemoryView(model: model, world: room["world_id"].string) }
     .sheet(isPresented: $autonomy) { AutonomyView(model: model, world: room["world_id"].string) }
     .confirmationDialog(
-      "换一种回答会替换这一轮所有角色的回应，并更新相关回忆。",
+      String(localized: "换一种回答会替换这一轮所有角色的回应，并更新相关回忆。"),
       isPresented: Binding(get: { regenerateRun != nil }, set: { if !$0 { regenerateRun = nil } }),
       titleVisibility: .visible
     ) {
-      Button("换一种回答") {
+      Button(String(localized: "换一种回答")) {
         guard let run = regenerateRun else { return }
         regenerateRun = nil
         Task { do { try await model.regenerate(id: run) } catch { model.report(error) } }
       }
     }
     .confirmationDialog(
-      "替换输入框里的草稿？",
+      String(localized: "替换输入框里的草稿？"),
       isPresented: Binding(
         get: { replacementDraft != nil },
         set: {
@@ -260,13 +286,13 @@ struct ChatView: View {
         }),
       titleVisibility: .visible
     ) {
-      Button("替换草稿", role: .destructive) {
+      Button(String(localized: "替换草稿"), role: .destructive) {
         guard let text = replacementDraft else { return }
         applyDraft(text, command: replacementCommand)
         replacementDraft = nil
         replacementCommand = nil
       }
-      Button("保留草稿", role: .cancel) {
+      Button(String(localized: "保留草稿"), role: .cancel) {
         replacementDraft = nil
         replacementCommand = nil
       }
@@ -293,18 +319,22 @@ struct ChatView: View {
           Text(subtitle).font(.caption).foregroundStyle(Color.echo.textSecondary).lineLimit(1)
         }
       }
-    }.buttonStyle(.plain).help("查看聊天与成员")
-      .accessibilityLabel("\(title)，\(subtitle)，聊天与成员")
+    }.buttonStyle(.plain).help(String(localized: "查看聊天与成员"))
+      .accessibilityLabel(String(localized: "\(title)，\(subtitle)，聊天与成员"))
   }
 
   private var emptyChat: some View {
     VStack(spacing: EchoSpacing.sm) {
       EchoAvatar(name: title, size: 56)
-      Text("还没有聊过天").font(.title3.weight(.semibold))
-      Text(isGroup ? "大家都在这里，先打个招呼吧。" : "想说的话，就从这里开始。").font(.callout).foregroundStyle(
+      Text(String(localized: "还没有聊过天")).font(.title3.weight(.semibold))
+      Text(isGroup ? String(localized: "大家都在这里，先打个招呼吧。") : String(localized: "想说的话，就从这里开始。")).font(
+        .callout
+      ).foregroundStyle(
         Color.echo.textSecondary)
-      Button("打个招呼") {
-        if content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { content = "你好" }
+      Button(String(localized: "打个招呼")) {
+        if content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+          content = String(localized: "你好")
+        }
         focusComposer()
       }.buttonStyle(.bordered)
     }.frame(maxWidth: .infinity).padding(.vertical, EchoSpacing.xxl)
@@ -313,75 +343,39 @@ struct ChatView: View {
   @ViewBuilder private func messageRow(_ message: Record, continuing: Bool, width: CGFloat)
     -> some View
   {
-    let isUser = message["role"].string == "user"
-    let status = message["status"].string
-    HStack(alignment: .top, spacing: EchoSpacing.sm) {
-      if isUser {
-        Spacer(minLength: EchoSpacing.xl)
-      } else {
-        EchoAvatar(name: actorName(message), id: message["actor_id"].string, size: 30)
-          .opacity(continuing ? 0 : 1).accessibilityHidden(true)
+    let item = ChatMessage(record: message)
+    VStack(alignment: .leading, spacing: EchoSpacing.xxs) {
+      MessageBubble(message: item, continuing: continuing, isGroup: isGroup, width: width) {
+        restoreQuestion(message)
       }
-      VStack(alignment: isUser ? .trailing : .leading, spacing: EchoSpacing.xxs) {
-        if isGroup && !isUser && !continuing {
-          Text(actorName(message)).font(.footnote.weight(.semibold)).foregroundStyle(
-            Color.echo.identity(for: message["actor_id"].string))
-        }
-        if !message["content"].string.isEmpty {
-          Text(
-            isUser
-              ? AttributedString(message["content"].string)
-              : chatMarkdown(message["content"].string)
-          )
-          .font(.body).lineSpacing(EchoMetric.lineSpacing).textSelection(.enabled)
-          .foregroundStyle(isUser ? Color.echo.onPrimary : Color.echo.textPrimary)
-          .padding(.horizontal, isUser ? EchoSpacing.md : 0)
-          .padding(.vertical, isUser ? EchoSpacing.xs : 0)
-          .background {
-            if isUser {
-              UnevenRoundedRectangle(
-                topLeadingRadius: EchoRadius.bubble, bottomLeadingRadius: EchoRadius.bubble,
-                bottomTrailingRadius: EchoRadius.xs,
-                topTrailingRadius: continuing ? EchoRadius.xs : EchoRadius.bubble
-              )
-              .fill(Color.echo.primary)
-            }
-          }
-          .frame(
-            maxWidth: isUser ? width * 0.78 : .infinity, alignment: isUser ? .trailing : .leading)
-        }
-        if status == "failed" || status == "interrupted" {
-          Label(
-            isUser ? "回应未完成，消息已保留" : "TA 好像走神了 · 这条回复未完成", systemImage: "exclamationmark.circle"
-          )
-          .font(.caption).foregroundStyle(Color.echo.error)
-          if !isUser {
-            Button("重新编辑这条提问") { restoreQuestion(message) }.font(.footnote).buttonStyle(.borderless)
-          }
-        } else if status == "invalidated" {
-          Text("已被新的回应替代").font(.caption).foregroundStyle(Color.echo.textSecondary)
-        } else if status == "cancelled" {
-          Text("本次回应已停止").font(.caption).foregroundStyle(Color.echo.textSecondary)
-        }
+      if message["context_stale"].bool {
+        Text(String(localized: "来自修改前的上下文")).font(EchoFont.caption)
+          .foregroundStyle(Color.echo.warning).padding(.horizontal, EchoSpacing.sm)
+          .accessibilityLabel(String(localized: "这条消息来自修改前的上下文"))
       }
-      if !isUser { Spacer(minLength: EchoSpacing.md) }
     }
-    .opacity(status == "invalidated" ? 0.55 : 1)
     .contextMenu {
-      Button("复制", systemImage: "doc.on.doc") { copy(message["content"].string) }
-      Button("引用回复", systemImage: "arrowshape.turn.up.left") {
+      Button(String(localized: "复制"), systemImage: "doc.on.doc") { copy(message["content"].string) }
+      if ["completed", "interrupted", "failed", "cancelled"].contains(message["status"].string) {
+        Button(String(localized: "编辑与历史版本"), systemImage: "clock.arrow.circlepath") {
+          historyTarget = message
+        }
+      }
+      Button(String(localized: "引用回复"), systemImage: "arrowshape.turn.up.left") {
         content = "> \(actorName(message))：\(message["content"].string)\n\n" + content
         focusComposer()
       }
-      if !isUser && status == "completed" {
-        Button("换一种回答", systemImage: "arrow.clockwise") { regenerateRun = message["run_id"].string }
+      if item.canRegenerate {
+        Button(String(localized: "换一种回答"), systemImage: "arrow.clockwise") {
+          regenerateRun = message["run_id"].string
+        }
       }
       if let date = ChatPresentation.date(message) {
         Text(date.formatted(date: .abbreviated, time: .shortened))
       }
     }
     .accessibilityElement(children: .contain)
-    .accessibilityLabel(isUser ? "你" : actorName(message))
+    .accessibilityLabel(item.displayName)
     .accessibilityIdentifier("message-" + message.id)
   }
 
@@ -401,18 +395,21 @@ struct ChatView: View {
           Button {
             Task { await model.retry(command) }
           } label: {
-            Label("没发出去 · 轻点重试", systemImage: "exclamationmark.circle.fill")
+            Label(String(localized: "没发出去 · 轻点重试"), systemImage: "exclamationmark.circle.fill")
           }.buttonStyle(.plain).font(.caption).foregroundStyle(Color.echo.error)
-          Text(command.failure.contains("（") ? "请检查消息内容与聊天设置后重试。" : command.failure).font(.caption)
+          Text(
+            command.failure.contains("（") ? String(localized: "请检查消息内容与聊天设置后重试。") : command.failure
+          ).font(.caption)
             .foregroundStyle(Color.echo.textSecondary)
         } else {
           TimelineView(.periodic(from: .now, by: 1)) { context in
             Text(
               command.state == "accepted"
-                ? "已送达 · 正在同步…"
+                ? String(localized: "已送达 · 正在同步…")
                 : !model.ready
-                  ? "已存到本机 · 联网后发送"
-                  : context.date.timeIntervalSince(command.createdAt) > 10 ? "网络有点慢，还在发" : "发送中…"
+                  ? String(localized: "已存到本机 · 联网后发送")
+                  : context.date.timeIntervalSince(command.createdAt) > 10
+                    ? String(localized: "网络有点慢，还在发") : String(localized: "发送中…")
             )
             .font(.caption).foregroundStyle(Color.echo.textSecondary)
           }
@@ -420,14 +417,14 @@ struct ChatView: View {
       }.frame(maxWidth: width * 0.78, alignment: .trailing)
     }
     .contextMenu {
-      Button("复制", systemImage: "doc.on.doc") { copy(command.content) }
+      Button(String(localized: "复制"), systemImage: "doc.on.doc") { copy(command.content) }
       if command.state == "failed" {
-        Button("重新编辑", systemImage: "pencil") {
+        Button(String(localized: "重新编辑"), systemImage: "pencil") {
           editDraft(command.content, command: command)
         }
       }
       if command.state != "accepted" {
-        Button("移除本机待发送内容", role: .destructive) { model.discard(command) }
+        Button(String(localized: "移除本机待发送内容"), role: .destructive) { model.discard(command) }
       }
     }
   }
@@ -436,7 +433,7 @@ struct ChatView: View {
     VStack(alignment: .leading, spacing: EchoSpacing.xs) {
       if isGroup {
         Menu {
-          Button("自动 · 按参与规则") { addressed = [] }
+          Button(String(localized: "自动 · 按参与规则")) { addressed = [] }
           ForEach(members) { actor in
             Toggle(
               actor.name,
@@ -447,33 +444,42 @@ struct ChatView: View {
                 }))
           }
         } label: {
-          Label(addressed.isEmpty ? "谁来回应 · 自动" : "已点名 \(addressed.count) 位", systemImage: "at")
-            .font(.footnote).padding(.horizontal, EchoSpacing.sm).padding(
-              .vertical, EchoSpacing.xxs
-            )
-            .background(Color.echo.primarySoft, in: Capsule())
+          Label(
+            addressed.isEmpty
+              ? String(localized: "谁来回应 · 自动") : String(localized: "已点名 \(addressed.count) 位"),
+            systemImage: "at"
+          )
+          .font(.footnote).padding(.horizontal, EchoSpacing.sm).padding(
+            .vertical, EchoSpacing.xxs
+          )
+          .background(Color.echo.primarySoft, in: Capsule())
         }.menuStyle(.borderlessButton).fixedSize(horizontal: true, vertical: false)
-          .help("选择回应者，每轮最多 \(room["max_replies"].int) 位")
+          .help(String(localized: "选择回应者，每轮最多 \(room["max_replies"].int) 位"))
       }
       if !model.ready {
-        Text("离线 · 消息先存到本机，联网后发送").font(.caption).foregroundStyle(Color.echo.textSecondary)
+        Text(String(localized: "离线 · 消息先存到本机，联网后发送")).font(.caption).foregroundStyle(
+          Color.echo.textSecondary)
       }
       HStack(alignment: .bottom, spacing: EchoSpacing.xs) {
         #if os(macOS)
           MacChatInput(
             text: $content, height: $macInputHeight,
-            placeholder: isGroup ? "想和大家说点什么…" : "想对\(title)说点什么…",
+            placeholder: isGroup
+              ? String(localized: "想和大家说点什么…") : String(localized: "想对\(title)说点什么…"),
             focusRequest: focusRequest, onSend: send
           )
           .frame(height: macInputHeight)
         #else
           TextField(
             "", text: $content,
-            prompt: Text(isGroup ? "想和大家说点什么…" : "想对\(title)说点什么…").foregroundStyle(
+            prompt: Text(
+              isGroup ? String(localized: "想和大家说点什么…") : String(localized: "想对\(title)说点什么…")
+            ).foregroundStyle(
               Color.echo.textSecondary), axis: .vertical
           )
           .lineLimit(1...6).textFieldStyle(.plain).font(.body).padding(.vertical, EchoSpacing.xs)
-          .focused($composerFocused).accessibilityIdentifier("chat-input").accessibilityLabel("消息")
+          .focused($composerFocused).accessibilityIdentifier("chat-input").accessibilityLabel(
+            String(localized: "消息"))
         #endif
         Button(action: send) {
           Image(systemName: "arrow.up").font(.headline).dynamicTypeSize(.large)
@@ -489,7 +495,9 @@ struct ChatView: View {
             .contentShape(Rectangle())
         }.buttonStyle(.plain).disabled(!ChatPresentation.canSend(content))
           .keyboardShortcut(.return, modifiers: .command)
-          .accessibilityLabel("发送").accessibilityIdentifier("send-message").help("发送消息")
+          .accessibilityLabel(String(localized: "发送")).accessibilityIdentifier("send-message").help(
+            String(localized: "发送消息")
+          )
           .padding(.bottom, EchoSpacing.xxs)
       }
       .padding(.leading, EchoSpacing.md).padding(.trailing, EchoSpacing.xxs)
@@ -504,7 +512,7 @@ struct ChatView: View {
       if inputLength >= ChatPresentation.messageLimit - 1_000 {
         Text(
           inputLength > ChatPresentation.messageLimit
-            ? "超出 \(inputLength - ChatPresentation.messageLimit) 字，删减后可发送"
+            ? String(localized: "超出 \(inputLength - ChatPresentation.messageLimit) 字，删减后可发送")
             : "\(inputLength.formatted()) / \(ChatPresentation.messageLimit.formatted())"
         )
         .font(.caption).foregroundStyle(
@@ -561,8 +569,8 @@ struct ChatView: View {
     focusComposer()
   }
   private func actorName(_ message: Record) -> String {
-    if message["role"].string == "user" { return "你" }
-    return message["actor_name"].string.isEmpty ? "角色" : message["actor_name"].string
+    if message["role"].string == "user" { return String(localized: "你") }
+    return ChatMessage(record: message).displayName
   }
   private func scrollToBottom() {
     followingSource = false
@@ -581,8 +589,8 @@ struct ChatView: View {
   }
   private func timestampLabel(_ date: Date) -> String {
     let time = date.formatted(date: .omitted, time: .shortened)
-    if Calendar.current.isDateInToday(date) { return "今天 \(time)" }
-    if Calendar.current.isDateInYesterday(date) { return "昨天 \(time)" }
+    if Calendar.current.isDateInToday(date) { return String(localized: "今天 \(time)") }
+    if Calendar.current.isDateInYesterday(date) { return String(localized: "昨天 \(time)") }
     return date.formatted(date: .abbreviated, time: .shortened)
   }
   private func copy(_ value: String) {
@@ -601,8 +609,16 @@ private struct ChatScrollSize: Equatable {
   let nearBottom: Bool
 }
 
-private struct TypingDots: View {
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+struct TypingDots: View {
+  @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+  private var reduceMotion: Bool {
+    #if DEBUG
+      systemReduceMotion
+        || ProcessInfo.processInfo.environment["ECHO2_UI_TEST_REDUCE_MOTION"] == "1"
+    #else
+      systemReduceMotion
+    #endif
+  }
   var body: some View {
     TimelineView(.animation(minimumInterval: 0.15, paused: reduceMotion)) { timeline in
       HStack(spacing: EchoSpacing.xxs) {
@@ -623,8 +639,10 @@ private struct TypingDots: View {
 
 func statusName(_ value: String) -> String {
   [
-    "accepted": "已接收", "streaming": "正在输入", "completed": "已完成", "failed": "回复未完成",
-    "cancelled": "已停止", "interrupted": "回复未完成", "invalidated": "已被新的回应替代",
+    "accepted": String(localized: "已接收"), "streaming": String(localized: "正在输入"),
+    "completed": String(localized: "已完成"), "failed": String(localized: "回复未完成"),
+    "cancelled": String(localized: "已停止"), "interrupted": String(localized: "回复未完成"),
+    "invalidated": String(localized: "已被新的回应替代"),
   ][value] ?? value
 }
 func safeMarkdown(_ text: String) -> AttributedString {
@@ -639,7 +657,7 @@ func safeMarkdown(_ text: String) -> AttributedString {
   }
   return result
 }
-private func chatMarkdown(_ text: String) -> AttributedString {
+func chatMarkdown(_ text: String) -> AttributedString {
   var result = safeMarkdown(text)
   // Emphasis represents quiet stage directions, not a second typographic hierarchy.
   for run in result.runs {

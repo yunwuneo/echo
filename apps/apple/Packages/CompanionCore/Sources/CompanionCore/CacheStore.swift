@@ -104,13 +104,17 @@ import SwiftData
         "runs": "run", "memories": "memory", "memory_settings": "memory_settings",
         "autonomy_settings": "autonomy_settings", "autonomy_policies": "autonomy_policy",
         "mcp_connections": "mcp_connection", "tool_grants": "tool_grant", "tool_calls": "tool_call",
+        "assets": "asset", "model_routes": "model_route",
+        "queued_inputs": "queued_input",
       ]
       for (key, kind) in mapping {
         for value in snapshot[key].array {
           let record = Record(kind: kind, value: value)
           // This namespace was cleared above. Avoid one lookup per record on a full rebuild.
-          context.insert(CachedEntity(namespace: namespace, kind: kind, id: record.id,
-            payload: try JSONEncoder().encode(value)))
+          context.insert(
+            CachedEntity(
+              namespace: namespace, kind: kind, id: record.id,
+              payload: try JSONEncoder().encode(value)))
         }
       }
       try saveCursor(namespace: namespace, cursor: snapshot["high_water_cursor"].string)
