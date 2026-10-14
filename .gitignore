@@ -9,5 +9,14 @@ dist/
 DerivedData/
 *.xcuserstate
 xcuserdata/
+# Apple build/test outputs when emitted outside .local/ or DerivedData/.
+/apps/apple/build/
+*.xcresult/
+*.xcarchive/
+*.dSYM/
+*.xcactivitylog
+*.xctestrun
+*.stringsdata
+*.ipa
 .local/
 coverage/

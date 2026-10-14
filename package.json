@@ -27,7 +27,9 @@
     "pairing:create": "node --import tsx packages/server/src/cli.ts pair",
     "p1:seed": "node --import tsx packages/server/src/cli.ts seed",
     "eval:models": "node --import tsx scripts/story-eval.ts",
-    "release:prepare": "node scripts/release.mjs"
+    "release:prepare": "node scripts/release.mjs",
+    "lint:apple-ui": "bash scripts/lint-apple-ui.sh",
+    "host": "node --import tsx scripts/host.ts"
   },
   "devDependencies": {
     "@types/node": "24.10.1",

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 // Host-side Compose operator. All child processes use argument arrays; secrets
 // remain in the private env file and never appear in command arguments or output.
+import { localSpace, databaseSpace } from './storage-preflight.mjs';
 import { spawn } from 'node:child_process';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { mkdir, readFile, writeFile, rename, stat, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { resolve, join } from 'node:path';
+import { resolve, join, dirname } from 'node:path';
 const [command, envFile, project, directory, ledgerFile] =
   process.argv.slice(2);
 if (
@@ -128,6 +129,21 @@ try {
     await cli(['privacy-export'], { output: directory });
     process.stdout.write('privacy_ledger_saved\n');
   } else if (command === 'backup') {
+    const databaseBytes = Number(
+      await run([
+        'exec',
+        '-T',
+        'database',
+        'psql',
+        '-U',
+        'echo2',
+        '-d',
+        'echo2',
+        '-Atc',
+        'SELECT pg_database_size(current_database())',
+      ]),
+    );
+    await localSpace(dirname(resolve(directory)), databaseBytes);
     await mkdir(directory, { mode: 0o700 });
     await run(['stop', 'proxy', 'api', 'worker']);
     await cli(['maintenance', 'on']);
@@ -162,6 +178,7 @@ try {
         bytes: (await stat(join(directory, name))).size,
       };
     const manifest = {
+      required_database_bytes: databaseBytes,
       format: 'echo-backup',
       format_version: 1,
       created_at: new Date().toISOString(),
@@ -186,6 +203,20 @@ try {
   } else {
     const m = await verify(directory);
     await run(['up', '-d', '--wait', 'database']);
+    const requiredBytes =
+      m.required_database_bytes ?? m.files['database.dump'].bytes * 4;
+    await localSpace(resolve(directory), requiredBytes);
+    databaseSpace(
+      await run([
+        'exec',
+        '-T',
+        'database',
+        'df',
+        '-Pk',
+        '/var/lib/postgresql/data',
+      ]),
+      requiredBytes,
+    );
     const existing = await run([
       'exec',
       '-T',

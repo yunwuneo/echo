@@ -43,8 +43,12 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
+      - run: command -v rg >/dev/null || brew install ripgrep
+      - run: bash scripts/lint-apple-ui.sh
+      - run: python3 scripts/check-apple-bundle.py
       - run: swift test --package-path apps/apple/Packages/CompanionCore
       - run: xcodebuild -project apps/apple/Companion.xcodeproj -scheme Companion-iOS -destination 'generic/platform=iOS Simulator' -derivedDataPath .local/ios CODE_SIGNING_ALLOWED=NO -skipPackagePluginValidation build
+      - run: python3 scripts/check-apple-bundle.py .local/ios/Build/Products/Debug-iphonesimulator/Echo.app
       - run: xcodebuild -project apps/apple/Companion.xcodeproj -scheme Companion-macOS -destination 'platform=macOS' -derivedDataPath .local/macos CODE_SIGNING_ALLOWED=NO -skipPackagePluginValidation build
 
   images:
